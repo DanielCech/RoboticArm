@@ -24,10 +24,6 @@ void setup() {
 
   lcd.begin(12, 13);// initialize the lcd with SDA and SCL pins
   lcd.backlight();
-//  lcd.setCursor(0,0);
-//  lcd.print("Tucnak Buclik");
-//  lcd.setCursor(0,1);
-//  lcd.print("tlaci vajcko");
 }
 
 

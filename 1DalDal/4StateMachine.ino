@@ -18,7 +18,6 @@
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
-int previousState = -1;
 int currentState = ST_INITIAL;
 int selectedMenuItem = 0;
 int menuOffset = 0;
@@ -42,86 +41,102 @@ void displayStrings(String text1, String text2, LiquidCrystal_I2C& lcd) {
 void processState() {
 
   switch (currentState) {
-  case ST_INITIAL:
-    if (refreshDisplay) {
-      displayStrings("RoboticArm 0.1", "JM-DC-01", lcd);
-      refreshDisplay = false;
-    }
-   
-    if (firstEncoder.buttonPressed) {
-      currentState = ST_MAIN_MENU;
-      refreshDisplay = true;
-      Serial.println("Button Pressed");
-      delay(200);
-      return;
-    }
     
-    break;
-
-  case ST_MAIN_MENU:
-
-    if (firstEncoder.buttonPressed) {
-      switch (selectedMenuItem) {
-        case MENU_PLAY_PROGRAM:
-
-        case MENU_CREATE_PROGRAM:
-          break;
-
-        case MENU_MANUAL_MODE:
-          break;
-
-        case MENU_WIFI_MODE:
-          currentState = ST_WIFI_MODE;
-          refreshDisplay = true;
-          delay(200);
-          return;
-
-        case MENU_DEMO:
-          break;
+  case ST_INITIAL: {
+      Serial.println("Initial state");
+    
+      if (refreshDisplay) {
+        displayStrings("RoboticArm 0.1", "JM-DC-01", lcd);
+        refreshDisplay = false;
       }
+     
+      if (firstEncoder.buttonPressed) {
+        currentState = ST_MAIN_MENU;
+        refreshDisplay = true;
+        Serial.println("Button Pressed");
+        delay(200);
+        return;
+      }
+      
+      return;
     }
 
-    if (secondEncoder.buttonPressed) {
-      currentState = ST_INITIAL;
-      refreshDisplay = true;
+  case ST_MAIN_MENU: {
+
+      Serial.println("Main menu");
+
+      if (firstEncoder.buttonPressed) {
+        switch (selectedMenuItem) {
+          case MENU_PLAY_PROGRAM:
+  
+          case MENU_CREATE_PROGRAM:
+            break;
+  
+          case MENU_MANUAL_MODE:
+            break;
+  
+          case MENU_WIFI_MODE:
+            currentState = ST_WIFI_MODE;
+            refreshDisplay = true;
+            delay(200);
+            return;
+  
+          case MENU_DEMO:
+            break;
+        }
+      }
+  
+      if (secondEncoder.buttonPressed) {
+        currentState = ST_INITIAL;
+        refreshDisplay = true;
+        return;
+      }
+      
+      if (refreshDisplay) {
+        String first = ((selectedMenuItem == menuOffset) ? "> ": "  ") + menuItems[menuOffset];
+        String second = ((selectedMenuItem == menuOffset + 1) ? "> ": "  ") + menuItems[menuOffset + 1];
+        displayStrings(first, second, lcd);
+        refreshDisplay = false;
+      }
+  
+      if (firstEncoder.direction < 0) {
+        selectedMenuItem = MAX(selectedMenuItem - 1, 0);
+        refreshDisplay = true;
+      }
+      if (firstEncoder.direction > 0) {
+        selectedMenuItem = MIN(selectedMenuItem + 1, 4);
+        refreshDisplay = true;
+      }
+  
+      if (selectedMenuItem > menuOffset + 1) {
+        menuOffset = selectedMenuItem - 1;
+        refreshDisplay = true;
+      }
+      else if (selectedMenuItem < menuOffset) {
+        menuOffset = selectedMenuItem;
+        refreshDisplay = true;
+      }
+  
+      return;
+    }
+
+  case ST_PLAY_PROGRAM: {
+      Serial.println("Play program");
       return;
     }
     
-    if (refreshDisplay) {
-      String first = ((selectedMenuItem == menuOffset) ? "> ": "  ") + menuItems[menuOffset];
-      String second = ((selectedMenuItem == menuOffset + 1) ? "> ": "  ") + menuItems[menuOffset + 1];
-      displayStrings(first, second, lcd);
-      refreshDisplay = false;
+  case ST_CREATE_PROGRAM: {
+      Serial.println("Create program");
+      return;
     }
-
-    if (firstEncoder.direction < 0) {
-      selectedMenuItem = MAX(selectedMenuItem - 1, 0);
-      refreshDisplay = true;
-    }
-    if (firstEncoder.direction > 0) {
-      selectedMenuItem = MIN(selectedMenuItem + 1, 4);
-      refreshDisplay = true;
-    }
-
-    if (selectedMenuItem > menuOffset + 1) {
-      menuOffset = selectedMenuItem - 1;
-      refreshDisplay = true;
-    }
-    else if (selectedMenuItem < menuOffset) {
-      menuOffset = selectedMenuItem;
-      refreshDisplay = true;
-    }
-
-    break;
     
-    
-  case ST_CREATE_PROGRAM:
-    break;
-    
-  case ST_MANUAL_MODE:
-    break;
+  case ST_MANUAL_MODE: {
+      Serial.println("Manual mode");
+      return;
+    }
     
   case ST_WIFI_MODE: {
+      Serial.println("Wifi mode");
       String line = wifiMode ? " [On]     Off" : "  On     [Off]";
     
       if (refreshDisplay) {
@@ -161,34 +176,35 @@ void processState() {
     }
 
   case ST_WIFI_ACTIVE: {
-
-    if (refreshDisplay) {
-        webServer.connectToWifi();
-        server.begin();
-
-//        char *address[30];
-//        sprintf(address, WiFi.localIP());
-
-        IPAddress address = WiFi.localIP();
-
-        displayStrings("Wifi Mode Active", address.toString(), lcd);
-        refreshDisplay = false;
-     }
-
-    // Return to main menu
-    if (firstEncoder.buttonPressed || secondEncoder.buttonPressed) {
-        currentState = ST_MAIN_MENU;
-        refreshDisplay = true;
-        delay(200);
-        return;
+      Serial.println("Wifi Active");
+  
+      if (refreshDisplay) {
+          displayStrings("Wifi: active", "...", lcd);
+          webServer.connectToWifi();
+          server.begin();
+  
+          IPAddress address = WiFi.localIP();
+  
+          displayStrings("Wifi: active", address.toString(), lcd);
+          refreshDisplay = false;
+       }
+  
+      // Return to main menu
+      if (firstEncoder.buttonPressed || secondEncoder.buttonPressed) {
+          currentState = ST_MAIN_MENU;
+          refreshDisplay = true;
+          delay(200);
+          return;
+      }
+  
+      return;
     }
-  }
     
     
-    
-  case ST_DEMO:
-    break;
-
+  case ST_DEMO: {
+      Serial.println("Demo");
+      return;
+    }
     
   }    
 }
