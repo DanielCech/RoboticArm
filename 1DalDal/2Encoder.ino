@@ -21,10 +21,10 @@ public:
     dtState = digitalRead(dt);
     buttonState = digitalRead(sw);
 
-    if (buttonState && !buttonPreviousState) {
+    buttonPressed = buttonState && !buttonPreviousState;
+    if (buttonPressed) {
       Serial.printf("Encoder %d: button", encoderIndex);
       Serial.println("");
-      buttonPressed = true;
     }
 
     if (clkState < clkPreviousState) {

@@ -5,8 +5,14 @@
 #define ST_CREATE_PROGRAM   20
 #define ST_MANUAL_MODE      30
 #define ST_WIFI_MODE        40
-#define ST_BLUETOOTH_MODE   50
-#define ST_DEMO             60
+#define ST_DEMO             50
+
+#define MENU_PLAY_PROGRAM   0
+#define MENU_CREATE_PROGRAM 1
+#define MENU_MANUAL_MODE    2
+#define MENU_WIFI_MODE      3
+#define MENU_DEMO           4
+
 
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
@@ -17,11 +23,16 @@ public:
   int previousState = -1;
   int currentState = ST_INITIAL;
   int selectedMenuItem = 0;
-  int previousSelectedMenuItem = -1;
+//  int previousSelectedMenuItem = -1;
   int menuOffset = 0;
-  int previousMenuOffset = -1;
+//  int previousMenuOffset = -1;
 
-  String menuItems[6] = {"Play Program", "Create Program", "Manual Mode", "WiFi Mode", "Bluetooth Mode", "Demo"};
+  bool refreshDisplay = true;
+
+  bool wifiMode = false;
+  bool bluetoothMode = false;
+  
+  String menuItems[6] = {"Play Program", "Create Program", "Manual Mode", "WiFi Mode", "Demo"};
 
   void displayStrings(String text1, String text2, LiquidCrystal_I2C& lcd) {
 //    Serial.println(text1 + " : " + text2);
@@ -36,48 +47,73 @@ public:
 
     switch (currentState) {
     case ST_INITIAL:
-      if (currentState != previousState) {
+      if (refreshDisplay) {
         displayStrings("RoboticArm 0.1", "JM-DC-01", lcd);
-        previousState = currentState;
+        refreshDisplay = false;
       }
      
       if (encoder1.buttonPressed) {
-        previousState = currentState;
         currentState = ST_MAIN_MENU;
+        refreshDisplay = true;
         Serial.println("Button Pressed");
+        delay(200);
         return;
-      
       }
+      
       break;
 
     case ST_MAIN_MENU:
-//      Serial.printf("selectedMenuItem %d menuOffset %d", selectedMenuItem, menuOffset);
-//      Serial.println("");
+
+      if (encoder1.buttonPressed) {
+        switch (selectedMenuItem) {
+          case MENU_PLAY_PROGRAM:
+
+          case MENU_CREATE_PROGRAM:
+            break;
+
+          case MENU_MANUAL_MODE:
+            break;
+
+          case MENU_WIFI_MODE:
+            currentState = ST_WIFI_MODE;
+            refreshDisplay = true;
+            delay(200);
+            return;
+
+          case MENU_DEMO:
+            break;
+        }
+      }
+
+      if (encoder2.buttonPressed) {
+        currentState = ST_INITIAL;
+        refreshDisplay = true;
+        return;
+      }
       
-      if ((selectedMenuItem != previousSelectedMenuItem) || (menuOffset != previousMenuOffset)) {
+      if (refreshDisplay) {
         String first = ((selectedMenuItem == menuOffset) ? "> ": "  ") + menuItems[menuOffset];
         String second = ((selectedMenuItem == menuOffset + 1) ? "> ": "  ") + menuItems[menuOffset + 1];
         displayStrings(first, second, lcd);
-        previousSelectedMenuItem = selectedMenuItem;
-        previousMenuOffset = menuOffset;
+        refreshDisplay = false;
       }
 
       if (encoder1.direction < 0) {
-        previousSelectedMenuItem = selectedMenuItem;
         selectedMenuItem = MAX(selectedMenuItem - 1, 0);
+        refreshDisplay = true;
       }
       if (encoder1.direction > 0) {
-        previousSelectedMenuItem = selectedMenuItem;
         selectedMenuItem = MIN(selectedMenuItem + 1, 5);
+        refreshDisplay = true;
       }
 
       if (selectedMenuItem > menuOffset + 1) {
-        previousMenuOffset = menuOffset;
         menuOffset = selectedMenuItem - 1;
+        refreshDisplay = true;
       }
       else if (selectedMenuItem < menuOffset) {
-        previousMenuOffset = menuOffset;
         menuOffset = selectedMenuItem;
+        refreshDisplay = true;
       }
 
       break;
@@ -89,11 +125,28 @@ public:
     case ST_MANUAL_MODE:
       break;
       
-    case ST_WIFI_MODE:
-      break;
+    case ST_WIFI_MODE: {
+        String line = wifiMode ? " [On]     Off" : "  On     [Off]";
       
-    case ST_BLUETOOTH_MODE:
-      break;
+        if (refreshDisplay) {
+          displayStrings("Wifi Mode", line, lcd);
+          refreshDisplay = false;
+        }
+  
+        // Return to main menu
+        if (encoder2.buttonPressed) {
+          currentState = ST_MAIN_MENU;
+          refreshDisplay = true;
+          return;
+        }
+  
+        if (encoder1.direction != 0) {
+          wifiMode = !wifiMode;
+          refreshDisplay = true;
+        }
+        
+        break;
+      }
       
     case ST_DEMO:
       break;
