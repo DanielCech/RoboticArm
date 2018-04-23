@@ -48,3 +48,11 @@ public:
   }  
 };
 
+////////////////////////////////////////////////////////////////////////
+// Rotary Encoders
+
+Encoder firstEncoder = Encoder(1);
+Encoder secondEncoder = Encoder(2);
+Encoder thirdEncoder = Encoder(3);
+Encoder fourthEncoder = Encoder(4);
+

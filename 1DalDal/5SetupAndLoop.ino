@@ -1,25 +1,6 @@
-////////////////////////////////////////////////////////////////////////
-// Wifi Setup
-
-WebServer webServer = WebServer();
 
 ////////////////////////////////////////////////////////////////////////
-// Rotary Encoders
-
-Encoder firstEncoder = Encoder(1);
-Encoder secondEncoder = Encoder(2);
-Encoder thirdEncoder = Encoder(3);
-Encoder fourthEncoder = Encoder(4);
-
-////////////////////////////////////////////////////////////////////////
-// LCD Display
-
-LiquidCrystal_I2C lcd(0x27,16,2);//set the LCD address to 0x27 for a 16 chars and 2 line display
-
-////////////////////////////////////////////////////////////////////////
-// States
-
-StateMachine stateMachine = StateMachine();
+// Main
 
 void setup() {
   // put your setup code here, to run once:
@@ -47,9 +28,6 @@ void setup() {
 //  lcd.print("Tucnak Buclik");
 //  lcd.setCursor(0,1);
 //  lcd.print("tlaci vajcko");
-
-  webServer.connectToWifi();
-  server.begin();
 }
 
 
@@ -63,6 +41,9 @@ void loop() {
   thirdEncoder.readEncoder(ENCODER_3_CLK, ENCODER_3_DT, ENCODER_3_SW);
   fourthEncoder.readEncoder(ENCODER_4_CLK, ENCODER_4_DT, ENCODER_4_SW);
 
-  webServer.processClients(server);
-  stateMachine.processState(firstEncoder, secondEncoder, thirdEncoder, fourthEncoder, lcd);
+  if (wifiMode) {
+    webServer.processClients(server);  
+  }
+  
+  processState();
 }
