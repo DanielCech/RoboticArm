@@ -32,6 +32,7 @@ int currentX = 0;
 int currentY = 0;
 int currentZ = 0;
 int currentAngle = 0;
+bool currentlyPumpEnabled = false;
 
 String menuItems[6] = {"Play Program", "Create Program", "Manual Mode", "WiFi Mode", "Demo"};
 
@@ -73,7 +74,10 @@ void mainMenu() {
         break;
 
       case MENU_MANUAL_MODE:
-        break;
+        currentState = ST_MANUAL_MODE;
+        refreshDisplay = true;
+        delay(200);
+        return;
 
       case MENU_WIFI_MODE:
         currentState = ST_WIFI_MODE;
@@ -128,6 +132,79 @@ void createProgram() {
 
 void manualMode() {
   Serial.println("Manual mode");
+
+  if (refreshDisplay) {
+
+    char firstLine[20];
+    sprintf(firstLine, "Angle:%3d Pump:%s", currentAngle, currentlyPumpEnabled ? "1" : "0");
+
+    char secondLine[20];
+    sprintf(secondLine, "X%-3d Y%-3d Z%-3d", currentX, currentY, currentZ);
+
+    displayStrings(String(firstLine), String(secondLine), lcd);
+    refreshDisplay = false;
+  }
+
+  if (firstEncoder.direction < 0) {
+    currentX = MAX(currentX - 1, 0);
+    refreshDisplay = true;
+    return;
+  }
+  if (firstEncoder.direction > 0) {
+    currentX = MIN(currentX + 1, 999);
+    refreshDisplay = true;
+    return;
+  }
+
+  if (secondEncoder.direction < 0) {
+    currentY = MAX(currentY - 1, 0);
+    refreshDisplay = true;
+    return;
+  }
+  if (secondEncoder.direction > 0) {
+    currentY = MIN(currentY + 1, 999);
+    refreshDisplay = true;
+    return;
+  }
+
+  if (thirdEncoder.direction < 0) {
+    currentZ = MAX(currentZ - 1, 0);
+    refreshDisplay = true;
+    return;
+  }
+  if (thirdEncoder.direction > 0) {
+    currentZ = MIN(currentZ + 1, 999);
+    refreshDisplay = true;
+    return;
+  }
+
+  if (fourthEncoder.direction < 0) {
+    currentAngle = MAX(currentAngle - 1, 0);
+    refreshDisplay = true;
+    return;
+  }
+  if (fourthEncoder.direction > 0) {
+    currentAngle = MIN(currentAngle + 1, 359);
+    refreshDisplay = true;
+    return;
+  }
+
+  // Return to main menu
+  if (secondEncoder.buttonPressed) {
+    currentState = ST_MAIN_MENU;
+    refreshDisplay = true;
+    delay(200);
+    return;
+  }
+
+  if (thirdEncoder.buttonPressed) {
+    currentlyPumpEnabled = !currentlyPumpEnabled;
+    refreshDisplay = true;
+    delay(200);
+    return;
+  }
+
+  
 }
 
 void wifiMode() {
