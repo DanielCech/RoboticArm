@@ -40,6 +40,10 @@ void loop() {
   if (wifiModeEnabled) {
     webServer.processClients(server);  
   }
+
+  if (bluetoothModeEnabled) {
+    processBluetoothLoop();
+  }
   
   processState();
 }

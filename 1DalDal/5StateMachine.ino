@@ -6,13 +6,15 @@
 #define ST_MANUAL_MODE      30
 #define ST_WIFI_MODE        40
 #define ST_WIFI_ACTIVE      45
-#define ST_DEMO             50
+#define ST_BLUETOOTH_MODE   50
+#define ST_DEMO             60
 
 #define MENU_PLAY_PROGRAM   0
 #define MENU_CREATE_PROGRAM 1
 #define MENU_MANUAL_MODE    2
 #define MENU_WIFI_MODE      3
-#define MENU_DEMO           4
+#define MENU_BLUETOOTH_MODE 4
+#define MENU_DEMO           5
 
 
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
@@ -26,7 +28,9 @@ bool refreshDisplay = true;
 
 bool wifiModeSelection = false;
 bool wifiModeEnabled = false;
-bool bluetoothMode = false;
+
+bool bluetoothModeSelection = false;
+bool bluetoothModeEnabled = false;
 
 int currentX = 0;
 int currentY = 0;
@@ -34,7 +38,7 @@ int currentZ = 0;
 int currentAngle = 0;
 bool currentlyPumpEnabled = false;
 
-String menuItems[6] = {"Play Program", "Create Program", "Manual Mode", "WiFi Mode", "Demo"};
+String menuItems[6] = {"Play Program", "Create Program", "Manual Mode", "WiFi Mode", "Bluetooth Mode", "Demo"};
 
 void displayStrings(String text1, String text2, LiquidCrystal_I2C& lcd) {
 
@@ -81,6 +85,12 @@ void mainMenu() {
 
       case MENU_WIFI_MODE:
         currentState = ST_WIFI_MODE;
+        refreshDisplay = true;
+        delay(200);
+        return;
+
+       case MENU_BLUETOOTH_MODE:
+        currentState = ST_BLUETOOTH_MODE;
         refreshDisplay = true;
         delay(200);
         return;
@@ -136,7 +146,7 @@ void manualMode() {
   if (refreshDisplay) {
 
     char firstLine[20];
-    sprintf(firstLine, "Angle:%3d Pump:%s", currentAngle, currentlyPumpEnabled ? "1" : "0");
+    sprintf(firstLine, "\xE0:%3d Pump:%s", currentAngle, currentlyPumpEnabled ? "1" : "0");
 
     char secondLine[20];
     sprintf(secondLine, "X%-3d Y%-3d Z%-3d", currentX, currentY, currentZ);
@@ -269,6 +279,43 @@ void wifiActive() {
     }
 }
 
+void bluetoothMode() {
+  Serial.println("Bluetooth mode");
+  String line = bluetoothModeSelection ? " [On]     Off" : "  On     [Off]";
+
+  if (refreshDisplay) {
+    displayStrings("Bluetooth Mode", line, lcd);
+    refreshDisplay = false;
+  }
+
+  // Return to main menu
+  if (secondEncoder.buttonPressed) {
+    currentState = ST_MAIN_MENU;
+    refreshDisplay = true;
+    delay(200);
+    return;
+  }
+
+  if (firstEncoder.buttonPressed) {
+    bluetoothModeEnabled = bluetoothModeSelection;
+
+    if (bluetoothModeEnabled) {
+      enableBluetooth();
+    }
+    currentState = ST_MAIN_MENU;
+    
+    refreshDisplay = true;
+    delay(200);
+    return;
+    
+  }
+
+  if (firstEncoder.direction != 0) {
+    bluetoothModeSelection = !bluetoothModeSelection;
+    refreshDisplay = true;
+  }
+}
+
 void demoMode() {
   Serial.println("Demo");
 }
@@ -311,7 +358,12 @@ void processState() {
       wifiActive();
       return;
     }
-    
+
+  case ST_BLUETOOTH_MODE: {
+      bluetoothMode();
+      return;
+    }
+      
     
   case ST_DEMO: {
       demoMode();

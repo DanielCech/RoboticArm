@@ -1,6 +1,11 @@
 #include <Wire.h> 
 #include <LiquidCrystal_I2C.h>
 #include <WiFi.h>
+#include <BLEDevice.h>
+#include <BLEServer.h>
+#include <BLEUtils.h>
+#include <BLE2902.h>
+#include <TaskScheduler.h>
 
 class Encoder;
 
