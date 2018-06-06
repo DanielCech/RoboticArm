@@ -39,9 +39,25 @@ void setup() {
 //  digitalWrite(LED4, HIGH);
 //  digitalWrite(LED5, HIGH);
 
-  ledcSetup(ledChannel, freq, resolution);
-  ledcAttachPin(LED1, ledChannel);
-  ledcWrite(ledChannel, 0);
+  ledcSetup(led1Channel, freq, resolution);
+  ledcAttachPin(LED1, led1Channel);
+  ledcWrite(led1Channel, 0);
+
+  ledcSetup(led2Channel, freq, resolution);
+  ledcAttachPin(LED2, led2Channel);
+  ledcWrite(led2Channel, 0);
+
+  ledcSetup(led3Channel, freq, resolution);
+  ledcAttachPin(LED3, led3Channel);
+  ledcWrite(led3Channel, 0);
+
+  ledcSetup(led4Channel, freq, resolution);
+  ledcAttachPin(LED4, led4Channel);
+  ledcWrite(led4Channel, 0);
+
+  ledcSetup(led5Channel, freq, resolution);
+  ledcAttachPin(LED5, led5Channel);
+  ledcWrite(led5Channel, 0);
 }
 
 
@@ -61,6 +77,8 @@ void loop() {
   
   processState();
 
-  dutyCycle = map(currentX, 0, 4095, 0, 255);
-  ledcWrite(ledChannel, dutyCycle);
+  ledcWrite(led1Channel, map(currentX, 0, 255, 0, 255));
+  ledcWrite(led2Channel, map(currentY, 0, 255, 0, 255));
+  ledcWrite(led3Channel, map(currentZ, 0, 255, 0, 255));
+  ledcWrite(led4Channel, map(currentAngle, 0, 255, 0, 255));
 }
