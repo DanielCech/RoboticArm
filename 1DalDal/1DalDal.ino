@@ -24,9 +24,9 @@ class Encoder;
 #define ENCODER_3_DT 18
 #define ENCODER_3_SW 14
 
-#define ENCODER_4_CLK 2
-#define ENCODER_4_DT 1//34
-#define ENCODER_4_SW 3//35
+#define ENCODER_4_CLK 34
+#define ENCODER_4_DT 2//34
+#define ENCODER_4_SW 35//35
 
 WiFiServer server(80);
 
