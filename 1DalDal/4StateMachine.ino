@@ -47,7 +47,7 @@ void displayStrings(String text1, String text2, LiquidCrystal_I2C& lcd) {
 
 void initialState() {
 
-  Serial.println("Initial state");
+  //Serial.println("Initial state");
 
   if (refreshDisplay) {
     displayStrings("RoboticArm 0.1", "JM-DC-01", lcd);
