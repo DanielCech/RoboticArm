@@ -55,9 +55,9 @@ void setup() {
   ledcAttachPin(LED4, led4Channel);
   ledcWrite(led4Channel, 0);
 
-  ledcSetup(led5Channel, freq, resolution);
-  ledcAttachPin(LED5, led5Channel);
-  ledcWrite(led5Channel, 0);
+//  ledcSetup(led5Channel, freq, resolution);
+//  ledcAttachPin(LED5, led5Channel);
+//  ledcWrite(led5Channel, 0);
 }
 
 
@@ -81,4 +81,10 @@ void loop() {
   ledcWrite(led2Channel, map(currentY, 0, 255, 0, 255));
   ledcWrite(led3Channel, map(currentZ, 0, 255, 0, 255));
   ledcWrite(led4Channel, map(currentAngle, 0, 255, 0, 255));
+
+  if (currentlyPumpEnabled != beforePumpEnabled) {
+    digitalWrite(LED5, currentlyPumpEnabled ? HIGH : LOW);
+    beforePumpEnabled = currentlyPumpEnabled;
+  }
+  
 }

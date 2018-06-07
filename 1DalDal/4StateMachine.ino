@@ -33,6 +33,7 @@ int currentY = 0;
 int currentZ = 0;
 int currentAngle = 0;
 bool currentlyPumpEnabled = false;
+bool beforePumpEnabled = false;
 
 String menuItems[6] = {"Play Program", "Create Program", "Manual Mode", "WiFi Mode", "Demo"};
 
@@ -50,7 +51,7 @@ void initialState() {
   //Serial.println("Initial state");
 
   if (refreshDisplay) {
-    displayStrings("RoboticArm 0.1", "JM-DC-01", lcd);
+    displayStrings("RoboticArm 0.2", "JDA-01", lcd);
     refreshDisplay = false;
   }
  
@@ -136,10 +137,10 @@ void manualMode() {
   if (refreshDisplay) {
 
     char firstLine[20];
-    sprintf(firstLine, "Angle:%3d Pump:%s", currentAngle, currentlyPumpEnabled ? "1" : "0");
+    sprintf(firstLine, "Angle:%-3d Pump:%s", currentAngle, currentlyPumpEnabled ? "1" : "0");
 
     char secondLine[20];
-    sprintf(secondLine, "X%-3d Y%-3d Z%-3d", currentX, currentY, currentZ);
+    sprintf(secondLine, "X:%-3d Y:%-3d Z:%-3d", currentX, currentY, currentZ);
 
     displayStrings(String(firstLine), String(secondLine), lcd);
     refreshDisplay = false;
