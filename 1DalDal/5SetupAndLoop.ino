@@ -20,7 +20,7 @@ void setup() {
 
   pinMode(ENCODER_4_CLK, INPUT);
   pinMode(ENCODER_4_DT, INPUT);
-  pinMode(ENCODER_4_SW, INPUT);
+  pinMode(ENCODER_4_SW, INPUT_PULLUP);
 
   lcd.begin(12, 13);// initialize the lcd with SDA and SCL pins
   lcd.backlight();

@@ -184,7 +184,13 @@ void manualMode() {
     return;
   }
   if (fourthEncoder.direction > 0) {
-    currentAngle = MIN(currentAngle + 1, 359);
+    if (encoder4normalDirection) {
+      currentAngle = MIN(currentAngle + 1, 359);  
+    }
+    else {
+      currentAngle = MAX(currentAngle - 1, 0);
+    }
+    
     refreshDisplay = true;
     return;
   }
@@ -204,6 +210,9 @@ void manualMode() {
     return;
   }
 
+  if (fourthEncoder.buttonPressed) {
+    encoder4normalDirection = !encoder4normalDirection;
+  }
   
 }
 
