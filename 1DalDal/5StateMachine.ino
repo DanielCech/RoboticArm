@@ -37,6 +37,7 @@ int currentY = 0;
 int currentZ = 0;
 int currentAngle = 0;
 bool currentlyPumpEnabled = false;
+bool beforePumpEnabled = false;
 
 String menuItems[6] = {"Play Program", "Create Program", "Manual Mode", "WiFi Mode", "Bluetooth Mode", "Demo"};
 
@@ -51,10 +52,10 @@ void displayStrings(String text1, String text2, LiquidCrystal_I2C& lcd) {
 
 void initialState() {
 
-  Serial.println("Initial state");
+  //Serial.println("Initial state");
 
   if (refreshDisplay) {
-    displayStrings("RoboticArm 0.1", "JM-DC-01", lcd);
+    displayStrings("RoboticArm 0.2", "JVDA-01", lcd);
     refreshDisplay = false;
   }
  
@@ -146,10 +147,10 @@ void manualMode() {
   if (refreshDisplay) {
 
     char firstLine[20];
-    sprintf(firstLine, "\xE0:%3d Pump:%s", currentAngle, currentlyPumpEnabled ? "1" : "0");
+    sprintf(firstLine, "Angle:%-3d Pump:%s", currentAngle, currentlyPumpEnabled ? "1" : "0");
 
     char secondLine[20];
-    sprintf(secondLine, "X%-3d Y%-3d Z%-3d", currentX, currentY, currentZ);
+    sprintf(secondLine, "X:%-3d Y:%-3d Z:%-3d", currentX, currentY, currentZ);
 
     displayStrings(String(firstLine), String(secondLine), lcd);
     refreshDisplay = false;
@@ -194,7 +195,13 @@ void manualMode() {
     return;
   }
   if (fourthEncoder.direction > 0) {
-    currentAngle = MIN(currentAngle + 1, 359);
+    if (encoder4normalDirection) {
+      currentAngle = MIN(currentAngle + 1, 359);  
+    }
+    else {
+      currentAngle = MAX(currentAngle - 1, 0);
+    }
+    
     refreshDisplay = true;
     return;
   }
@@ -214,6 +221,9 @@ void manualMode() {
     return;
   }
 
+  if (fourthEncoder.buttonPressed) {
+    encoder4normalDirection = !encoder4normalDirection;
+  }
   
 }
 
@@ -256,28 +266,28 @@ void wifiMode() {
   }
 }
 
-void wifiActive() {
-  Serial.println("Wifi Active");
-  
-    if (refreshDisplay) {
-        displayStrings("Wifi: active", "...", lcd);
-        webServer.connectToWifi();
-        server.begin();
-  
-        IPAddress address = WiFi.localIP();
-  
-        displayStrings("Wifi: active", address.toString(), lcd);
-        refreshDisplay = false;
-     }
-  
-    // Return to main menu
-    if (firstEncoder.buttonPressed || secondEncoder.buttonPressed) {
-        currentState = ST_MAIN_MENU;
-        refreshDisplay = true;
-        delay(200);
-        return;
-    }
-}
+//void wifiActive() {
+//  Serial.println("Wifi Active");
+//  
+//    if (refreshDisplay) {
+//        displayStrings("Wifi: active", "...", lcd);
+//        webServer.connectToWifi();
+//        server.begin();
+//  
+//        IPAddress address = WiFi.localIP();
+//  
+//        displayStrings("Wifi: active", address.toString(), lcd);
+//        refreshDisplay = false;
+//     }
+//  
+//    // Return to main menu
+//    if (firstEncoder.buttonPressed || secondEncoder.buttonPressed) {
+//        currentState = ST_MAIN_MENU;
+//        refreshDisplay = true;
+//        delay(200);
+//        return;
+//    }
+//}
 
 void bluetoothMode() {
   Serial.println("Bluetooth mode");
@@ -350,12 +360,12 @@ void processState() {
     }
     
   case ST_WIFI_MODE: {
-      wifiMode();
+      //wifiMode();
       return;
     }
 
   case ST_WIFI_ACTIVE: {
-      wifiActive();
+      //wifiActive();
       return;
     }
 
