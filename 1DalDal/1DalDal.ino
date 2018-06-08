@@ -1,6 +1,5 @@
 #include <Wire.h> 
 #include <LiquidCrystal_I2C.h>
-#include <WiFi.h>
 #include <BLEDevice.h>
 #include <BLEServer.h>
 #include <BLEUtils.h>
@@ -28,7 +27,7 @@ class Encoder;
 #define ENCODER_4_DT 2
 #define ENCODER_4_SW 35
 
-WiFiServer server(80);
+//WiFiServer server(80);
 
 ////////////////////////////////////////////////////////////////////////
 // LCD Display

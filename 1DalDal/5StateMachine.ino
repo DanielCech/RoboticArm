@@ -4,17 +4,14 @@
 #define ST_PLAY_PROGRAM     10
 #define ST_CREATE_PROGRAM   20
 #define ST_MANUAL_MODE      30
-#define ST_WIFI_MODE        40
-#define ST_WIFI_ACTIVE      45
-#define ST_BLUETOOTH_MODE   50
-#define ST_DEMO             60
+#define ST_BLUETOOTH_MODE   40
+#define ST_DEMO             50
 
 #define MENU_PLAY_PROGRAM   0
 #define MENU_CREATE_PROGRAM 1
 #define MENU_MANUAL_MODE    2
-#define MENU_WIFI_MODE      3
-#define MENU_BLUETOOTH_MODE 4
-#define MENU_DEMO           5
+#define MENU_BLUETOOTH_MODE 3
+#define MENU_DEMO           4
 
 
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
@@ -26,9 +23,6 @@ int menuOffset = 0;
 
 bool refreshDisplay = true;
 
-bool wifiModeSelection = false;
-bool wifiModeEnabled = false;
-
 bool bluetoothModeSelection = false;
 bool bluetoothModeEnabled = false;
 
@@ -39,7 +33,7 @@ int currentAngle = 0;
 bool currentlyPumpEnabled = false;
 bool beforePumpEnabled = false;
 
-String menuItems[6] = {"Play Program", "Create Program", "Manual Mode", "WiFi Mode", "Bluetooth Mode", "Demo"};
+String menuItems[6] = {"Play Program", "Create Program", "Manual Mode", "Bluetooth Mode", "Demo"};
 
 void displayStrings(String text1, String text2, LiquidCrystal_I2C& lcd) {
 
@@ -80,12 +74,6 @@ void mainMenu() {
 
       case MENU_MANUAL_MODE:
         currentState = ST_MANUAL_MODE;
-        refreshDisplay = true;
-        delay(200);
-        return;
-
-      case MENU_WIFI_MODE:
-        currentState = ST_WIFI_MODE;
         refreshDisplay = true;
         delay(200);
         return;
@@ -227,68 +215,6 @@ void manualMode() {
   
 }
 
-void wifiMode() {
-  Serial.println("Wifi mode");
-  String line = wifiModeSelection ? " [On]     Off" : "  On     [Off]";
-
-  if (refreshDisplay) {
-    displayStrings("Wifi Mode", line, lcd);
-    refreshDisplay = false;
-  }
-
-  // Return to main menu
-  if (secondEncoder.buttonPressed) {
-    currentState = ST_MAIN_MENU;
-    refreshDisplay = true;
-    delay(200);
-    return;
-  }
-
-  if (firstEncoder.buttonPressed) {
-    wifiModeEnabled = wifiModeSelection;
-    if (wifiModeEnabled) {
-      currentState = ST_WIFI_ACTIVE;
-    }
-    else {
-      server.end();
-      currentState = ST_MAIN_MENU;
-    }
-    
-    refreshDisplay = true;
-    delay(200);
-    return;
-    
-  }
-
-  if (firstEncoder.direction != 0) {
-    wifiModeSelection = !wifiModeSelection;
-    refreshDisplay = true;
-  }
-}
-
-//void wifiActive() {
-//  Serial.println("Wifi Active");
-//  
-//    if (refreshDisplay) {
-//        displayStrings("Wifi: active", "...", lcd);
-//        webServer.connectToWifi();
-//        server.begin();
-//  
-//        IPAddress address = WiFi.localIP();
-//  
-//        displayStrings("Wifi: active", address.toString(), lcd);
-//        refreshDisplay = false;
-//     }
-//  
-//    // Return to main menu
-//    if (firstEncoder.buttonPressed || secondEncoder.buttonPressed) {
-//        currentState = ST_MAIN_MENU;
-//        refreshDisplay = true;
-//        delay(200);
-//        return;
-//    }
-//}
-
 void bluetoothMode() {
   Serial.println("Bluetooth mode");
   String line = bluetoothModeSelection ? " [On]     Off" : "  On     [Off]";
@@ -359,16 +285,6 @@ void processState() {
       return;
     }
     
-  case ST_WIFI_MODE: {
-      //wifiMode();
-      return;
-    }
-
-  case ST_WIFI_ACTIVE: {
-      //wifiActive();
-      return;
-    }
-
   case ST_BLUETOOTH_MODE: {
       bluetoothMode();
       return;
