@@ -21,17 +21,8 @@ int currentState = ST_INITIAL;
 int selectedMenuItem = 0;
 int menuOffset = 0;
 
-bool refreshDisplay = true;
-
 bool bluetoothModeSelection = false;
 bool bluetoothModeEnabled = false;
-
-int currentX = 0;
-int currentY = 0;
-int currentZ = 0;
-int currentAngle = 0;
-bool currentlyPumpEnabled = false;
-bool beforePumpEnabled = false;
 
 String menuItems[6] = {"Play Program", "Create Program", "Manual Mode", "Bluetooth Mode", "Demo"};
 
@@ -63,7 +54,7 @@ void initialState() {
 
 
 void mainMenu() {
-  Serial.println("Main menu");
+//  Serial.println("Main menu");
 
   if (firstEncoder.buttonPressed) {
     switch (selectedMenuItem) {
@@ -122,15 +113,15 @@ void mainMenu() {
 }
 
 void playProgram() {
-  Serial.println("Play program");
+//  Serial.println("Play program");
 }
 
 void createProgram() {
-  Serial.println("Create program");
+//  Serial.println("Create program");
 }
 
 void manualMode() {
-  Serial.println("Manual mode");
+//  Serial.println("Manual mode");
 
   if (refreshDisplay) {
 
@@ -216,7 +207,7 @@ void manualMode() {
 }
 
 void bluetoothMode() {
-  Serial.println("Bluetooth mode");
+//  Serial.println("Bluetooth mode");
   String line = bluetoothModeSelection ? " [On]     Off" : "  On     [Off]";
 
   if (refreshDisplay) {
@@ -253,7 +244,7 @@ void bluetoothMode() {
 }
 
 void demoMode() {
-  Serial.println("Demo");
+//  Serial.println("Demo");
 }
 
 void processState() {

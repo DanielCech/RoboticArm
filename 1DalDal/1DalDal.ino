@@ -4,7 +4,6 @@
 #include <BLEServer.h>
 #include <BLEUtils.h>
 #include <BLE2902.h>
-#include <TaskScheduler.h>
 
 class Encoder;
 
@@ -55,4 +54,26 @@ int led5Channel = 4;
 int resolution = 8;
 
 int dutyCycle = 0;
+
+
+const int minX = 0;
+const int maxX = 256;
+const int minY = 0;
+const int maxY = 256;
+const int minZ = 0;
+const int maxZ = 256;
+const int minAngle = 0;
+const int maxAngle = 256;
+
+////////////////////////////////////////////////////////////////////////
+// State
+
+int currentX = 0;
+int currentY = 0;
+int currentZ = 0;
+int currentAngle = 0;
+bool currentlyPumpEnabled = false;
+bool beforePumpEnabled = false;
+
+bool refreshDisplay = true;
 
