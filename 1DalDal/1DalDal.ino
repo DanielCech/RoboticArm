@@ -75,5 +75,10 @@ int currentAngle = 0;
 bool currentlyPumpEnabled = false;
 bool beforePumpEnabled = false;
 
+long currentXUpdate = 0;
+long currentYUpdate = 0;
+long currentZUpdate = 0;
+long currentAngleUpdate = 0;
+
 bool refreshDisplay = true;
 

@@ -26,6 +26,24 @@ bool bluetoothModeEnabled = false;
 
 String menuItems[6] = {"Play Program", "Create Program", "Manual Mode", "Bluetooth Mode", "Demo"};
 
+int stepSize(long before, long after) {
+  long difference = after - before;
+  if (difference > 500) {
+    return 1;
+  }
+  if (difference > 300) {
+    return 3;
+  }
+  if (difference > 250) {
+    return 6;
+  }
+  if (difference > 180) {
+    return 10;
+  }
+  return 15;
+}
+
+
 void displayStrings(String text1, String text2, LiquidCrystal_I2C& lcd) {
 
   lcd.clear();
@@ -136,51 +154,66 @@ void manualMode() {
   }
 
   if (firstEncoder.direction < 0) {
-    currentX = MAX(currentX - 1, 0);
+    int step = stepSize(currentXUpdate, millis());
+    currentX = MAX(currentX - step, 0);
+    currentXUpdate = millis();
     refreshDisplay = true;
     return;
   }
   if (firstEncoder.direction > 0) {
-    currentX = MIN(currentX + 1, 999);
+    int step = stepSize(currentXUpdate, millis());
+    currentX = MIN(currentX + step, 999);
+    currentXUpdate = millis();
     refreshDisplay = true;
     return;
   }
 
   if (secondEncoder.direction < 0) {
-    currentY = MAX(currentY - 1, 0);
+    int step = stepSize(currentYUpdate, millis());
+    currentY = MAX(currentY - step, 0);
+    currentYUpdate = millis();
     refreshDisplay = true;
     return;
   }
   if (secondEncoder.direction > 0) {
-    currentY = MIN(currentY + 1, 999);
+    int step = stepSize(currentYUpdate, millis());
+    currentY = MIN(currentY + step, 999);
+    currentYUpdate = millis();
     refreshDisplay = true;
     return;
   }
 
   if (thirdEncoder.direction < 0) {
-    currentZ = MAX(currentZ - 1, 0);
+    int step = stepSize(currentZUpdate, millis());
+    currentZ = MAX(currentZ - step, 0);
+    currentZUpdate = millis();
     refreshDisplay = true;
     return;
   }
   if (thirdEncoder.direction > 0) {
-    currentZ = MIN(currentZ + 1, 999);
+    int step = stepSize(currentZUpdate, millis());
+    currentZ = MIN(currentZ + step, 999);
+    currentZUpdate = millis();
     refreshDisplay = true;
     return;
   }
 
   if (fourthEncoder.direction < 0) {
-    currentAngle = MAX(currentAngle - 1, 0);
+    int step = stepSize(currentAngleUpdate, millis());
+    currentAngle = MAX(currentAngle - step, 0);
+    currentZUpdate = millis();
     refreshDisplay = true;
     return;
   }
   if (fourthEncoder.direction > 0) {
+    int step = stepSize(currentAngleUpdate, millis());
     if (encoder4normalDirection) {
-      currentAngle = MIN(currentAngle + 1, 359);  
+      currentAngle = MIN(currentAngle + step, 359);  
     }
     else {
-      currentAngle = MAX(currentAngle - 1, 0);
+      currentAngle = MAX(currentAngle - step, 0);
     }
-    
+    currentZUpdate = millis();
     refreshDisplay = true;
     return;
   }
