@@ -213,7 +213,7 @@ void manualMode() {
     else {
       currentAngle = MAX(currentAngle - step, 0);
     }
-    currentZUpdate = millis();
+    currentAngleUpdate = millis();
     refreshDisplay = true;
     return;
   }

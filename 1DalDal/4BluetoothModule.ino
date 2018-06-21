@@ -1,6 +1,6 @@
 #define SERVICE_UUID        "326a9000-85cb-9195-d9dd-464cfbbae75a"
-#define IMU_UUID            "326a9001-85cb-9195-d9dd-464cfbbae75a"
-#define JUGGLE_UUID         "326a9006-85cb-9195-d9dd-464cfbbae75a"
+#define CONTROL_UUID            "326a9001-85cb-9195-d9dd-464cfbbae75a"
+#define PROGRAM_UUID         "326a9006-85cb-9195-d9dd-464cfbbae75a"
 #define DEVICE_NAME         "RoboticArm"
 #define ENABLE_IMU_NOTIFY   0
 
@@ -133,13 +133,14 @@ void enableBluetooth() {
   pCharBat->setValue(&level, 1);
   pService->start();
   
-  // Control service
+  // Control characteristic
   pService = pServer->createService(SERVICE_UUID);
-  pCharControl = pService->createCharacteristic(IMU_UUID, BLECharacteristic::PROPERTY_WRITE);
+  pCharControl = pService->createCharacteristic(CONTROL_UUID, BLECharacteristic::PROPERTY_WRITE);
   pCharControl->setCallbacks(new ControlCallbacks());
   pCharControl->addDescriptor(new BLE2902());
-  
-  pCharProgram = pService->createCharacteristic(JUGGLE_UUID, BLECharacteristic::PROPERTY_WRITE);
+
+  // Program characteristic
+  pCharProgram = pService->createCharacteristic(PROGRAM_UUID, BLECharacteristic::PROPERTY_WRITE);
   pCharProgram->addDescriptor(new BLE2902());
   
   pService->start();
