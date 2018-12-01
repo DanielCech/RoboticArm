@@ -4,6 +4,7 @@
 #include <BLEServer.h>
 #include <BLEUtils.h>
 #include <BLE2902.h>
+#include <ESP32_Servo.h>
 
 class Encoder;
 
@@ -57,22 +58,40 @@ int dutyCycle = 0;
 
 
 const int minX = 0;
-const int maxX = 256;
+const int maxX = 180;
 const int minY = 0;
-const int maxY = 256;
+const int maxY = 90;
 const int minZ = 0;
-const int maxZ = 256;
+const int maxZ = 90;
 const int minAngle = 0;
-const int maxAngle = 256;
+const int maxAngle = 180;
+
+const int minPulseWidth = 500;
+const int maxPulseWidth = 2500;
+
+
+////////////////////////////////////////////////////////////////////////
+// Servos
+
+Servo servo1;
+Servo servo2;
+Servo servo3;
+Servo servo4;
+
 
 ////////////////////////////////////////////////////////////////////////
 // State
 
-int currentX = 0;
-int currentY = 0;
-int currentZ = 0;
-int currentAngle = 0;
+int currentX = 90;
+int currentY = 90;
+int currentZ = 90;
+int currentAngle = 90;
 bool currentlyPumpEnabled = false;
+
+int lastX = 90;
+int lastY = 90;
+int lastZ = 90;
+int lastAngle = 90;
 bool beforePumpEnabled = false;
 
 long currentXUpdate = 0;
@@ -82,3 +101,22 @@ long currentAngleUpdate = 0;
 
 bool refreshDisplay = true;
 
+////////////////////////////////////////////////////////////////////////
+// Program
+
+const int maxStepCount = 20;
+
+struct ProgramStep {
+  int x;
+  int y;
+  int z;
+  int angle;
+  bool pump;
+  int duration;
+};
+
+struct ProgramStep program[maxStepCount];
+
+int programStepCount = 0;
+int currentStep = 0;
+unsigned long currentStepBegin = 0;

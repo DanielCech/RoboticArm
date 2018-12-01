@@ -1,17 +1,20 @@
 #define ST_INITIAL          0
 #define ST_MAIN_MENU        1
 
-#define ST_PLAY_PROGRAM     10
-#define ST_CREATE_PROGRAM   20
-#define ST_MANUAL_MODE      30
-#define ST_BLUETOOTH_MODE   40
-#define ST_DEMO             50
+#define ST_RESET_POSITION   10
+#define ST_PLAY_PROGRAM     20
+#define ST_CREATE_PROGRAM   30
+#define ST_CREATE_PROGRAM_CONFIRM_STEP   31
+#define ST_MANUAL_MODE      40
+#define ST_BLUETOOTH_MODE   50
+#define ST_DEMO             60
 
-#define MENU_PLAY_PROGRAM   0
-#define MENU_CREATE_PROGRAM 1
-#define MENU_MANUAL_MODE    2
-#define MENU_BLUETOOTH_MODE 3
-#define MENU_DEMO           4
+#define MENU_RESET_POSITION 0
+#define MENU_PLAY_PROGRAM   1
+#define MENU_CREATE_PROGRAM 2
+#define MENU_MANUAL_MODE    3
+#define MENU_BLUETOOTH_MODE 4
+#define MENU_DEMO           5
 
 
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
@@ -24,7 +27,7 @@ int menuOffset = 0;
 bool bluetoothModeSelection = false;
 bool bluetoothModeEnabled = false;
 
-String menuItems[6] = {"Play Program", "Create Program", "Manual Mode", "Bluetooth Mode", "Demo"};
+String menuItems[6] = {"Reset Position", "Play Program", "Create Program", "Manual Mode", "Bluetooth Mode", "Demo"};
 
 int stepSize(long before, long after) {
   long difference = after - before;
@@ -76,10 +79,25 @@ void mainMenu() {
 
   if (firstEncoder.buttonPressed) {
     switch (selectedMenuItem) {
+      case MENU_RESET_POSITION:
+        currentState = ST_RESET_POSITION;
+        refreshDisplay = true;
+        Serial.println("Button Pressed");
+        delay(200);
+        return;
+        
       case MENU_PLAY_PROGRAM:
+        currentState = ST_PLAY_PROGRAM;
+        refreshDisplay = true;
+        delay(200);
+        return;
+        
 
       case MENU_CREATE_PROGRAM:
-        break;
+        currentState = ST_CREATE_PROGRAM;
+        refreshDisplay = true;
+        delay(200);
+        return;
 
       case MENU_MANUAL_MODE:
         currentState = ST_MANUAL_MODE;
@@ -130,8 +148,15 @@ void mainMenu() {
   }
 }
 
-void playProgram() {
-//  Serial.println("Play program");
+void resetPosition() {
+  currentX = 90;
+  currentY = 90;
+  currentZ = 90;
+  currentAngle = 90;
+  currentlyPumpEnabled = false;
+  beforePumpEnabled = false;
+
+  currentState = ST_MAIN_MENU;
 }
 
 void createProgram() {
@@ -144,10 +169,11 @@ void manualMode() {
   if (refreshDisplay) {
 
     char firstLine[20];
-    sprintf(firstLine, "Angle:%-3d Pump:%s", currentAngle, currentlyPumpEnabled ? "1" : "0");
+    sprintf(firstLine, "XYZ:%3d,%3d,%3d", currentX, currentY, currentZ);
+    
 
     char secondLine[20];
-    sprintf(secondLine, "X:%-3d Y:%-3d Z:%-3d", currentX, currentY, currentZ);
+    sprintf(secondLine, "Angle:%-3d Pump:%s", currentAngle, currentlyPumpEnabled ? "1" : "0");
 
     displayStrings(String(firstLine), String(secondLine), lcd);
     refreshDisplay = false;
@@ -155,14 +181,14 @@ void manualMode() {
 
   if (firstEncoder.direction < 0) {
     int step = stepSize(currentXUpdate, millis());
-    currentX = MAX(currentX - step, 0);
+    currentX = MAX(currentX - step, minX);
     currentXUpdate = millis();
     refreshDisplay = true;
     return;
   }
   if (firstEncoder.direction > 0) {
     int step = stepSize(currentXUpdate, millis());
-    currentX = MIN(currentX + step, 999);
+    currentX = MIN(currentX + step, maxX);
     currentXUpdate = millis();
     refreshDisplay = true;
     return;
@@ -170,14 +196,14 @@ void manualMode() {
 
   if (secondEncoder.direction < 0) {
     int step = stepSize(currentYUpdate, millis());
-    currentY = MAX(currentY - step, 0);
+    currentY = MAX(currentY - step, minY);
     currentYUpdate = millis();
     refreshDisplay = true;
     return;
   }
   if (secondEncoder.direction > 0) {
     int step = stepSize(currentYUpdate, millis());
-    currentY = MIN(currentY + step, 999);
+    currentY = MIN(currentY + step, maxY);
     currentYUpdate = millis();
     refreshDisplay = true;
     return;
@@ -185,14 +211,14 @@ void manualMode() {
 
   if (thirdEncoder.direction < 0) {
     int step = stepSize(currentZUpdate, millis());
-    currentZ = MAX(currentZ - step, 0);
+    currentZ = MAX(currentZ - step, minZ);
     currentZUpdate = millis();
     refreshDisplay = true;
     return;
   }
   if (thirdEncoder.direction > 0) {
     int step = stepSize(currentZUpdate, millis());
-    currentZ = MIN(currentZ + step, 999);
+    currentZ = MIN(currentZ + step, maxZ);
     currentZUpdate = millis();
     refreshDisplay = true;
     return;
@@ -200,7 +226,7 @@ void manualMode() {
 
   if (fourthEncoder.direction < 0) {
     int step = stepSize(currentAngleUpdate, millis());
-    currentAngle = MAX(currentAngle - step, 0);
+    currentAngle = MAX(currentAngle - step, minAngle);
     currentZUpdate = millis();
     refreshDisplay = true;
     return;
@@ -208,13 +234,20 @@ void manualMode() {
   if (fourthEncoder.direction > 0) {
     int step = stepSize(currentAngleUpdate, millis());
     if (encoder4normalDirection) {
-      currentAngle = MIN(currentAngle + step, 359);  
+      currentAngle = MIN(currentAngle + step, maxAngle);  
     }
     else {
       currentAngle = MAX(currentAngle - step, 0);
     }
     currentAngleUpdate = millis();
     refreshDisplay = true;
+    return;
+  }
+
+  if (firstEncoder.buttonPressed && currentState == ST_CREATE_PROGRAM) {
+    currentState = ST_CREATE_PROGRAM_CONFIRM_STEP;
+    refreshDisplay = true;
+    delay(200);
     return;
   }
 
@@ -276,6 +309,15 @@ void bluetoothMode() {
   }
 }
 
+void confirmProgramStep() {
+  String line = "Step stored";
+
+  if (refreshDisplay) {
+    displayStrings("Create Program:", line, lcd);
+    refreshDisplay = false;
+  }
+}
+
 void demoMode() {
 //  Serial.println("Demo");
 }
@@ -294,13 +336,18 @@ void processState() {
       return;
     }
 
+   case ST_RESET_POSITION: {
+      resetPosition();
+      return;
+   }
+
   case ST_PLAY_PROGRAM: {
       playProgram();
       return;
     }
     
   case ST_CREATE_PROGRAM: {
-      createProgram();
+      manualMode();
       return;
     }
     
