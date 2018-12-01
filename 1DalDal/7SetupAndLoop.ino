@@ -68,11 +68,11 @@ void loop() {
   }
 
   checkLimits();
-  convertCoordinatesToAngles(currentX, currentY, currentZ);
+//  convertCoordinatesToAngles(currentX, currentY, currentZ);
   
-//  servo1.write(currentX);
-//  servo2.write(currentY);
-//  servo3.write(currentZ);
+  servo1.write(currentX);
+  servo2.write(currentY);
+  servo3.write(currentZ);
   servo4.write(currentAngle);  
 }
 

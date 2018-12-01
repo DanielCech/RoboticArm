@@ -34,6 +34,15 @@ class Encoder;
 
 LiquidCrystal_I2C lcd(0x27,16,2);//set the LCD address to 0x27 for a 16 chars and 2 line display
 
+void displayStrings(String text1, String text2, LiquidCrystal_I2C& lcd) {
+
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print(text1);
+  lcd.setCursor(0,1);
+  lcd.print(text2);
+}
+
 
 ////////////////////////////////////////////////////////////////////////
 // LED diods
@@ -82,6 +91,28 @@ Servo servo4;
 ////////////////////////////////////////////////////////////////////////
 // State
 
+#define ST_INITIAL          0
+#define ST_MAIN_MENU        1
+
+#define ST_RESET_POSITION   10
+#define ST_PLAY_PROGRAM     20
+#define ST_CREATE_PROGRAM   30
+#define ST_CREATE_PROGRAM_CONFIRM_STEP   31
+#define ST_MANUAL_MODE      40
+#define ST_BLUETOOTH_MODE   50
+#define ST_DEMO             60
+
+#define MENU_RESET_POSITION 0
+#define MENU_PLAY_PROGRAM   1
+#define MENU_CREATE_PROGRAM 2
+#define MENU_MANUAL_MODE    3
+#define MENU_BLUETOOTH_MODE 4
+#define MENU_DEMO           5
+
+int currentState = ST_INITIAL;
+int selectedMenuItem = 0;
+int menuOffset = 0;
+
 int currentX = 90;
 int currentY = 90;
 int currentZ = 90;
@@ -104,6 +135,12 @@ bool refreshDisplay = true;
 ////////////////////////////////////////////////////////////////////////
 // Program
 
+
+#define STEP_INITIAL 0
+#define STEP_PAUSE_BEFORE 1
+#define STEP_MOVEMENT 2
+#define STEP_PAUSE_AFTER 3
+
 const int maxStepCount = 20;
 
 struct ProgramStep {
@@ -113,10 +150,13 @@ struct ProgramStep {
   int angle;
   bool pump;
   int duration;
+  int pauseBefore;
+  int pauseAfter;
 };
 
 struct ProgramStep program[maxStepCount];
 
 int programStepCount = 0;
-int currentStep = 0;
+int currentStep = -1;
+int currentStepPhase = STEP_INITIAL;
 unsigned long currentStepBegin = 0;

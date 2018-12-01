@@ -1,11 +1,10 @@
 
-
 void playProgram() {
+//  Serial.printf("playProgram\n");
   
-  if (currentStepBegin == 0) {
-    currentStep = 0;
-    currentStepBegin = millis();
-    Serial.printf("Step: %d\n", currentStep);
+  if (currentStep == -1) {
+    startNewStep();
+    return;
   }
 
   if (refreshDisplay) {
@@ -20,22 +19,57 @@ void playProgram() {
   
   ProgramStep currentProgramStep = program[currentStep];
 
-  if (timeDelta <= currentProgramStep.duration) {
-    int nextX = currentProgramStep.x;
-    int nextY = currentProgramStep.y;
-    int nextZ = currentProgramStep.z;
-    int nextAngle = currentProgramStep.angle;
-    
-    currentX = lastX + (nextX - lastX) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
-    currentY = lastY + (nextY - lastY) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
-    currentZ = lastZ + (nextZ - lastZ) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
-    currentAngle = lastAngle + (nextAngle - lastAngle) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
+  switch (currentStepPhase) {
+    case STEP_PAUSE_BEFORE: {
+      if (timeDelta <= currentProgramStep.duration) {
+        // Do nothing 
+      }
+      else {
+        currentStepBegin = millis();
+        currentStepPhase = STEP_MOVEMENT;
+      }
+      return;
+    }
 
-    Serial.printf("Values: %d %d %d %d\n", currentX, currentY, currentZ, currentAngle);
+    case STEP_MOVEMENT: {
+      if (timeDelta <= currentProgramStep.duration) {
+        int nextX = currentProgramStep.x;
+        int nextY = currentProgramStep.y;
+        int nextZ = currentProgramStep.z;
+        int nextAngle = currentProgramStep.angle;
+        
+        currentX = lastX + (nextX - lastX) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
+        currentY = lastY + (nextY - lastY) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
+        currentZ = lastZ + (nextZ - lastZ) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
+        currentAngle = lastAngle + (nextAngle - lastAngle) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
+    
+        Serial.printf("Values: %d %d %d %d\n", currentX, currentY, currentZ, currentAngle);
+      }
+      else {
+        currentStepPhase = STEP_PAUSE_AFTER;
+        currentStepBegin = millis();
+      }
+      return;
+    }
+
+    case STEP_PAUSE_AFTER: {
+      if (timeDelta <= currentProgramStep.duration) {
+        // Do nothing 
+      }
+      else {
+        startNewStep();
+      }
+      return;
+    }
   }
-  else {
-    if (currentStep < programStepCount - 1) {
+}
+
+void startNewStep() {
+  Serial.printf("startNewStep\n");
+  
+  if (currentStep < programStepCount - 1) {
       currentStep++;
+      currentStepPhase = STEP_PAUSE_BEFORE;
       lastX = currentX;
       lastY = currentY;
       lastZ = currentZ;
@@ -44,6 +78,10 @@ void playProgram() {
       currentStepBegin = millis();
 
       Serial.printf("Step: %d\n", currentStep);
+      ProgramStep currentProgramStep = program[currentStep];
+
+      currentlyPumpEnabled = currentProgramStep.pump;
+      
       refreshDisplay = true;
     }
     else {
@@ -52,10 +90,10 @@ void playProgram() {
       refreshDisplay = true;
       delay(200);
 
-      currentStepBegin = 0;
+      currentStep == -1;
+      currentStepPhase = STEP_PAUSE_BEFORE;
       return;
     }
-  }
 }
 
 double linear(double t) {
@@ -172,6 +210,8 @@ void setupProgram() {
   first.angle = 50;
   first.pump = false;
   first.duration = 1500;
+  first.pauseBefore = 1500;
+  first.pauseAfter = 1500;
   program[0] = first;
 
   struct ProgramStep second;
@@ -181,6 +221,8 @@ void setupProgram() {
   second.angle = 50;
   second.pump = false;
   second.duration = 1500;
+  second.pauseBefore = 1500;
+  second.pauseAfter = 1500;
   program[1] = second;
 
   struct ProgramStep third;
@@ -188,8 +230,10 @@ void setupProgram() {
   third.y = 75;
   third.z = 45;
   third.angle = 50;
-  third.pump = false;
+  third.pump = true;
   third.duration = 1500;
+  third.pauseBefore = 1500;
+  third.pauseAfter = 1500;
   program[2] = third;
 
   struct ProgramStep fourth;
@@ -199,6 +243,8 @@ void setupProgram() {
   fourth.angle = 50;
   fourth.pump = false;
   fourth.duration = 1500;
+  fourth.pauseBefore = 1500;
+  fourth.pauseAfter = 1500;
   program[3] = fourth;
 
   programStepCount = 4;

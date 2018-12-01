@@ -1,28 +1,5 @@
-#define ST_INITIAL          0
-#define ST_MAIN_MENU        1
-
-#define ST_RESET_POSITION   10
-#define ST_PLAY_PROGRAM     20
-#define ST_CREATE_PROGRAM   30
-#define ST_CREATE_PROGRAM_CONFIRM_STEP   31
-#define ST_MANUAL_MODE      40
-#define ST_BLUETOOTH_MODE   50
-#define ST_DEMO             60
-
-#define MENU_RESET_POSITION 0
-#define MENU_PLAY_PROGRAM   1
-#define MENU_CREATE_PROGRAM 2
-#define MENU_MANUAL_MODE    3
-#define MENU_BLUETOOTH_MODE 4
-#define MENU_DEMO           5
-
-
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
-
-int currentState = ST_INITIAL;
-int selectedMenuItem = 0;
-int menuOffset = 0;
 
 bool bluetoothModeSelection = false;
 bool bluetoothModeEnabled = false;
@@ -46,15 +23,6 @@ int stepSize(long before, long after) {
   return 15;
 }
 
-
-void displayStrings(String text1, String text2, LiquidCrystal_I2C& lcd) {
-
-  lcd.clear();
-  lcd.setCursor(0,0);
-  lcd.print(text1);
-  lcd.setCursor(0,1);
-  lcd.print(text2);
-}
 
 void initialState() {
 
