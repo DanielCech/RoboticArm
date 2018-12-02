@@ -160,3 +160,5 @@ int programStepCount = 0;
 int currentStep = -1;
 int currentStepPhase = STEP_INITIAL;
 unsigned long currentStepBegin = 0;
+
+//String stepNumber = "";
