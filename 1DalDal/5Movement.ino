@@ -38,12 +38,12 @@ void playProgram() {
         int nextZ = currentProgramStep.z;
         int nextAngle = currentProgramStep.angle;
         
-        currentX = lastX + (nextX - lastX) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
-        currentY = lastY + (nextY - lastY) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
-        currentZ = lastZ + (nextZ - lastZ) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
-        currentAngle = lastAngle + (nextAngle - lastAngle) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
+        currentInputX = lastInputX + (nextX - lastInputX) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
+        currentInputY = lastInputY + (nextY - lastInputY) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
+        currentInputZ = lastInputZ + (nextZ - lastInputZ) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
+        currentInputAngle = lastInputAngle + (nextAngle - lastInputAngle) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
     
-        Serial.printf("Values: %d %d %d %d\n", currentX, currentY, currentZ, currentAngle);
+        Serial.printf("Values: %d %d %d %d\n", currentInputX, currentInputY, currentInputZ, currentInputAngle);
       }
       else {
         currentStepPhase = STEP_PAUSE_AFTER;
@@ -70,10 +70,10 @@ void startNewStep() {
   if (currentStep < programStepCount - 1) {
       currentStep++;
       currentStepPhase = STEP_PAUSE_BEFORE;
-      lastX = currentX;
-      lastY = currentY;
-      lastZ = currentZ;
-      lastAngle = currentAngle;
+      lastInputX = currentInputX;
+      lastInputY = currentInputY;
+      lastInputZ = currentInputZ;
+      lastInputAngle = currentInputAngle;
 
       currentStepBegin = millis();
 
@@ -104,100 +104,289 @@ double easeInOutCubic(double t) {
   return t<.5 ? 4*t*t*t : (t-1)*(2*t-2)*(2*t-2)+1;
 }
 
-void convertCoordinatesToAngles(float x, float y, float z) {
+float toDegrees(float angle) {
+  return 180 * angle / PI;
+}
 
-  float x_1 = 0;
-  float d = 0;
-  float gama = 0;
-  float alfa = 0;
-  float alfa_1 = 0;
-  float alfa_2 = 0;
-  float beta = 0;
-  float delta = 0;
-  float offset_0 = 92;
-  float offset_1 = 1;
-  float offset_2 = 45; //ak je servo_2 otocene na 45°, vtedy  je beta=0
-  float compensation = 0; //vykompenzovanie sklonu drahy pri pohybe po osi X
+void convertCoordinatesToAngles() {
+//
+//  realX = currentX;
+//  realY = currentY;
+//  realZ = currentZ;
+//  realAngle = currentAngle;
 
-  x_1 = sqrt((x * x) + (y * y));
-  delta = ((180 * asin(y / x_1)) / 3.14);
-  x_1 = x_1 - 45;
-  d = sqrt((z * z) + (x_1 * x_1));
-  gama = ((2 * 180 * asin(d / 400)) / 3.14);
-  alfa_1 = ((180 * asin(z / d)) / 3.14);
-  alfa_2 = (180 - gama) / 2;
-  alfa = alfa_1 + alfa_2;
-  beta = 180 - alfa - gama;
+  checkRealCoordinateLimits();
 
-  compensation = x_1 * 0.018;
+  float heightDelta = realY - baseHeight;
+  float chord = sqrt(realZ * realZ + heightDelta * heightDelta);
+  
 
-  float a = delta + offset_0;
-  float b = alfa + offset_1 + compensation;
-  float c = beta + offset_2 - compensation;
+  float betaComplement = toDegrees(acos((chord / 2) / armSegmentLength));
+  float delta = toDegrees(asin(abs(heightDelta) / chord));
+  float gamaComplement = toDegrees(asin((chord / 2) / armSegmentLength)) / 2; //180 - 2 * betaComplement;
+  
+  float beta;
+  float gama;
 
-  if (a < minX) {
-    a = minX;
+  if (heightDelta > 0) {
+    beta = 90 - betaComplement - delta;
+    gama = 90 - gamaComplement - 1.1 * delta;
+  }
+  else if (heightDelta < 0) {
+    beta = 90 - betaComplement + delta;
+    gama = 90 - gamaComplement + 1.1 * delta;
+  }
+  else {
+    beta = 90 - betaComplement;
+    gama = 90 - gamaComplement;
   }
 
-  if (a > maxX) {
-    a = maxX;
-  }
+  
+  
+//  Serial.printf("centimeterY: %.2f, centimeterZ: %.2f, heightDelta: %.2f, chord: %.2f\n", centimeterY, centimeterZ, heightDelta, chord);
 
-  if (b < minY) {
-    b = minY;
-  }
 
-  if (b > maxY) {
-    b = maxY;
-  }
+//  float beta = toDegrees(acos((chord / 2) / armSegmentLength));
+//  float delta = toDegrees(asin(abs(heightDelta) / chord));
+//  float gama = 180 - 2 * beta;
+//
+//  float epsilon;
+//
+//  if (heightDelta > 0) {
+//    epsilon = beta + delta;
+//  }
+//  else if (heightDelta < 0) {
+//    epsilon = beta - delta;
+//  }
+//  else {
+//    epsilon = beta;
+//  }
+//
+//  float servoEpsilon = 90 - epsilon + 77;
+//  float servoGama = 90 - gama + 28;
 
-  if (c < minZ) {
-    c = minZ;
-  }
+  
+/////////////////////////////
 
-  if (c > maxZ) {
-    c = maxZ;
-  }
+//  float x_1 = 0;
+//  float d = 0;
+//  float gama = 0;
+//  float alfa = 0;
+//  float alfa_1 = 0;
+//  float alfa_2 = 0;
+//  float beta = 0;
+//  float delta = 0;
+//  float offset_0 = 92;
+//  float offset_1 = 1;
+//  float offset_2 = 45; //ak je servo_2 otocene na 45°, vtedy  je beta=0
+//  float compensation = 0; //vykompenzovanie sklonu drahy pri pohybe po osi X
+//
+//  x_1 = sqrt((x * x) + (y * y));
+//  delta = ((180 * asin(y / x_1)) / 3.14);
+//  x_1 = x_1 - 45;
+//  d = sqrt((z * z) + (x_1 * x_1));
+//  gama = ((2 * 180 * asin(d / 400)) / 3.14);
+//  alfa_1 = ((180 * asin(z / d)) / 3.14);
+//  alfa_2 = (180 - gama) / 2;
+//  alfa = alfa_1 + alfa_2;
+//  beta = 180 - alfa - gama;
+//
+//  compensation = x_1 * 0.018;
+//
+//  float a = delta + offset_0;
+//  float b = alfa + offset_1 + compensation;
+//  float c = beta + offset_2 - compensation;
+//
+//  if (b < minY) {
+//    b = minY;
+//  }
+//
+//  if (b > maxY) {
+//    b = maxY;
+//  }
+//
+//  if (c < minZ) {
+//    c = minZ;
+//  }
+//
+//  if (c > maxY) {
+//    c = maxZ;
+//  }
+//
+////  if (currentZ < minZ) {
+////    currentZ = minZ;
+////  }
+////
+////  if (currentZ > maxZ) {
+////    currentZ = maxZ;
+////  }
+//
+//  if (currentAngle < minAngle) {
+//    currentAngle = minAngle;
+//  }
+//
+//  if (currentAngle > maxAngle) {
+//    currentAngle = maxAngle;
+//  }
 
-  servo1.write(a); //serva trupu
-  servo2.write(b); //rameno dolne
-  servo3.write(c); //rameno horne
+//  Serial.printf("cY: %.2f, cZ: %.2f, hD: %.2f, chord: %.2f, b: %.2f, d: %.2f, e: %.2f(%.2f), g: %.2f(%.2f)\n",  centimeterY, centimeterZ, heightDelta, chord, beta, delta, epsilon, servoEpsilon, gama, servoGama);
 
-  Serial.printf("A: %.2f, B: %.2f, C: %.2f\n", a, b, c);
+//  if (servoEpsilon < minEpsilon) {
+//    servoEpsilon = minEpsilon;
+//  }
+//
+//  if (servoEpsilon > maxEpsilon) {
+//    servoEpsilon = maxEpsilon;
+//  }
+//
+//  if (servoGama < minGama) {
+//    servoGama = minGama;
+//  }
+//
+//  if (servoGama > maxGama) {
+//    servoGama = maxGama;
+//  }
+
+  servo1Angle = realX;
+  servo2Angle = gama - 20;
+  servo3Angle = 97 - beta;
+  servo4Angle = realAngle;
+
+  Serial.printf("rX: %.2f, rY: %.2f, rZ: %.2f, hD: %.2f, chord: %.2f, b: %.2f(%.2f), d: %.2f, g: %.2f(%.2f), s2: %.2f, s3: %.2f\n",  realX, realY, realZ, heightDelta, chord, beta, betaComplement, delta, gama, gamaComplement, servo2Angle, servo3Angle);
+
+  checkServoAngleLimits();
+
+//
+//  float x_1 = 0;
+//  float d = 0;
+//  float gama = 0;
+//  float alfa = 0;
+//  float alfa_1 = 0;
+//  float alfa_2 = 0;
+//  float beta = 0;
+//  float delta = 0;
+//  float offset_0 = 92;
+//  float offset_1 = 1;
+//  float offset_2 = 45; //ak je servo_2 otocene na 45°, vtedy  je beta=0
+//  float compensation = 0; //vykompenzovanie sklonu drahy pri pohybe po osi X
+
+//  servo3.write(servoEpsilon); //rameno dolne
+//  servo2.write(servoGama); //rameno horne
+//
+//  servo3.write(c); //rameno dolne
+//  servo2.write(b); //rameno horne
+  
+
+
+//  servo3.write(90); //rameno dolne
+//  servo2.write(servoEpsilon); //rameno horne
+//  
+  
+
+
 };
 
 
-void checkLimits() {
-  if (currentX < minX) {
-    currentX = minX;
+void checkServoAngleLimits() {
+  if (servo1Angle < minServo1Angle) {
+    servo1Angle = minServo1Angle;
   }
 
-  if (currentX > maxX) {
-    currentX = maxX;
+  if (servo1Angle > maxServo1Angle) {
+    servo1Angle = maxServo1Angle;
   }
 
-  if (currentY < minY) {
-    currentY = minY;
+  if (servo2Angle < minServo2Angle) {
+    servo2Angle = minServo2Angle;
   }
 
-  if (currentY > maxY) {
-    currentY = maxY;
+  if (servo2Angle > maxServo2Angle) {
+    servo2Angle = maxServo2Angle;
   }
 
-  if (currentZ < minZ) {
-    currentZ = minZ;
+  if (servo3Angle < minServo3Angle) {
+    servo3Angle = minServo3Angle;
   }
 
-  if (currentZ > maxZ) {
-    currentZ = maxZ;
+  if (servo3Angle > maxServo3Angle) {
+    servo3Angle = maxServo3Angle;
   }
 
-  if (currentAngle < minAngle) {
-    currentAngle = minAngle;
+  if (servo4Angle < minServo4Angle) {
+    servo4Angle = minServo4Angle;
   }
 
-  if (currentAngle > maxAngle) {
-    currentAngle = maxAngle;
+  if (servo4Angle > maxServo4Angle) {
+    servo4Angle = maxServo4Angle;
+  }
+}
+
+void checkRealCoordinateLimits() {
+  if (realX < minRealX) {
+    realX = minRealX;
+  }
+
+  if (realX > maxRealX) {
+    realX = maxRealX;
+  }
+
+  if (realY < minRealY) {
+    realY = minRealY;
+  }
+
+  if (realY > maxRealY) {
+    realY = maxRealY;
+  }
+
+  if (realZ < minRealZ) {
+    realZ = minRealZ;
+  }
+
+  if (realZ > maxRealZ) {
+    realZ = maxRealZ;
+  }
+
+  if (realAngle < minRealAngle) {
+    realAngle = minRealAngle;
+  }
+
+  if (realAngle > maxRealAngle) {
+    realAngle = maxRealAngle;
+  }
+}
+
+
+void checkInputCoordinateLimits() {
+  if (currentInputX < minInputX) {
+    currentInputX = minInputX;
+  }
+
+  if (currentInputX > maxInputX) {
+    currentInputX = maxInputX;
+  }
+
+  if (currentInputY < minInputY) {
+    currentInputY = minInputY;
+  }
+
+  if (currentInputY > maxInputY) {
+    currentInputY = maxInputY;
+  }
+
+  if (currentInputZ < minInputZ) {
+    currentInputZ = minInputZ;
+  }
+
+  if (currentInputZ > maxInputZ) {
+    currentInputZ = maxInputZ;
+  }
+
+  if (currentInputAngle < minInputAngle) {
+    currentInputAngle = minInputAngle;
+  }
+
+  if (currentInputAngle > maxInputAngle) {
+    currentInputAngle = maxInputAngle;
   }
 }
 

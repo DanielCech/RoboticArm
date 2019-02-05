@@ -119,12 +119,17 @@ void mainMenu() {
 }
 
 void resetPosition() {
-  currentX = 90;
-  currentY = 90;
-  currentZ = 90;
-  currentAngle = 90;
+  currentInputX = startX;
+  currentInputY = startY;
+  currentInputZ = startZ;
+  currentInputAngle = startAngle;
   currentlyPumpEnabled = false;
   beforePumpEnabled = false;
+
+  realX = startX;
+  realY = startY;
+  realZ = startZ;
+  realAngle = startAngle;
 
   currentState = ST_MAIN_MENU;
 }
@@ -139,11 +144,11 @@ void manualMode() {
   if (refreshDisplay) {
 
     char firstLine[20];
-    sprintf(firstLine, "XYZ:%3d,%3d,%3d", currentX, currentY, currentZ);
+    sprintf(firstLine, "XYZ:%3d,%3d,%3d", currentInputX, currentInputY, currentInputZ);
     
 
     char secondLine[20];
-    sprintf(secondLine, "A:%-3d Pump:%s #%d", currentAngle, currentlyPumpEnabled ? "1" : "0", currentStep + 1 );
+    sprintf(secondLine, "A:%-3d Pump:%s #%d", currentInputAngle, currentlyPumpEnabled ? "1" : "0", currentStep + 1 );
     
 
 
@@ -152,80 +157,80 @@ void manualMode() {
   }
 
   if (firstEncoder.direction < 0) {
-    int step = stepSize(currentXUpdate, millis());
-    currentX = MAX(currentX - step, minX);
-    currentXUpdate = millis();
+    int step = stepSize(currentInputXUpdate, millis());
+    currentInputX = MAX(currentInputX - step, minInputX);
+    currentInputXUpdate = millis();
     refreshDisplay = true;
     return;
   }
   if (firstEncoder.direction > 0) {
-    int step = stepSize(currentXUpdate, millis());
-    currentX = MIN(currentX + step, maxX);
-    currentXUpdate = millis();
+    int step = stepSize(currentInputXUpdate, millis());
+    currentInputX = MIN(currentInputX + step, maxInputX);
+    currentInputXUpdate = millis();
     refreshDisplay = true;
     return;
   }
 
   if (secondEncoder.direction < 0) {
-    int step = stepSize(currentYUpdate, millis());
-    currentY = MAX(currentY - step, minY);
-    currentYUpdate = millis();
+    int step = stepSize(currentInputYUpdate, millis());
+    currentInputY = MAX(currentInputY - step, minInputY);
+    currentInputYUpdate = millis();
     refreshDisplay = true;
     return;
   }
   if (secondEncoder.direction > 0) {
-    int step = stepSize(currentYUpdate, millis());
-    currentY = MIN(currentY + step, maxY);
-    currentYUpdate = millis();
+    int step = stepSize(currentInputYUpdate, millis());
+    currentInputY = MIN(currentInputY + step, maxInputY);
+    currentInputYUpdate = millis();
     refreshDisplay = true;
     return;
   }
 
   if (thirdEncoder.direction < 0) {
-    int step = stepSize(currentZUpdate, millis());
-    currentZ = MAX(currentZ - step, minZ);
-    currentZUpdate = millis();
+    int step = stepSize(currentInputZUpdate, millis());
+    currentInputZ = MAX(currentInputZ - step, minInputZ);
+    currentInputZUpdate = millis();
     refreshDisplay = true;
     return;
   }
   if (thirdEncoder.direction > 0) {
-    int step = stepSize(currentZUpdate, millis());
-    currentZ = MIN(currentZ + step, maxZ);
-    currentZUpdate = millis();
+    int step = stepSize(currentInputZUpdate, millis());
+    currentInputZ = MIN(currentInputZ + step, maxInputZ);
+    currentInputZUpdate = millis();
     refreshDisplay = true;
     return;
   }
 
   if (fourthEncoder.direction < 0) {
-    int step = stepSize(currentAngleUpdate, millis());
-    currentAngle = MAX(currentAngle - step, minAngle);
-    currentZUpdate = millis();
+    int step = stepSize(currentInputAngleUpdate, millis());
+    currentInputAngle = MAX(currentInputAngle - step, minInputAngle);
+    currentInputZUpdate = millis();
     refreshDisplay = true;
     return;
   }
   if (fourthEncoder.direction > 0) {
-    int step = stepSize(currentAngleUpdate, millis());
+    int step = stepSize(currentInputAngleUpdate, millis());
     if (encoder4normalDirection) {
-      currentAngle = MIN(currentAngle + step, maxAngle);  
+      currentInputAngle = MIN(currentInputAngle + step, maxInputAngle);  
     }
     else {
-      currentAngle = MAX(currentAngle - step, 0);
+      currentInputAngle = MAX(currentInputAngle - step, 0);
     }
-    currentAngleUpdate = millis();
+    currentInputAngleUpdate = millis();
     refreshDisplay = true;
     return;
   }
 
   if (firstEncoder.buttonPressed && currentState == ST_CREATE_PROGRAM) {
     struct ProgramStep newStep;
-    newStep.x = currentX;
-    newStep.y = currentY;
-    newStep.z = currentZ;
-    newStep.angle = currentAngle;
+    newStep.x = currentInputX;
+    newStep.y = currentInputY;
+    newStep.z = currentInputZ;
+    newStep.angle = currentInputAngle;
     newStep.pump = currentlyPumpEnabled;
-    newStep.duration = 1500;
-    newStep.pauseBefore = 1500;
-    newStep.pauseAfter = 1500;
+    newStep.duration = 1000;
+    newStep.pauseBefore = 300;
+    newStep.pauseAfter = 300;
     currentStep++;
     programStepCount++;
     program[currentStep] = newStep;

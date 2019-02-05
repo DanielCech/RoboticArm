@@ -71,20 +71,20 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
         int numberPump = (int)strtol(stringPump.c_str(), NULL, 16);
 
 
-        if ((numberX >= minX) && (numberX <= maxX)) {
-          currentX = numberX;
+        if ((numberX >= minInputX) && (numberX <= maxInputX)) {
+          currentInputX = numberX;
         }
 
-        if ((numberY >= minY) && (numberY <= maxY)) {
-          currentY = numberY;
+        if ((numberY >= minInputY) && (numberY <= maxInputY)) {
+          currentInputY = numberY;
         }
 
-        if ((numberZ >= minZ) && (numberZ <= maxZ)) {
-          currentZ = numberZ;
+        if ((numberZ >= minInputZ) && (numberZ <= maxInputZ)) {
+          currentInputZ = numberZ;
         }
 
-        if ((numberAngle >= minAngle) && (numberAngle <= maxAngle)) {
-          currentAngle = numberAngle;
+        if ((numberAngle >= minInputAngle) && (numberAngle <= maxInputAngle)) {
+          currentInputAngle = numberAngle;
         }
 
         currentlyPumpEnabled = (numberPump > 0);

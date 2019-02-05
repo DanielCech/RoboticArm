@@ -1,4 +1,4 @@
-#include <Wire.h> 
+#include <Wire.h>
 #include <LiquidCrystal_I2C.h>
 #include <BLEDevice.h>
 #include <BLEServer.h>
@@ -18,7 +18,7 @@ class Encoder;
 #define ENCODER_2_CLK 33
 #define ENCODER_2_DT 19
 #define ENCODER_2_SW 26
-                
+
 #define ENCODER_3_CLK 4
 #define ENCODER_3_DT 18
 #define ENCODER_3_SW 14
@@ -47,7 +47,7 @@ void displayStrings(String text1, String text2, LiquidCrystal_I2C& lcd) {
 ////////////////////////////////////////////////////////////////////////
 // LED diods
 
-int LED1 = 23; 
+int LED1 = 23;
 int LED2 = 27;
 int LED3 = 22;
 int LED4 = 15 ;
@@ -65,18 +65,92 @@ int resolution = 8;
 
 int dutyCycle = 0;
 
+////////////////////////////////////////////////////////////////////////
+// Movement
 
-const int minX = 0;
-const int maxX = 180;
-const int minY = 0;
-const int maxY = 90;
-const int minZ = 0;
-const int maxZ = 90;
-const int minAngle = 0;
-const int maxAngle = 180;
+// Initial values of X, Y, Z
+const int startX = 90;
+const int startY = 5;
+const int startZ = 0;
+const int startAngle = 90;
 
+// Current input positions
+int currentInputX = startX;
+int currentInputY = startY;
+int currentInputZ = startZ;
+int currentInputAngle = startAngle;
+bool currentlyPumpEnabled = false;
+
+// Timestamps of X, Y, Z updates
+long currentInputXUpdate = 0;
+long currentInputYUpdate = 0;
+long currentInputZUpdate = 0;
+long currentInputAngleUpdate = 0;
+
+// Last input positions
+int lastInputX = 90;
+int lastInputY = 90;
+int lastInputZ = 90;
+int lastInputAngle = 90;
+bool beforePumpEnabled = false;
+
+// Limits for input
+const int minInputX = 0;
+const int maxInputX = 180;
+const int minInputY = 5;
+const int maxInputY = 18;  // 16
+const int minInputZ = 0;   // 6
+const int maxInputZ = 30;  // 20
+const int minInputAngle = 0;
+const int maxInputAngle = 180;
+
+// Real float position
+float realX = startX;
+float realY = startY;
+float realZ = startZ;
+float realAngle = startAngle;
+
+// Limits for real movement
+const float minRealX = 0;
+const float maxRealX = 180;
+const float minRealY = 0;
+const float maxRealY = 18;  // 16
+const float minRealZ = 10;   // 6
+const float maxRealZ = 30;  // 20
+const float minRealAngle = 0;
+const float maxRealAngle = 180;
+
+
+////////////////////////////////////////////////////////////////////////
+// Servo Angles
+
+float servo1Angle = 90;
+float servo2Angle = 90;
+float servo3Angle = 90;
+float servo4Angle = 90;
+
+const int minServo1Angle = 0;
+const int maxServo1Angle = 180;
+const int minServo2Angle = 0;
+const int maxServo2Angle = 110;  // 16
+const int minServo3Angle = 0;   // 6
+const int maxServo3Angle = 110;  // 20
+const int minServo4Angle = 0;
+const int maxServo4Angle = 180;
+
+// PWM Related
 const int minPulseWidth = 500;
 const int maxPulseWidth = 2500;
+
+const int minEpsilon = 0;
+const int maxEpsilon = 90;
+const int minGama = 0;
+const int maxGama = 90;
+const int minDelta = 0;
+const int maxDelta = 90;
+
+const double baseHeight = 11;         // vyska zakladny 11 cm
+const double armSegmentLength = 20;   // delka casti ramena 20 cm
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -112,23 +186,6 @@ Servo servo4;
 int currentState = ST_INITIAL;
 int selectedMenuItem = 0;
 int menuOffset = 0;
-
-int currentX = 90;
-int currentY = 90;
-int currentZ = 90;
-int currentAngle = 90;
-bool currentlyPumpEnabled = false;
-
-int lastX = 90;
-int lastY = 90;
-int lastZ = 90;
-int lastAngle = 90;
-bool beforePumpEnabled = false;
-
-long currentXUpdate = 0;
-long currentYUpdate = 0;
-long currentZUpdate = 0;
-long currentAngleUpdate = 0;
 
 bool refreshDisplay = true;
 

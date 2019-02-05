@@ -66,14 +66,19 @@ void loop() {
     digitalWrite(LED5, currentlyPumpEnabled ? HIGH : LOW);
     beforePumpEnabled = currentlyPumpEnabled;
   }
-
-  checkLimits();
-//  convertCoordinatesToAngles(currentX, currentY, currentZ);
   
-  servo1.write(currentX);
-  servo2.write(currentY);
-  servo3.write(currentZ);
-  servo4.write(currentAngle);  
+//  servo1Angle = currentX;
+//  servo2Angle = currentY;
+//  servo3Angle = currentZ;
+//  servo4Angle = currentAngle;
+//  checkCoordinateLimits();
+
+  convertCoordinatesToAngles();
+  
+//  servo1.write(servo1Angle);
+//  servo2.write(servo2Angle);
+//  servo3.write(servo3Angle);
+//  servo4.write(servo4Angle); 
 }
 
 
