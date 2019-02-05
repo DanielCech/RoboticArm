@@ -38,12 +38,12 @@ void playProgram() {
         int nextZ = currentProgramStep.z;
         int nextAngle = currentProgramStep.angle;
         
-        currentInputX = lastInputX + (nextX - lastInputX) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
-        currentInputY = lastInputY + (nextY - lastInputY) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
-        currentInputZ = lastInputZ + (nextZ - lastInputZ) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
-        currentInputAngle = lastInputAngle + (nextAngle - lastInputAngle) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
+        realX = lastInputX + (nextX - lastInputX) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
+        realY = lastInputY + (nextY - lastInputY) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
+        realZ = lastInputZ + (nextZ - lastInputZ) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
+        realAngle = lastInputAngle + (nextAngle - lastInputAngle) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
     
-        Serial.printf("Values: %d %d %d %d\n", currentInputX, currentInputY, currentInputZ, currentInputAngle);
+        Serial.printf("Values: %.2f %.2f %.2f %.2f\n", realX, realY, realZ, realAngle);
       }
       else {
         currentStepPhase = STEP_PAUSE_AFTER;

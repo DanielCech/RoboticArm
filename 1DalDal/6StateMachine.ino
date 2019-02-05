@@ -159,6 +159,7 @@ void manualMode() {
   if (firstEncoder.direction < 0) {
     int step = stepSize(currentInputXUpdate, millis());
     currentInputX = MAX(currentInputX - step, minInputX);
+    realX = currentInputX;
     currentInputXUpdate = millis();
     refreshDisplay = true;
     return;
@@ -166,6 +167,7 @@ void manualMode() {
   if (firstEncoder.direction > 0) {
     int step = stepSize(currentInputXUpdate, millis());
     currentInputX = MIN(currentInputX + step, maxInputX);
+    realX = currentInputX;
     currentInputXUpdate = millis();
     refreshDisplay = true;
     return;
@@ -174,6 +176,7 @@ void manualMode() {
   if (secondEncoder.direction < 0) {
     int step = stepSize(currentInputYUpdate, millis());
     currentInputY = MAX(currentInputY - step, minInputY);
+    realY = currentInputY;
     currentInputYUpdate = millis();
     refreshDisplay = true;
     return;
@@ -181,6 +184,7 @@ void manualMode() {
   if (secondEncoder.direction > 0) {
     int step = stepSize(currentInputYUpdate, millis());
     currentInputY = MIN(currentInputY + step, maxInputY);
+    realY = currentInputY;
     currentInputYUpdate = millis();
     refreshDisplay = true;
     return;
@@ -189,6 +193,7 @@ void manualMode() {
   if (thirdEncoder.direction < 0) {
     int step = stepSize(currentInputZUpdate, millis());
     currentInputZ = MAX(currentInputZ - step, minInputZ);
+    realZ = currentInputZ;
     currentInputZUpdate = millis();
     refreshDisplay = true;
     return;
@@ -196,6 +201,7 @@ void manualMode() {
   if (thirdEncoder.direction > 0) {
     int step = stepSize(currentInputZUpdate, millis());
     currentInputZ = MIN(currentInputZ + step, maxInputZ);
+    realZ = currentInputZ;
     currentInputZUpdate = millis();
     refreshDisplay = true;
     return;
@@ -204,6 +210,7 @@ void manualMode() {
   if (fourthEncoder.direction < 0) {
     int step = stepSize(currentInputAngleUpdate, millis());
     currentInputAngle = MAX(currentInputAngle - step, minInputAngle);
+    realAngle = currentInputAngle;
     currentInputZUpdate = millis();
     refreshDisplay = true;
     return;
@@ -216,6 +223,7 @@ void manualMode() {
     else {
       currentInputAngle = MAX(currentInputAngle - step, 0);
     }
+    realAngle = currentInputAngle;
     currentInputAngleUpdate = millis();
     refreshDisplay = true;
     return;

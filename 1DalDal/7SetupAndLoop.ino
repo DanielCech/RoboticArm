@@ -75,9 +75,9 @@ void loop() {
 
   convertCoordinatesToAngles();
   
-//  servo1.write(servo1Angle);
-//  servo2.write(servo2Angle);
-//  servo3.write(servo3Angle);
+  servo1.write(servo1Angle);
+  servo2.write(servo2Angle);
+  servo3.write(servo3Angle);
 //  servo4.write(servo4Angle); 
 }
 
