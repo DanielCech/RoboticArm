@@ -70,7 +70,7 @@ int dutyCycle = 0;
 
 // Initial values of X, Y, Z
 const int startX = 90;
-const int startY = 5;
+const int startY = 11;
 const int startZ = 0;
 const int startAngle = 90;
 
@@ -97,7 +97,7 @@ bool beforePumpEnabled = false;
 // Limits for input
 const int minInputX = 0;
 const int maxInputX = 180;
-const int minInputY = 5;
+const int minInputY = 3;
 const int maxInputY = 18;  // 16
 const int minInputZ = 0;   // 6
 const int maxInputZ = 30;  // 20
@@ -134,7 +134,7 @@ const int maxServo1Angle = 180;
 const int minServo2Angle = 0;
 const int maxServo2Angle = 110;  // 16
 const int minServo3Angle = 0;   // 6
-const int maxServo3Angle = 110;  // 20
+const int maxServo3Angle = 112;  // 20
 const int minServo4Angle = 0;
 const int maxServo4Angle = 180;
 

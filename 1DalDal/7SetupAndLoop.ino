@@ -41,8 +41,6 @@ void setup() {
   
   // LED
   pinMode(LED5, OUTPUT);  // !! important for pump
-
-  setupProgram();
 }
 
 
@@ -78,7 +76,7 @@ void loop() {
   servo1.write(servo1Angle);
   servo2.write(servo2Angle);
   servo3.write(servo3Angle);
-//  servo4.write(servo4Angle); 
+  servo4.write(servo4Angle); 
 }
 
 
