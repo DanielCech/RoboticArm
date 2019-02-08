@@ -71,7 +71,15 @@ void loop() {
 //  servo4Angle = currentAngle;
 //  checkCoordinateLimits();
 
-  convertCoordinatesToAngles();
+  if (currentState != ST_PLAY_PROGRAM) {
+    convertCoordinatesToAngles(realX, realY, realZ, realAngle);
+    servo1Angle = convertedServo1Angle;
+    servo2Angle = convertedServo2Angle;
+    servo3Angle = convertedServo3Angle;  
+    servo4Angle = convertedServo4Angle;
+  }
+
+  checkServoAngleLimits();
   
   servo1.write(servo1Angle);
   servo2.write(servo2Angle);

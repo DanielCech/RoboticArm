@@ -98,7 +98,7 @@ bool beforePumpEnabled = false;
 const int minInputX = 0;
 const int maxInputX = 180;
 const int minInputY = 3;
-const int maxInputY = 18;  // 16
+const int maxInputY = 23;  // 16
 const int minInputZ = 0;   // 6
 const int maxInputZ = 30;  // 20
 const int minInputAngle = 0;
@@ -128,6 +128,23 @@ float servo1Angle = 90;
 float servo2Angle = 90;
 float servo3Angle = 90;
 float servo4Angle = 90;
+
+// Immediate results of conversion
+float convertedServo1Angle = 90;
+float convertedServo2Angle = 90;
+float convertedServo3Angle = 90;
+float convertedServo4Angle = 90;
+
+// Previous angles for movement
+float lastServo1Angle = 90;
+float lastServo2Angle = 90;
+float lastServo3Angle = 90;
+float lastServo4Angle = 90;
+
+float nextServo1Angle = 90;
+float nextServo2Angle = 90;
+float nextServo3Angle = 90;
+float nextServo4Angle = 90;
 
 const int minServo1Angle = 0;
 const int maxServo1Angle = 180;
