@@ -95,7 +95,7 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
 //        int numberX = (int)strtol(stringX.c_str());
 //        int numberX = (int)strtol(stringX.c_str());
 
-        Serial.printf("X:%d Y:%d Z:%d Angle:%d Pump:%d", numberX, numberY, numberZ, numberAngle, numberPump); 
+        // Serial.printf("X:%d Y:%d Z:%d Angle:%d Pump:%d", numberX, numberY, numberZ, numberAngle, numberPump); 
 
         Serial.print("Prijata zprava: ");
         for (int i = 0; i < prijataZprava.length(); i++) {

@@ -215,6 +215,13 @@ bool refreshDisplay = true;
 #define STEP_MOVEMENT 2
 #define STEP_PAUSE_AFTER 3
 
+#define MOVE_BEGIN 0
+#define MOVE_IN_PROGRESS 1
+#define MOVE_FINISHED 2
+
+int movePhase = MOVE_FINISHED;
+const int moveStepDuration = 1500;
+
 const int maxStepCount = 20;
 
 struct ProgramStep {

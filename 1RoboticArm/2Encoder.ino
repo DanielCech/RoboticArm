@@ -45,33 +45,21 @@ public:
       }
 
       long now = millis();
-      if ((direction == -1) && (now - forwardStepUpdate < 300)) {
+      if ((direction == -1) && (now - forwardStepUpdate < 200)) {
         direction = 0;
-//        forwardStepUpdate = millis();
       } 
-      else if ((direction == 1) && (now - backwardStepUpdate < 300)) {
+      else if ((direction == 1) && (now - backwardStepUpdate < 200)) {
         direction = 0;
-//        backwardStepUpdate = millis();
       }
  
-
-//      if ((direction != previousDirection) && (millis() - directionUpdate < 400)) {
-//        direction = previousDirection; 
-//      }
-//      
       previousDirection = direction;
     }
     else {
       direction = 0;
     }
 
-//    if ((direction != 0) && (direction != previousDirection))  {
-//        direction = previousDirection; 
-//      }
-
     clkPreviousState = clkState;
     buttonPreviousState = buttonState;
-//    previousDirection = direction;
   }  
 };
 

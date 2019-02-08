@@ -71,7 +71,7 @@ void loop() {
 //  servo4Angle = currentAngle;
 //  checkCoordinateLimits();
 
-  if (currentState != ST_PLAY_PROGRAM) {
+  if ((currentState != ST_PLAY_PROGRAM) && (currentState != ST_MANUAL_MODE)) {
     checkRealCoordinateLimits();
     convertCoordinatesToAngles(realX, realY, realZ, realAngle);
     servo1Angle = convertedServo1Angle;

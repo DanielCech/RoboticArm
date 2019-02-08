@@ -26,8 +26,8 @@ void playProgram() {
       }
       else {
         currentStepBegin = millis();
-        float currentProgramStepRealY = minRealY + (currentInputY - minInputY) / float(maxInputY - minInputY) * (maxRealY - minRealY);
-        float currentProgramStepRealZ = minRealZ + (currentInputZ - minInputZ) / float(maxInputZ - minInputZ) * (maxRealZ - minRealZ);
+        float currentProgramStepRealY = minRealY + (currentProgramStep.y - minInputY) / float(maxInputY - minInputY) * (maxRealY - minRealY);
+        float currentProgramStepRealZ = minRealZ + (currentProgramStep.z - minInputZ) / float(maxInputZ - minInputZ) * (maxRealZ - minRealZ);
         convertCoordinatesToAngles(currentProgramStep.x, currentProgramStepRealY, currentProgramStepRealZ, currentProgramStep.angle);
         nextServo1Angle = convertedServo1Angle;
         nextServo2Angle = convertedServo2Angle;
@@ -143,7 +143,7 @@ void convertCoordinatesToAngles(float x, float y, float z, float angle) {
   convertedServo3Angle = 107 - beta;
   convertedServo4Angle = 181 - angle;
 
-  Serial.printf("rX: %.2f, rY: %.2f, rZ: %.2f, hD: %.2f, chord: %.2f, b: %.2f(%.2f), d: %.2f, g: %.2f(%.2f), s2: %.2f, s3: %.2f, s4: %.2f\n",  realX, realY, realZ, heightDelta, chord, beta, betaComplement, delta, gama, gamaComplement, servo2Angle, servo3Angle, servo4Angle);
+  //Serial.printf("rX: %.2f, rY: %.2f, rZ: %.2f, hD: %.2f, chord: %.2f, b: %.2f(%.2f), d: %.2f, g: %.2f(%.2f), s2: %.2f, s3: %.2f, s4: %.2f\n",  realX, realY, realZ, heightDelta, chord, beta, betaComplement, delta, gama, gamaComplement, servo2Angle, servo3Angle, servo4Angle);
 };
 
 
@@ -250,4 +250,61 @@ void checkInputCoordinateLimits() {
   }
 }
 
+
+void manualMovement() {  
+  double timeDelta = millis() - currentStepBegin;
+  
+  switch (movePhase) {
+    case MOVE_BEGIN: {
+      lastServo1Angle = servo1Angle;
+      lastServo2Angle = servo2Angle;
+      lastServo3Angle = servo3Angle;
+      lastServo4Angle = servo4Angle;
+      updateNextServoAngles(false);
+      
+      movePhase = MOVE_IN_PROGRESS;
+      Serial.printf("Begin\n");
+      return;
+    }
+
+    case MOVE_IN_PROGRESS: {
+      if (timeDelta <= moveStepDuration) {
+        
+        servo1Angle = lastServo1Angle + (nextServo1Angle - lastServo1Angle) * easeInOutCubic(timeDelta / (double)moveStepDuration);
+        servo2Angle = lastServo2Angle + (nextServo2Angle - lastServo2Angle) * easeInOutCubic(timeDelta / (double)moveStepDuration);
+        servo3Angle = lastServo3Angle + (nextServo3Angle - lastServo3Angle) * easeInOutCubic(timeDelta / (double)moveStepDuration);
+        servo4Angle = lastServo4Angle + (nextServo4Angle - lastServo4Angle) * easeInOutCubic(timeDelta / (double)moveStepDuration);
+
+        Serial.printf("Movement\n");
+        //Serial.printf("Values: s1:%.2f s2:%.2f s3:%.2f s4:%.2f\n", servo1Angle, servo2Angle, servo3Angle, servo4Angle);
+      }
+      else {
+        movePhase = MOVE_FINISHED;
+      }
+      return;
+    }
+
+    case MOVE_FINISHED: {
+      Serial.printf("Finished\n");
+      return;
+    }
+  }
+}
+
+void updateNextServoAngles(bool changePhase) {
+  float currentProgramStepRealY = minRealY + (currentInputY - minInputY) / float(maxInputY - minInputY) * (maxRealY - minRealY);
+  float currentProgramStepRealZ = minRealZ + (currentInputZ - minInputZ) / float(maxInputZ - minInputZ) * (maxRealZ - minRealZ);
+  convertCoordinatesToAngles(currentInputX, currentProgramStepRealY, currentProgramStepRealZ, currentInputAngle);
+  nextServo1Angle = convertedServo1Angle;
+  nextServo2Angle = convertedServo2Angle;
+  nextServo3Angle = convertedServo3Angle;
+  nextServo4Angle = convertedServo4Angle;
+  currentStepBegin = millis();
+
+  if (changePhase) {
+    if (movePhase != MOVE_IN_PROGRESS) {
+      movePhase = MOVE_BEGIN;
+    }  
+  }
+}
 
