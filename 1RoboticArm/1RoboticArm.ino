@@ -113,7 +113,7 @@ float realAngle = startAngle;
 // Limits for real movement
 const float minRealX = 0;
 const float maxRealX = 180;
-const float minRealY = 4;
+const float minRealY = 3;
 const float maxRealY = 25;  // 16
 const float minRealZ = 10;   // 6
 const float maxRealZ = 30;  // 20
