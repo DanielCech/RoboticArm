@@ -26,7 +26,9 @@ void playProgram() {
       }
       else {
         currentStepBegin = millis();
-        convertCoordinatesToAngles(currentProgramStep.x, currentProgramStep.y, currentProgramStep.z, currentProgramStep.angle);
+        float currentProgramStepRealY = minRealY + (currentInputY - minInputY) / float(maxInputY - minInputY) * (maxRealY - minRealY);
+        float currentProgramStepRealZ = minRealZ + (currentInputZ - minInputZ) / float(maxInputZ - minInputZ) * (maxRealZ - minRealZ);
+        convertCoordinatesToAngles(currentProgramStep.x, currentProgramStepRealY, currentProgramStepRealZ, currentProgramStep.angle);
         nextServo1Angle = convertedServo1Angle;
         nextServo2Angle = convertedServo2Angle;
         nextServo3Angle = convertedServo3Angle;
@@ -112,8 +114,6 @@ float toDegrees(float angle) {
 
 void convertCoordinatesToAngles(float x, float y, float z, float angle) {
 
-  checkRealCoordinateLimits();
-
   float heightDelta = y - baseHeight;
   float chord = sqrt(z * z + heightDelta * heightDelta);
   
@@ -138,10 +138,10 @@ void convertCoordinatesToAngles(float x, float y, float z, float angle) {
     gama = 90 - gamaComplement;
   }
 
-  convertedServo1Angle = x;
+  convertedServo1Angle = 180 - x;
   convertedServo2Angle = gama - 10;
   convertedServo3Angle = 107 - beta;
-  convertedServo4Angle = angle;
+  convertedServo4Angle = 181 - angle;
 
   Serial.printf("rX: %.2f, rY: %.2f, rZ: %.2f, hD: %.2f, chord: %.2f, b: %.2f(%.2f), d: %.2f, g: %.2f(%.2f), s2: %.2f, s3: %.2f, s4: %.2f\n",  realX, realY, realZ, heightDelta, chord, beta, betaComplement, delta, gama, gamaComplement, servo2Angle, servo3Angle, servo4Angle);
 };

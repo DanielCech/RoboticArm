@@ -126,7 +126,7 @@ void resetPosition() {
   currentlyPumpEnabled = false;
   beforePumpEnabled = false;
 
-  realX = startX;
+  startX;
   realY = startY;
   realZ = startZ;
   realAngle = startAngle;
@@ -176,7 +176,7 @@ void manualMode() {
   if (secondEncoder.direction < 0) {
     int step = stepSize(currentInputYUpdate, millis());
     currentInputY = MAX(currentInputY - step, minInputY);
-    realY = currentInputY;
+    realY = minRealY + ((currentInputY - minInputY) / float(maxInputY - minInputY)) * (maxRealY - minRealY);
     currentInputYUpdate = millis();
     refreshDisplay = true;
     return;
@@ -184,7 +184,7 @@ void manualMode() {
   if (secondEncoder.direction > 0) {
     int step = stepSize(currentInputYUpdate, millis());
     currentInputY = MIN(currentInputY + step, maxInputY);
-    realY = currentInputY;
+    realY = minRealY + ((currentInputY - minInputY) / float(maxInputY - minInputY)) * (maxRealY - minRealY);
     currentInputYUpdate = millis();
     refreshDisplay = true;
     return;
@@ -193,7 +193,7 @@ void manualMode() {
   if (thirdEncoder.direction < 0) {
     int step = stepSize(currentInputZUpdate, millis());
     currentInputZ = MAX(currentInputZ - step, minInputZ);
-    realZ = currentInputZ;
+    realZ = minRealZ + ((currentInputZ - minInputZ) / float(maxInputZ - minInputZ)) * (maxRealZ - minRealZ);
     currentInputZUpdate = millis();
     refreshDisplay = true;
     return;
@@ -201,7 +201,7 @@ void manualMode() {
   if (thirdEncoder.direction > 0) {
     int step = stepSize(currentInputZUpdate, millis());
     currentInputZ = MIN(currentInputZ + step, maxInputZ);
-    realZ = currentInputZ;
+    realZ = minRealZ + (currentInputZ - minInputZ) / float(maxInputZ - minInputZ) * (maxRealZ - minRealZ);
     currentInputZUpdate = millis();
     refreshDisplay = true;
     return;

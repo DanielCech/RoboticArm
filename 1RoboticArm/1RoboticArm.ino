@@ -97,10 +97,10 @@ bool beforePumpEnabled = false;
 // Limits for input
 const int minInputX = 0;
 const int maxInputX = 180;
-const int minInputY = 3;
-const int maxInputY = 23;  // 16
+const int minInputY = 0;
+const int maxInputY = 200;  // 16
 const int minInputZ = 0;   // 6
-const int maxInputZ = 30;  // 20
+const int maxInputZ = 200;  // 20
 const int minInputAngle = 0;
 const int maxInputAngle = 180;
 
@@ -113,8 +113,8 @@ float realAngle = startAngle;
 // Limits for real movement
 const float minRealX = 0;
 const float maxRealX = 180;
-const float minRealY = 0;
-const float maxRealY = 18;  // 16
+const float minRealY = 4;
+const float maxRealY = 25;  // 16
 const float minRealZ = 10;   // 6
 const float maxRealZ = 30;  // 20
 const float minRealAngle = 0;
@@ -146,14 +146,14 @@ float nextServo2Angle = 90;
 float nextServo3Angle = 90;
 float nextServo4Angle = 90;
 
-const int minServo1Angle = 0;
-const int maxServo1Angle = 180;
-const int minServo2Angle = 0;
-const int maxServo2Angle = 110;  // 16
-const int minServo3Angle = 0;   // 6
-const int maxServo3Angle = 112;  // 20
-const int minServo4Angle = 0;
-const int maxServo4Angle = 180;
+const float minServo1Angle = 0;
+const float maxServo1Angle = 180;
+const float minServo2Angle = 0;
+const float maxServo2Angle = 110;  // 16
+const float minServo3Angle = 0;   // 6
+const float maxServo3Angle = 112;  // 20
+const float minServo4Angle = 0;
+const float maxServo4Angle = 180;
 
 // PWM Related
 const int minPulseWidth = 500;
