@@ -256,10 +256,6 @@ void manualMovement() {
   
   switch (movePhase) {
     case MOVE_BEGIN: {
-      lastServo1Angle = servo1Angle;
-      lastServo2Angle = servo2Angle;
-      lastServo3Angle = servo3Angle;
-      lastServo4Angle = servo4Angle;
       updateNextServoAngles(false);
       
       movePhase = MOVE_IN_PROGRESS;
@@ -292,6 +288,11 @@ void manualMovement() {
 }
 
 void updateNextServoAngles(bool changePhase) {
+  lastServo1Angle = servo1Angle;
+  lastServo2Angle = servo2Angle;
+  lastServo3Angle = servo3Angle;
+  lastServo4Angle = servo4Angle;
+      
   float currentProgramStepRealY = minRealY + (currentInputY - minInputY) / float(maxInputY - minInputY) * (maxRealY - minRealY);
   float currentProgramStepRealZ = minRealZ + (currentInputZ - minInputZ) / float(maxInputZ - minInputZ) * (maxRealZ - minRealZ);
   convertCoordinatesToAngles(currentInputX, currentProgramStepRealY, currentProgramStepRealZ, currentInputAngle);
