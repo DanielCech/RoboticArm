@@ -53,10 +53,6 @@ void loop() {
   secondEncoder.readEncoder(ENCODER_2_CLK, ENCODER_2_DT, ENCODER_2_SW);
   thirdEncoder.readEncoder(ENCODER_3_CLK, ENCODER_3_DT, ENCODER_3_SW);
   fourthEncoder.readEncoder(ENCODER_4_CLK, ENCODER_4_DT, ENCODER_4_SW);
-
-  if (bluetoothModeEnabled) {
-    processBluetoothLoop();
-  }
   
   processState();
 
