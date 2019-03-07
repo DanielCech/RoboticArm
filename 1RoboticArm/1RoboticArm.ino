@@ -2,6 +2,7 @@
 #include <LiquidCrystal_I2C.h>
 #include <BLEDevice.h>
 #include <BLEServer.h>
+#include <BLEAdvertising.h>
 #include <BLEUtils.h>
 #include <BLE2902.h>
 #include <ESP32_Servo.h>

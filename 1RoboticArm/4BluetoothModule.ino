@@ -62,7 +62,7 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
         std::string stringAngle = prijataZprava.substr(6, 2);
         std::string stringPump = prijataZprava.substr(8, 2);
 
-        //Serial.printf("sX:%s sY:%s sZ:%s sAngle:%s sPump:%s", stringX.c_str(), stringY.c_str(), stringZ.c_str(), stringAngle.c_str(), stringPump.c_str());
+        Serial.printf("sX:%s sY:%s sZ:%s sAngle:%s sPump:%s", stringX.c_str(), stringY.c_str(), stringZ.c_str(), stringAngle.c_str(), stringPump.c_str());
 
         int numberX = (int)strtol(stringX.c_str(), NULL, 16);
         int numberY = (int)strtol(stringY.c_str(), NULL, 16);
@@ -95,7 +95,7 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
 //        int numberX = (int)strtol(stringX.c_str());
 //        int numberX = (int)strtol(stringX.c_str());
 
-        // Serial.printf("X:%d Y:%d Z:%d Angle:%d Pump:%d", numberX, numberY, numberZ, numberAngle, numberPump); 
+//         Serial.printf("X:%d Y:%d Z:%d Angle:%d Pump:%d", numberX, numberY, numberZ, numberAngle, numberPump); 
 
         Serial.print("Prijata zprava: ");
         for (int i = 0; i < prijataZprava.length(); i++) {

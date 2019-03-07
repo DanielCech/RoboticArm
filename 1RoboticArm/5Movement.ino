@@ -281,7 +281,7 @@ void manualMovement() {
     }
 
     case MOVE_FINISHED: {
-      Serial.printf("Finished\n");
+      //Serial.printf("Finished\n");
       return;
     }
   }
