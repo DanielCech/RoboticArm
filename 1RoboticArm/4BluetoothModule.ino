@@ -70,10 +70,17 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
           currentInputAngle = numberAngle;
         }
 
-        realX = numberX;
-        realY = numberY;
-        realZ = numberZ;
-        realAngle = numberAngle;
+
+        if (immediately) {
+          realX = numberX;
+          realY = numberY;
+          realZ = numberZ;
+          realAngle = numberAngle;
+        }
+        else {
+          updateNextServoAngles(!immediately);
+        }
+        
 
         currentlyPumpEnabled = (numberPump > 0);
 
