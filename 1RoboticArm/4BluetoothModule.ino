@@ -70,11 +70,16 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
           currentInputAngle = numberAngle;
         }
 
+        realX = numberX;
+        realY = numberY;
+        realZ = numberZ;
+        realAngle = numberAngle;
+
         currentlyPumpEnabled = (numberPump > 0);
 
-        updateNextServoAngles(!immediately);
-
-        refreshDisplay = true;
+        if ((currentState != ST_PLAY_PROGRAM) && (currentState != ST_MANUAL_MODE)) {
+          refreshDisplay = true;
+        }
         
         Serial.println();
       }
