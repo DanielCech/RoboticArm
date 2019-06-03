@@ -1,6 +1,5 @@
 
 void playProgram() {
-//  Serial.printf("playProgram\n");
   
   if (currentStep == -1) {
     startNewStep();
@@ -100,6 +99,9 @@ void startNewStep() {
     }
 }
 
+
+// Movement transition functions
+
 double linear(double t) {
   return t;
 }
@@ -111,6 +113,8 @@ double easeInOutCubic(double t) {
 float toDegrees(float angle) {
   return 180 * angle / PI;
 }
+
+// Coordinates to angles
 
 void convertCoordinatesToAngles(float x, float y, float z, float angle) {
 

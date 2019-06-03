@@ -325,9 +325,6 @@ void confirmProgramStep() {
   }
 }
 
-void demoMode() {
-//  Serial.println("Demo");
-}
 
 void processState() {
 
@@ -367,13 +364,7 @@ void processState() {
       bluetoothMode();
       return;
     }
-      
-    
-  case ST_DEMO: {
-      demoMode();
-      return;
-    }
-    
+          
   }    
 }
 

@@ -27,20 +27,20 @@ void setup() {
 
   // Servos
 
-  servo1.attach(23, minPulseWidth, maxPulseWidth);
+  servo1.attach(servo1Pin, minPulseWidth, maxPulseWidth);
   servo1.setTimerWidth(20);
   
-  servo2.attach(27, minPulseWidth, maxPulseWidth);
+  servo2.attach(servo2Pin, minPulseWidth, maxPulseWidth);
   servo2.setTimerWidth(20);
   
-  servo3.attach(22, minPulseWidth, maxPulseWidth);
+  servo3.attach(servo3Pin, minPulseWidth, maxPulseWidth);
   servo3.setTimerWidth(20);
   
-  servo4.attach(15, minPulseWidth, maxPulseWidth);
+  servo4.attach(servo4Pin, minPulseWidth, maxPulseWidth);
   servo4.setTimerWidth(20);
   
   // LED
-  pinMode(LED5, OUTPUT);  // !! important for pump
+  pinMode(pumpPin, OUTPUT);  // !! important for pump
 }
 
 
@@ -57,7 +57,7 @@ void loop() {
   processState();
 
   if (currentlyPumpEnabled != beforePumpEnabled) {
-    digitalWrite(LED5, currentlyPumpEnabled ? HIGH : LOW);
+    digitalWrite(pumpPin, currentlyPumpEnabled ? HIGH : LOW);
     beforePumpEnabled = currentlyPumpEnabled;
   }
   

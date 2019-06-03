@@ -46,28 +46,20 @@ void displayStrings(String text1, String text2, LiquidCrystal_I2C& lcd) {
 
 
 ////////////////////////////////////////////////////////////////////////
-// LED diods
+// Servo & Pump diods
 
-int LED1 = 23;
-int LED2 = 27;
-int LED3 = 22;
-int LED4 = 15 ;
-int LED5 = 5;
+int servo1Pin = 23;
+int servo2Pin = 27;
+int servo3Pin = 22;
+int servo4Pin = 15 ;
+int pumpPin = 5;
 
 int freq = 5000;
 
-int led1Channel = 0;
-int led2Channel = 1;
-int led3Channel = 2;
-int led4Channel = 3;
-int led5Channel = 4;
-
-int resolution = 8;
-
-int dutyCycle = 0;
-
 ////////////////////////////////////////////////////////////////////////
 // Movement
+
+bool immediately = false;
 
 // Initial values of X, Y, Z
 const int startX = 90;
@@ -183,16 +175,18 @@ Servo servo4;
 ////////////////////////////////////////////////////////////////////////
 // State
 
-#define ST_INITIAL          0
-#define ST_MAIN_MENU        1
+#define ST_INITIAL                        0
+#define ST_MAIN_MENU                      1
 
-#define ST_RESET_POSITION   10
-#define ST_PLAY_PROGRAM     20
-#define ST_CREATE_PROGRAM   30
-#define ST_CREATE_PROGRAM_CONFIRM_STEP   31
-#define ST_MANUAL_MODE      40
-#define ST_BLUETOOTH_MODE   50
-#define ST_DEMO             60
+#define ST_RESET_POSITION                 10
+#define ST_PLAY_PROGRAM                   20
+#define ST_CREATE_PROGRAM                 30
+#define ST_CREATE_PROGRAM_CONFIRM_STEP    31
+#define ST_MANUAL_MODE                    40
+#define ST_BLUETOOTH_MODE                 50
+
+////////////////////////////////////////////////////////////////////////
+// Menu
 
 #define MENU_RESET_POSITION 0
 #define MENU_PLAY_PROGRAM   1
@@ -209,7 +203,6 @@ bool refreshDisplay = true;
 
 ////////////////////////////////////////////////////////////////////////
 // Program
-
 
 #define STEP_INITIAL 0
 #define STEP_PAUSE_BEFORE 1
@@ -242,5 +235,3 @@ int programStepCount = 0;
 int currentStep = -1;
 int currentStepPhase = STEP_INITIAL;
 unsigned long currentStepBegin = 0;
-
-//String stepNumber = "";

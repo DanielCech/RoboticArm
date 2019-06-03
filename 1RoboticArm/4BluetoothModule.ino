@@ -1,6 +1,6 @@
 #define SERVICE_UUID        "326a9000-85cb-9195-d9dd-464cfbbae75a"
-#define CONTROL_UUID            "326a9001-85cb-9195-d9dd-464cfbbae75a"
-#define PROGRAM_UUID         "326a9006-85cb-9195-d9dd-464cfbbae75a"
+#define CONTROL_UUID        "326a9001-85cb-9195-d9dd-464cfbbae75a"
+#define PROGRAM_UUID        "326a9006-85cb-9195-d9dd-464cfbbae75a"
 #define DEVICE_NAME         "RoboticArm"
 
 
@@ -29,28 +29,30 @@ class MyServerCallbacks: public BLEServerCallbacks {
 // Message receiving
 class ControlCallbacks: public BLECharacteristicCallbacks {
     void onWrite(BLECharacteristic *pCharacteristic) {
-      // načti přijatou zprávu do proměnné
+      
       receivedMessage = pCharacteristic->getValue();
-      // pokud není zpráva prázdná, vypiš její obsah
-      // po znacích po sériové lince
-
      
       if (receivedMessage.length() > 0) {
         
-        std::string stringX = receivedMessage.substr(0, 2);
-        std::string stringY = receivedMessage.substr(2, 2);
-        std::string stringZ = receivedMessage.substr(4, 2);
-        std::string stringAngle = receivedMessage.substr(6, 2);
-        std::string stringPump = receivedMessage.substr(8, 2);
+        std::string stringX = receivedMessage.substr(0, 4);
+        std::string stringY = receivedMessage.substr(4, 4);
+        std::string stringZ = receivedMessage.substr(8, 4);
+        std::string stringAngle = receivedMessage.substr(12, 4);
+        std::string stringPump = receivedMessage.substr(16, 1);
+        std::string stringImmediately = receivedMessage.substr(17, 1);
+        std::string stringControlServos = receivedMessage.substr(18, 1);
 
-        Serial.printf("sX:%s sY:%s sZ:%s sAngle:%s sPump:%s", stringX.c_str(), stringY.c_str(), stringZ.c_str(), stringAngle.c_str(), stringPump.c_str());
+        //Serial.printf("sX:%s sY:%s sZ:%s sAngle:%s sPump:%s", stringX.c_str(), stringY.c_str(), stringZ.c_str(), stringAngle.c_str(), stringPump.c_str());
 
-        int numberX = (int)strtol(stringX.c_str(), NULL, 16);
-        int numberY = (int)strtol(stringY.c_str(), NULL, 16);
-        int numberZ = (int)strtol(stringZ.c_str(), NULL, 16);
-        int numberAngle = (int)strtol(stringAngle.c_str(), NULL, 16);
+        float numberX = (float)strtol(stringX.c_str(), NULL, 16) / 10;
+        float numberY = (float)strtol(stringY.c_str(), NULL, 16) / 10;
+        float numberZ = (float)strtol(stringZ.c_str(), NULL, 16) / 10;
+        float numberAngle = (float)strtol(stringAngle.c_str(), NULL, 16) / 10;
         int numberPump = (int)strtol(stringPump.c_str(), NULL, 16);
+        int numberImmediately = (int)strtol(stringImmediately.c_str(), NULL, 16);
+        int numberControlServos = (int)strtol(stringControlServos.c_str(), NULL, 16);
 
+        immediately = (bool)numberImmediately;
 
         if ((numberX >= minInputX) && (numberX <= maxInputX)) {
           currentInputX = numberX;
@@ -70,14 +72,10 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
 
         currentlyPumpEnabled = (numberPump > 0);
 
-        updateNextServoAngles(true);
+        updateNextServoAngles(!immediately);
 
         refreshDisplay = true;
         
-//        Serial.print("Received message: ");
-//        for (int i = 0; i < receivedMessage.length(); i++) {
-//          Serial.print(receivedMessage[i]);
-//        }
         Serial.println();
       }
     }
