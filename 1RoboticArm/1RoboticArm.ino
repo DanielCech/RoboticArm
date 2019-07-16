@@ -70,7 +70,13 @@ const int startY = 11;
 const int startZ = 0;
 const int startAngle = 90;
 
-// Current input positions
+// Input coordinates used for initial movement (in manual movement mode)
+int fromInputX = startX;
+int fromInputY = startY;
+int fromInputZ = startZ;
+int fromInputAngle = startAngle;
+
+// Current input positions (in manual movement mode)
 int currentInputX = startX;
 int currentInputY = startY;
 int currentInputZ = startZ;
@@ -82,6 +88,8 @@ long currentInputXUpdate = 0;
 long currentInputYUpdate = 0;
 long currentInputZUpdate = 0;
 long currentInputAngleUpdate = 0;
+
+const long pauseBeforeManualMovement = 1000;
 
 // Last input positions
 int lastInputX = 90;
@@ -136,10 +144,10 @@ float servo3Angle = 90;
 float servo4Angle = 90;
 
 // Immediate results of conversion
-float convertedServo1Angle = 90;
-float convertedServo2Angle = 90;
-float convertedServo3Angle = 90;
-float convertedServo4Angle = 90;
+//float convertedServo1Angle = 90;
+//float convertedServo2Angle = 90;
+//float convertedServo3Angle = 90;
+//float convertedServo4Angle = 90;
 
 // Previous angles for movement
 //float lastServo1Angle = 90;

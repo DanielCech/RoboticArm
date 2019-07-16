@@ -116,7 +116,7 @@ float toDegrees(float angle) {
 ////////////////////////////////////////////////////////////////////////
 // Coordinates to angles
 
-void convertCoordinatesToAngles(float x, float y, float z, float angle, float& outputS1Angle, float& outputServo2Angle, float& outputServo3Angle, float& outputServo4Angle) {
+void convertCoordinatesToAngles(float x, float y, float z, float angle, float& outputServo1Angle, float& outputServo2Angle, float& outputServo3Angle, float& outputServo4Angle) {
 
   float heightDelta = y - baseHeight;
   float chord = sqrt(z * z + heightDelta * heightDelta);
@@ -142,12 +142,12 @@ void convertCoordinatesToAngles(float x, float y, float z, float angle, float& o
     gama = 90 - gamaComplement;
   }
 
-  convertedServo1Angle = 180 - x;
-  convertedServo2Angle = gama - 10;
-  convertedServo3Angle = 107 - beta;
-  convertedServo4Angle = 181 - angle;
+  outputServo1Angle = 180 - x;
+  outputServo2Angle = gama - 10;
+  outputServo3Angle = 107 - beta;
+  outputServo4Angle = 181 - angle;
 
-  Serial.printf("rX: %.2f, rY: %.2f, rZ: %.2f, hD: %.2f, chord: %.2f, b: %.2f(%.2f), d: %.2f, g: %.2f(%.2f), s2: %.2f, s3: %.2f, s4: %.2f\n",  realX, realY, realZ, heightDelta, chord, beta, betaComplement, delta, gama, gamaComplement, servo2Angle, servo3Angle, servo4Angle);
+  Serial.printf("rX: %.2f, rY: %.2f, rZ: %.2f, hD: %.2f, chord: %.2f, b: %.2f(%.2f), d: %.2f, g: %.2f(%.2f), s2: %.2f, s3: %.2f, s4: %.2f\n",  realX, realY, realZ, heightDelta, chord, beta, betaComplement, delta, gama, gamaComplement, outputServo2Angle, outputServo3Angle, outputServo4Angle);
 };
 
 
@@ -261,6 +261,31 @@ void checkInputCoordinateLimits() {
 ////////////////////////////////////////////////////////////////////////
 // Movement
 
+void startMovement(float fromInputX, float fromInputY, float fromInputZ, float fromInputAngle, float toInputX, float toInputY, float toInputZ, float toInputAngle) {
+  if ((fromInputX == toInputX) && (fromInputY == toInputY) && (fromInputZ == toInputZ) && (fromInputAngle == toInputAngle)) { return; }
+
+  switch (movePhase) {
+    case MOVE_BEGIN:
+    case MOVE_FINISHED: 
+      convertCoordinatesToAngles(fromInputX, fromInputY, fromInputZ, fromInputAngle, fromServo1Angle, fromServo2Angle, fromServo3Angle, fromServo4Angle);
+      convertCoordinatesToAngles(toInputX, toInputY, toInputZ, toInputAngle, toServo1Angle, toServo2Angle, toServo3Angle, toServo4Angle);
+      movePhase = MOVE_IN_PROGRESS;
+      currentStepBegin = millis();
+      return;
+
+    case MOVE_IN_PROGRESS: 
+      fromServo1Angle = servo1Angle;
+      fromServo2Angle = servo2Angle;
+      fromServo3Angle = servo3Angle;
+      fromServo4Angle = servo4Angle;   
+   
+      convertCoordinatesToAngles(toInputX, toInputY, toInputZ, toInputAngle, toServo1Angle, toServo2Angle, toServo3Angle, toServo4Angle);
+      movePhase = MOVE_IN_PROGRESS;
+      currentStepBegin = millis();
+      return; 
+    }
+}
+
 void movement() {
   switch (movementType) {
     case none:
@@ -270,6 +295,10 @@ void movement() {
     case remoteManual:
       manualMovement();
       break;
+
+    // TODO: complete
+    case localProgram:
+      break;  
       
     case remoteProgram:
       immediateMovement();

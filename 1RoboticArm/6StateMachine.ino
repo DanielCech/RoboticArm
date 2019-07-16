@@ -132,17 +132,12 @@ void resetPosition() {
   realAngle = startAngle;
 
   currentState = ST_MAIN_MENU;
-
-  manualMovement();
-//  updateNextServoAngles(true);
 }
 
 
 void manualMode() {
-//  ("Manual mode");
 
   if (refreshDisplay) {
-
     char firstLine[20];
     sprintf(firstLine, "XYZ:%3d,%3d,%3d", currentInputX, currentInputY, currentInputZ);
     
@@ -152,8 +147,6 @@ void manualMode() {
     displayStrings(String(firstLine), String(secondLine), lcd);
     refreshDisplay = false;
   }
-
-  manualMovement();
 
   if (firstEncoder.direction < 0) {
     int step = stepSize(currentInputXUpdate, millis());
@@ -265,6 +258,12 @@ void manualMode() {
 
   if (fourthEncoder.buttonPressed) {
     encoder4normalDirection = !encoder4normalDirection;
+  }
+
+  // Start movement after 1s pause
+  long now = millis();
+  if ((now - currentInputXUpdate > pauseBeforeManualMovement) && (now - currentInputYUpdate > pauseBeforeManualMovement) && (now - currentInputZUpdate > pauseBeforeManualMovement) && (now - currentInputAngleUpdate > pauseBeforeManualMovement)) {
+    startMovement(fromInputX, fromInputY, fromInputZ, fromInputAngle, currentInputX, currentInputY, currentInputZ, currentInputAngle);
   }
 }
 
