@@ -26,7 +26,7 @@ int stepSize(long before, long after) {
 
 void initialState() {
 
-  //Serial.println("Initial state");
+  //("Initial state");
 
   if (refreshDisplay) {
     displayStrings("RoboticArm 0.2", "JVDA-01", lcd);
@@ -36,21 +36,21 @@ void initialState() {
   if (firstEncoder.buttonPressed) {
     currentState = ST_MAIN_MENU;
     refreshDisplay = true;
-    Serial.println("Button Pressed");
+    ("Button Pressed");
     delay(200);
   }
 }
 
 
 void mainMenu() {
-//  Serial.println("Main menu");
+//  ("Main menu");
 
   if (firstEncoder.buttonPressed) {
     switch (selectedMenuItem) {
       case MENU_RESET_POSITION:
         currentState = ST_RESET_POSITION;
         refreshDisplay = true;
-        Serial.println("Button Pressed");
+        ("Button Pressed");
         delay(200);
         return;
         
@@ -126,32 +126,29 @@ void resetPosition() {
   currentlyPumpEnabled = false;
   beforePumpEnabled = false;
 
-  startX;
+  realX = startX;
   realY = startY;
   realZ = startZ;
   realAngle = startAngle;
 
   currentState = ST_MAIN_MENU;
+
+  manualMovement();
+  updateNextServoAngles(true);
 }
 
-void createProgram() {
-//  Serial.println("Create program");
-}
 
 void manualMode() {
-//  Serial.println("Manual mode");
+//  ("Manual mode");
 
   if (refreshDisplay) {
 
     char firstLine[20];
     sprintf(firstLine, "XYZ:%3d,%3d,%3d", currentInputX, currentInputY, currentInputZ);
     
-
     char secondLine[20];
     sprintf(secondLine, "A:%-3d Pump:%s #%d", currentInputAngle, currentlyPumpEnabled ? "1" : "0", currentStep + 1 );
     
-
-
     displayStrings(String(firstLine), String(secondLine), lcd);
     refreshDisplay = false;
   }
@@ -161,7 +158,6 @@ void manualMode() {
   if (firstEncoder.direction < 0) {
     int step = stepSize(currentInputXUpdate, millis());
     currentInputX = MAX(currentInputX - step, minInputX);
-//    realX = currentInputX;
     updateNextServoAngles(true);
     currentInputXUpdate = millis();
     refreshDisplay = true;
@@ -171,7 +167,6 @@ void manualMode() {
     int step = stepSize(currentInputXUpdate, millis());
     currentInputX = MIN(currentInputX + step, maxInputX);
     updateNextServoAngles(true);
-//    realX = currentInputX;
     currentInputXUpdate = millis();
     refreshDisplay = true;
     return;
@@ -181,7 +176,6 @@ void manualMode() {
     int step = stepSize(currentInputYUpdate, millis());
     currentInputY = MAX(currentInputY - step, minInputY);
     updateNextServoAngles(true);
-//    realY = minRealY + ((currentInputY - minInputY) / float(maxInputY - minInputY)) * (maxRealY - minRealY);
     currentInputYUpdate = millis();
     refreshDisplay = true;
     return;
@@ -190,7 +184,6 @@ void manualMode() {
     int step = stepSize(currentInputYUpdate, millis());
     currentInputY = MIN(currentInputY + step, maxInputY);
     updateNextServoAngles(true);
-//    realY = minRealY + ((currentInputY - minInputY) / float(maxInputY - minInputY)) * (maxRealY - minRealY);
     currentInputYUpdate = millis();
     refreshDisplay = true;
     return;
@@ -200,7 +193,6 @@ void manualMode() {
     int step = stepSize(currentInputZUpdate, millis());
     currentInputZ = MAX(currentInputZ - step, minInputZ);
     updateNextServoAngles(true);
-//    realZ = minRealZ + ((currentInputZ - minInputZ) / float(maxInputZ - minInputZ)) * (maxRealZ - minRealZ);
     currentInputZUpdate = millis();
     refreshDisplay = true;
     return;
@@ -209,7 +201,6 @@ void manualMode() {
     int step = stepSize(currentInputZUpdate, millis());
     currentInputZ = MIN(currentInputZ + step, maxInputZ);
     updateNextServoAngles(true);
-//    realZ = minRealZ + (currentInputZ - minInputZ) / float(maxInputZ - minInputZ) * (maxRealZ - minRealZ);
     currentInputZUpdate = millis();
     refreshDisplay = true;
     return;
@@ -219,7 +210,6 @@ void manualMode() {
     int step = stepSize(currentInputAngleUpdate, millis());
     currentInputAngle = MAX(currentInputAngle - step, minInputAngle);
     updateNextServoAngles(true);
-//    realAngle = currentInputAngle;
     currentInputZUpdate = millis();
     refreshDisplay = true;
     return;
@@ -233,7 +223,6 @@ void manualMode() {
       currentInputAngle = MAX(currentInputAngle - step, 0);
     }
     updateNextServoAngles(true);
-//    realAngle = currentInputAngle;
     currentInputAngleUpdate = millis();
     refreshDisplay = true;
     return;

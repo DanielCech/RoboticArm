@@ -44,47 +44,54 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
 
         //Serial.printf("sX:%s sY:%s sZ:%s sAngle:%s sPump:%s", stringX.c_str(), stringY.c_str(), stringZ.c_str(), stringAngle.c_str(), stringPump.c_str());
 
-        float numberX = (float)strtol(stringX.c_str(), NULL, 16) / 10;
-        float numberY = (float)strtol(stringY.c_str(), NULL, 16) / 10;
-        float numberZ = (float)strtol(stringZ.c_str(), NULL, 16) / 10;
-        float numberAngle = (float)strtol(stringAngle.c_str(), NULL, 16) / 10;
+        numberX = (float)strtol(stringX.c_str(), NULL, 16) / 10;
+        numberY = (float)strtol(stringY.c_str(), NULL, 16) / 10;
+        numberZ = (float)strtol(stringZ.c_str(), NULL, 16) / 10;
+        numberAngle = (float)strtol(stringAngle.c_str(), NULL, 16) / 10;
         int numberPump = (int)strtol(stringPump.c_str(), NULL, 16);
         int numberImmediately = (int)strtol(stringImmediately.c_str(), NULL, 16);
         int numberControlServos = (int)strtol(stringControlServos.c_str(), NULL, 16);
 
-        immediately = (bool)numberImmediately;
-
-        if ((numberX >= minInputX) && (numberX <= maxInputX)) {
-          currentInputX = numberX;
-        }
-
-        if ((numberY >= minInputY) && (numberY <= maxInputY)) {
-          currentInputY = numberY;
-        }
-
-        if ((numberZ >= minInputZ) && (numberZ <= maxInputZ)) {
-          currentInputZ = numberZ;
-        }
-
-        if ((numberAngle >= minInputAngle) && (numberAngle <= maxInputAngle)) {
-          currentInputAngle = numberAngle;
-        }
-
-
-        if (immediately) {
-          realX = numberX;
-          realY = numberY;
-          realZ = numberZ;
-          realAngle = numberAngle;
+        if (numberImmediately > 0) {
+          movementType = remoteImmediate;
         }
         else {
-          updateNextServoAngles(!immediately);
+          movementType = remoteManual;
+        }
+
+        numbersToCurrentInput();
+
+        if (movementType == remoteImmediate) {
+          if (lastBluetoothUpdate < 0) {
+              lastBluetoothUpdate = millis();
+              updateLastServoAngles();
+              return;
+            }
+          
+            long now = millis();
+            long stepDuration = now - lastBluetoothUpdate;
+          
+            if (stepDuration > 2000) {
+              lastBluetoothUpdate = millis();
+              updateLastServoAngles();
+              return;
+            }
+
+            // TODO: fix lastServoAngles etc....
+            convertCoordinatesToAngles(currentInputX, currentInputY, currentInputZ, currentInputAngle);
+            convertedToNextServoAngles();
+
+            lastBluetoothUpdate = millis();
+        }
+        else {
+          numbersToCurrentInput();
+          updateNextServoAngles(true);
         }
         
 
         currentlyPumpEnabled = (numberPump > 0);
 
-        if ((currentState != ST_PLAY_PROGRAM) && (currentState != ST_MANUAL_MODE)) {
+        if ((currentState == ST_MANUAL_MODE) || (currentState == ST_PLAY_PROGRAM)) {
           refreshDisplay = true;
         }
         
@@ -92,6 +99,15 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
       }
     }
 };
+
+void updateLastServoAngles() {
+  convertCoordinatesToAngles(currentInputX, currentInputY, currentInputZ, currentInputAngle);
+  
+  lastServo1Angle = convertedServo1Angle;
+  lastServo2Angle = convertedServo2Angle;
+  lastServo3Angle = convertedServo3Angle;
+  lastServo4Angle = convertedServo4Angle;
+}
 
 void enableBluetooth() {
   Serial.println("Starting...");

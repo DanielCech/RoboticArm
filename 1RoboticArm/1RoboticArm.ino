@@ -59,7 +59,10 @@ int freq = 5000;
 ////////////////////////////////////////////////////////////////////////
 // Movement
 
-bool immediately = false;
+enum MovementType { none, manual, remoteManual, remoteImmediate };
+MovementType movementType = none;
+long lastBluetoothUpdate = -1;
+long bluetoothStepDuration = 0;
 
 // Initial values of X, Y, Z
 const int startX = 90;
@@ -113,9 +116,19 @@ const float maxRealZ = 30;  // 20
 const float minRealAngle = 0;
 const float maxRealAngle = 180;
 
+// Temporary values
+float numberX;
+float numberY;
+float numberZ;
+float numberAngle;
 
 ////////////////////////////////////////////////////////////////////////
 // Servo Angles
+
+float previousServo1Angle = 90;
+float previousServo2Angle = 90;
+float previousServo3Angle = 90;
+float previousServo4Angle = 90;
 
 float servo1Angle = 90;
 float servo2Angle = 90;
@@ -152,12 +165,12 @@ const float maxServo4Angle = 180;
 const int minPulseWidth = 500;
 const int maxPulseWidth = 2500;
 
-const int minEpsilon = 0;
-const int maxEpsilon = 90;
-const int minGama = 0;
-const int maxGama = 90;
-const int minDelta = 0;
-const int maxDelta = 90;
+//const int minEpsilon = 0;
+//const int maxEpsilon = 90;
+//const int minGama = 0;
+//const int maxGama = 90;
+//const int minDelta = 0;
+//const int maxDelta = 90;
 
 const double baseHeight = 11;         // vyska zakladny 11 cm
 const double armSegmentLength = 20;   // delka casti ramena 20 cm
@@ -185,6 +198,8 @@ Servo servo4;
 #define ST_MANUAL_MODE                    40
 #define ST_BLUETOOTH_MODE                 50
 
+int currentState = ST_INITIAL;
+
 ////////////////////////////////////////////////////////////////////////
 // Menu
 
@@ -195,10 +210,8 @@ Servo servo4;
 #define MENU_BLUETOOTH_MODE 4
 #define MENU_DEMO           5
 
-int currentState = ST_INITIAL;
 int selectedMenuItem = 0;
 int menuOffset = 0;
-
 bool refreshDisplay = true;
 
 ////////////////////////////////////////////////////////////////////////
