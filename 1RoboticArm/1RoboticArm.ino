@@ -59,7 +59,7 @@ int freq = 5000;
 ////////////////////////////////////////////////////////////////////////
 // Movement
 
-enum MovementType { none, manual, remoteManual, remoteImmediate };
+enum MovementType { none, manual, remoteManual, remoteProgram };
 MovementType movementType = none;
 long lastBluetoothUpdate = -1;
 long bluetoothStepDuration = 0;

@@ -271,7 +271,7 @@ void movement() {
       manualMovement();
       break;
       
-    case remoteImmediate:
+    case remoteProgram:
       immediateMovement();
   }
   

@@ -95,9 +95,9 @@ void loop() {
   servo3.write(pulseWidthForAngle(servo3Angle));
   servo4.write(pulseWidthForAngle(servo4Angle)); 
 
-//  if (loopPhase == 0) {
-//    Serial.printf("Values: s1:%.2f s2:%.2f s3:%.2f s4:%.2f\n", servo1Angle, servo2Angle, servo3Angle, servo4Angle); 
-//  }
+  if (loopPhase == 0) {
+    Serial.printf("Values: s1:%.3f s2:%.3f s3:%.3f s4:%.3f\n", servo1Angle, servo2Angle, servo3Angle, servo4Angle); 
+  }
 
 //  if ((servo1Angle != previousServo1Angle) || (servo2Angle != previousServo2Angle) || (servo3Angle != previousServo3Angle) || (servo4Angle != previousServo4Angle)) {
 //    Serial.printf("Values: s1:%.2f s2:%.2f s3:%.2f s4:%.2f\n", servo1Angle, servo2Angle, servo3Angle, servo4Angle);

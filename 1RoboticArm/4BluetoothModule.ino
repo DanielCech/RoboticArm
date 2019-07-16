@@ -53,7 +53,7 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
         int numberControlServos = (int)strtol(stringControlServos.c_str(), NULL, 16);
 
         if (numberImmediately > 0) {
-          movementType = remoteImmediate;
+          movementType = remoteProgram;
         }
         else {
           movementType = remoteManual;
@@ -61,7 +61,7 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
 
         numbersToCurrentInput();
 
-        if (movementType == remoteImmediate) {
+        if (movementType == remoteProgram) {
           if (lastBluetoothUpdate < 0) {
               lastBluetoothUpdate = millis();
               updateLastServoAngles();
