@@ -3,99 +3,99 @@
 // Playing program
 
 void playProgram() {
-  
-  if (currentStep == -1) {
-    startNewStep();
-    return;
-  }
-
-  if (refreshDisplay) {
-    char line[20];
-    sprintf(line, "%d / %d", currentStep + 1, programStepCount);
-    
-    displayStrings("Playing Program", line, lcd);
-    refreshDisplay = false;
-  }
-
-  double timeDelta = millis() - currentStepBegin;
-  
-  ProgramStep currentProgramStep = program[currentStep];
-
-  switch (currentStepPhase) {
-    case STEP_PAUSE_BEFORE: {
-      if (timeDelta <= currentProgramStep.duration) {
-        // Do nothing 
-      }
-      else {
-        currentStepBegin = millis();
-        float currentProgramStepRealY = minRealY + (currentProgramStep.y - minInputY) / float(maxInputY - minInputY) * (maxRealY - minRealY);
-        float currentProgramStepRealZ = minRealZ + (currentProgramStep.z - minInputZ) / float(maxInputZ - minInputZ) * (maxRealZ - minRealZ);
-        convertCoordinatesToAngles(currentProgramStep.x, currentProgramStepRealY, currentProgramStepRealZ, currentProgramStep.angle);
-        convertedToNextServoAngles();
-        
-        currentStepPhase = STEP_MOVEMENT;
-      }
-      return;
-    }
-
-    case STEP_MOVEMENT: {
-      if (timeDelta <= currentProgramStep.duration) {
-        
-        servo1Angle = lastServo1Angle + (nextServo1Angle - lastServo1Angle) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
-        servo2Angle = lastServo2Angle + (nextServo2Angle - lastServo2Angle) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
-        servo3Angle = lastServo3Angle + (nextServo3Angle - lastServo3Angle) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
-        servo4Angle = lastServo4Angle + (nextServo4Angle - lastServo4Angle) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
-      }
-      else {
-        currentStepPhase = STEP_PAUSE_AFTER;
-        currentStepBegin = millis();
-      }
-      return;
-    }
-
-    case STEP_PAUSE_AFTER: {
-      if (timeDelta <= currentProgramStep.duration) {
-        // Do nothing 
-      }
-      else {
-        startNewStep();
-      }
-      return;
-    }
-  }
+//  
+//  if (currentStep == -1) {
+//    startNewStep();
+//    return;
+//  }
+//
+//  if (refreshDisplay) {
+//    char line[20];
+//    sprintf(line, "%d / %d", currentStep + 1, programStepCount);
+//    
+//    displayStrings("Playing Program", line, lcd);
+//    refreshDisplay = false;
+//  }
+//
+//  double timeDelta = millis() - currentStepBegin;
+//  
+//  ProgramStep currentProgramStep = program[currentStep];
+//
+//  switch (currentStepPhase) {
+//    case STEP_PAUSE_BEFORE: {
+//      if (timeDelta <= currentProgramStep.duration) {
+//        // Do nothing 
+//      }
+//      else {
+//        currentStepBegin = millis();
+//        float currentProgramStepRealY = minRealY + (currentProgramStep.y - minInputY) / float(maxInputY - minInputY) * (maxRealY - minRealY);
+//        float currentProgramStepRealZ = minRealZ + (currentProgramStep.z - minInputZ) / float(maxInputZ - minInputZ) * (maxRealZ - minRealZ);
+//        convertCoordinatesToAngles(currentProgramStep.x, currentProgramStepRealY, currentProgramStepRealZ, currentProgramStep.angle);
+//        convertedToNextServoAngles();
+//        
+//        currentStepPhase = STEP_MOVEMENT;
+//      }
+//      return;
+//    }
+//
+//    case STEP_MOVEMENT: {
+//      if (timeDelta <= currentProgramStep.duration) {
+//        
+//        servo1Angle = lastServo1Angle + (nextServo1Angle - lastServo1Angle) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
+//        servo2Angle = lastServo2Angle + (nextServo2Angle - lastServo2Angle) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
+//        servo3Angle = lastServo3Angle + (nextServo3Angle - lastServo3Angle) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
+//        servo4Angle = lastServo4Angle + (nextServo4Angle - lastServo4Angle) * easeInOutCubic(timeDelta / (double)currentProgramStep.duration);
+//      }
+//      else {
+//        currentStepPhase = STEP_PAUSE_AFTER;
+//        currentStepBegin = millis();
+//      }
+//      return;
+//    }
+//
+//    case STEP_PAUSE_AFTER: {
+//      if (timeDelta <= currentProgramStep.duration) {
+//        // Do nothing 
+//      }
+//      else {
+//        startNewStep();
+//      }
+//      return;
+//    }
+//  }
 }
 
-void startNewStep() {
-  Serial.printf("startNewStep\n");
-  
-  if (currentStep < programStepCount - 1) {
-      currentStep++;
-      currentStepPhase = STEP_PAUSE_BEFORE;
-      lastServo1Angle = servo1Angle;
-      lastServo2Angle = servo2Angle;
-      lastServo3Angle = servo3Angle;
-      lastServo4Angle = servo4Angle;
-
-      currentStepBegin = millis();
-
-      Serial.printf("Step: %d\n", currentStep);
-      ProgramStep currentProgramStep = program[currentStep];
-
-      currentlyPumpEnabled = currentProgramStep.pump;
-      
-      refreshDisplay = true;
-    }
-    else {
-      Serial.printf("Program End\n");
-      currentState = ST_MAIN_MENU;
-      refreshDisplay = true;
-      delay(200);
-
-      currentStep = -1;
-      currentStepPhase = STEP_PAUSE_BEFORE;
-      return;
-    }
-}
+//void startNewStep() {
+//  Serial.printf("startNewStep\n");
+//  
+//  if (currentStep < programStepCount - 1) {
+//      currentStep++;
+//      currentStepPhase = STEP_PAUSE_BEFORE;
+//      lastServo1Angle = servo1Angle;
+//      lastServo2Angle = servo2Angle;
+//      lastServo3Angle = servo3Angle;
+//      lastServo4Angle = servo4Angle;
+//
+//      currentStepBegin = millis();
+//
+//      Serial.printf("Step: %d\n", currentStep);
+//      ProgramStep currentProgramStep = program[currentStep];
+//
+//      currentlyPumpEnabled = currentProgramStep.pump;
+//      
+//      refreshDisplay = true;
+//    }
+//    else {
+//      Serial.printf("Program End\n");
+//      currentState = ST_MAIN_MENU;
+//      refreshDisplay = true;
+//      delay(200);
+//
+//      currentStep = -1;
+//      currentStepPhase = STEP_PAUSE_BEFORE;
+//      return;
+//    }
+//}
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -116,7 +116,7 @@ float toDegrees(float angle) {
 ////////////////////////////////////////////////////////////////////////
 // Coordinates to angles
 
-void convertCoordinatesToAngles(float x, float y, float z, float angle) {
+void convertCoordinatesToAngles(float x, float y, float z, float angle, float& outputS1Angle, float& outputServo2Angle, float& outputServo3Angle, float& outputServo4Angle) {
 
   float heightDelta = y - baseHeight;
   float chord = sqrt(z * z + heightDelta * heightDelta);
@@ -266,7 +266,7 @@ void movement() {
     case none:
       break;
       
-    case manual:
+    case localManual:
     case remoteManual:
       manualMovement();
       break;
@@ -274,7 +274,24 @@ void movement() {
     case remoteProgram:
       immediateMovement();
   }
-  
+
+  checkServoAngleLimits();
+
+  servo1.write(pulseWidthForAngle(servo1Angle));
+  servo2.write(pulseWidthForAngle(servo2Angle));
+  servo3.write(pulseWidthForAngle(servo3Angle));
+  servo4.write(pulseWidthForAngle(servo4Angle)); 
+
+  if (loopPhase == 0) {
+    Serial.printf("Values: s1:%.3f s2:%.3f s3:%.3f s4:%.3f\n", servo1Angle, servo2Angle, servo3Angle, servo4Angle); 
+  }
+
+  loopPhase = (loopPhase + 1) % 20; 
+
+  previousServo1Angle = servo1Angle;
+  previousServo2Angle = servo2Angle;
+  previousServo3Angle = servo3Angle;
+  previousServo4Angle = servo4Angle;
 }
 
 void manualMovement() {  
@@ -282,7 +299,7 @@ void manualMovement() {
   
   switch (movePhase) {
     case MOVE_BEGIN: {
-      updateNextServoAngles(false);
+//      updateNextServoAngles(false);
       
       movePhase = MOVE_IN_PROGRESS;
       Serial.printf("Begin\n");
@@ -292,10 +309,10 @@ void manualMovement() {
     case MOVE_IN_PROGRESS: {
       if (timeDelta <= moveStepDuration) {
         
-        servo1Angle = lastServo1Angle + (nextServo1Angle - lastServo1Angle) * easeInOutCubic(timeDelta / (double)moveStepDuration);
-        servo2Angle = lastServo2Angle + (nextServo2Angle - lastServo2Angle) * easeInOutCubic(timeDelta / (double)moveStepDuration);
-        servo3Angle = lastServo3Angle + (nextServo3Angle - lastServo3Angle) * easeInOutCubic(timeDelta / (double)moveStepDuration);
-        servo4Angle = lastServo4Angle + (nextServo4Angle - lastServo4Angle) * easeInOutCubic(timeDelta / (double)moveStepDuration);
+        servo1Angle = fromServo1Angle + (toServo1Angle - fromServo1Angle) * easeInOutCubic(timeDelta / (double)moveStepDuration);
+        servo2Angle = fromServo2Angle + (toServo2Angle - fromServo2Angle) * easeInOutCubic(timeDelta / (double)moveStepDuration);
+        servo3Angle = fromServo3Angle + (toServo3Angle - fromServo3Angle) * easeInOutCubic(timeDelta / (double)moveStepDuration);
+        servo4Angle = fromServo4Angle + (toServo4Angle - fromServo4Angle) * easeInOutCubic(timeDelta / (double)moveStepDuration);
       }
       else {
         movePhase = MOVE_FINISHED;
@@ -311,35 +328,35 @@ void manualMovement() {
 }
 
 void immediateMovement() {
-          
-  double timeDelta = millis() - lastBluetoothUpdate;
-  
-  if (timeDelta <= bluetoothStepDuration) {
-    
-    servo1Angle = lastServo1Angle + (nextServo1Angle - lastServo1Angle) * linear(timeDelta / (double)bluetoothStepDuration);
-    servo2Angle = lastServo2Angle + (nextServo2Angle - lastServo2Angle) * linear(timeDelta / (double)bluetoothStepDuration);
-    servo3Angle = lastServo3Angle + (nextServo3Angle - lastServo3Angle) * linear(timeDelta / (double)bluetoothStepDuration);
-    servo4Angle = lastServo4Angle + (nextServo4Angle - lastServo4Angle) * linear(timeDelta / (double)bluetoothStepDuration);
-
-  }
+//          
+//  double timeDelta = millis() - lastBluetoothUpdate;
+//  
+//  if (timeDelta <= bluetoothStepDuration) {
+//    
+//    servo1Angle = lastServo1Angle + (nextServo1Angle - lastServo1Angle) * linear(timeDelta / (double)bluetoothStepDuration);
+//    servo2Angle = lastServo2Angle + (nextServo2Angle - lastServo2Angle) * linear(timeDelta / (double)bluetoothStepDuration);
+//    servo3Angle = lastServo3Angle + (nextServo3Angle - lastServo3Angle) * linear(timeDelta / (double)bluetoothStepDuration);
+//    servo4Angle = lastServo4Angle + (nextServo4Angle - lastServo4Angle) * linear(timeDelta / (double)bluetoothStepDuration);
+//
+//  }
 }
 
 ////////////////////////////////////////////////////////////////////////
 // Updating
 
-void servoAnglesToLastServoAngles() {
-  lastServo1Angle = servo1Angle;
-  lastServo2Angle = servo2Angle;
-  lastServo3Angle = servo3Angle;
-  lastServo4Angle = servo4Angle;
-}
+//void servoAnglesToLastServoAngles() {
+//  lastServo1Angle = servo1Angle;
+//  lastServo2Angle = servo2Angle;
+//  lastServo3Angle = servo3Angle;
+//  lastServo4Angle = servo4Angle;
+//}
 
-void convertedToNextServoAngles() {
-  nextServo1Angle = convertedServo1Angle;
-  nextServo2Angle = convertedServo2Angle;
-  nextServo3Angle = convertedServo3Angle;
-  nextServo4Angle = convertedServo4Angle;
-}
+//void convertedToNextServoAngles() {
+//  nextServo1Angle = convertedServo1Angle;
+//  nextServo2Angle = convertedServo2Angle;
+//  nextServo3Angle = convertedServo3Angle;
+//  nextServo4Angle = convertedServo4Angle;
+//}
 
 void numbersToCurrentInput() {
   if ((numberX >= minInputX) && (numberX <= maxInputX)) {
@@ -359,19 +376,19 @@ void numbersToCurrentInput() {
   }
 }
 
-void updateNextServoAngles(bool changePhase) {
-  servoAnglesToLastServoAngles();
-      
-  float currentProgramStepRealY = minRealY + (currentInputY - minInputY) / float(maxInputY - minInputY) * (maxRealY - minRealY);
-  float currentProgramStepRealZ = minRealZ + (currentInputZ - minInputZ) / float(maxInputZ - minInputZ) * (maxRealZ - minRealZ);
-  convertCoordinatesToAngles(currentInputX, currentProgramStepRealY, currentProgramStepRealZ, currentInputAngle);
-  convertedToNextServoAngles();
-  currentStepBegin = millis();
-
-  if (changePhase) {
-    if (movePhase != MOVE_IN_PROGRESS) {
-      movePhase = MOVE_BEGIN;
-    }  
-  }
-}
+//void updateNextServoAngles(bool changePhase) {
+//  servoAnglesToLastServoAngles();
+//      
+//  float currentProgramStepRealY = minRealY + (currentInputY - minInputY) / float(maxInputY - minInputY) * (maxRealY - minRealY);
+//  float currentProgramStepRealZ = minRealZ + (currentInputZ - minInputZ) / float(maxInputZ - minInputZ) * (maxRealZ - minRealZ);
+//  convertCoordinatesToAngles(currentInputX, currentProgramStepRealY, currentProgramStepRealZ, currentInputAngle);
+//  convertedToNextServoAngles();
+//  currentStepBegin = millis();
+//
+//  if (changePhase) {
+//    if (movePhase != MOVE_IN_PROGRESS) {
+//      movePhase = MOVE_BEGIN;
+//    }  
+//  }
+//}
 

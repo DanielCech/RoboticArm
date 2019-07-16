@@ -64,7 +64,7 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
         if (movementType == remoteProgram) {
           if (lastBluetoothUpdate < 0) {
               lastBluetoothUpdate = millis();
-              updateLastServoAngles();
+//              updateLastServoAngles();
               return;
             }
           
@@ -73,19 +73,19 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
           
             if (stepDuration > 2000) {
               lastBluetoothUpdate = millis();
-              updateLastServoAngles();
+//              updateLastServoAngles();
               return;
             }
 
             // TODO: fix lastServoAngles etc....
-            convertCoordinatesToAngles(currentInputX, currentInputY, currentInputZ, currentInputAngle);
-            convertedToNextServoAngles();
+//            convertCoordinatesToAngles(currentInputX, currentInputY, currentInputZ, currentInputAngle);
+//            convertedToNextServoAngles();
 
             lastBluetoothUpdate = millis();
         }
         else {
           numbersToCurrentInput();
-          updateNextServoAngles(true);
+//          updateNextServoAngles(true);
         }
         
 
@@ -100,14 +100,14 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
     }
 };
 
-void updateLastServoAngles() {
-  convertCoordinatesToAngles(currentInputX, currentInputY, currentInputZ, currentInputAngle);
-  
-  lastServo1Angle = convertedServo1Angle;
-  lastServo2Angle = convertedServo2Angle;
-  lastServo3Angle = convertedServo3Angle;
-  lastServo4Angle = convertedServo4Angle;
-}
+//void updateLastServoAngles() {
+//  convertCoordinatesToAngles(currentInputX, currentInputY, currentInputZ, currentInputAngle);
+//  
+//  lastServo1Angle = convertedServo1Angle;
+//  lastServo2Angle = convertedServo2Angle;
+//  lastServo3Angle = convertedServo3Angle;
+//  lastServo4Angle = convertedServo4Angle;
+//}
 
 void enableBluetooth() {
   Serial.println("Starting...");

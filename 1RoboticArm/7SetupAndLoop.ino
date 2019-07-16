@@ -2,8 +2,6 @@
 ////////////////////////////////////////////////////////////////////////
 // Main
 
-int loopPhase = 0;
-
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(115200);
@@ -64,49 +62,8 @@ void loop() {
     digitalWrite(pumpPin, currentlyPumpEnabled ? HIGH : LOW);
     beforePumpEnabled = currentlyPumpEnabled;
   }
-  
-//  servo1Angle = currentX;
-//  servo2Angle = currentY;
-//  servo3Angle = currentZ;
-//  servo4Angle = currentAngle;
-//  checkCoordinateLimits();
-
-//  if (immediately) {
-//    checkRealCoordinateLimits();
-//    convertCoordinatesToAngles(realX, realY, realZ, realAngle);
-//    servo1Angle = convertedServo1Angle;
-//    servo2Angle = convertedServo2Angle;
-//    servo3Angle = convertedServo3Angle;  
-//    servo4Angle = convertedServo4Angle;
-//  }
 
   movement();
-  checkServoAngleLimits();
-
-  loopPhase = (loopPhase + 1) % 20; 
-
-
-//  if (loopPhase != 0) {
-//    return;
-//  }
-  
-  servo1.write(pulseWidthForAngle(servo1Angle));
-  servo2.write(pulseWidthForAngle(servo2Angle));
-  servo3.write(pulseWidthForAngle(servo3Angle));
-  servo4.write(pulseWidthForAngle(servo4Angle)); 
-
-  if (loopPhase == 0) {
-    Serial.printf("Values: s1:%.3f s2:%.3f s3:%.3f s4:%.3f\n", servo1Angle, servo2Angle, servo3Angle, servo4Angle); 
-  }
-
-//  if ((servo1Angle != previousServo1Angle) || (servo2Angle != previousServo2Angle) || (servo3Angle != previousServo3Angle) || (servo4Angle != previousServo4Angle)) {
-//    Serial.printf("Values: s1:%.2f s2:%.2f s3:%.2f s4:%.2f\n", servo1Angle, servo2Angle, servo3Angle, servo4Angle);
-//  }
-
-  previousServo1Angle = servo1Angle;
-  previousServo2Angle = servo2Angle;
-  previousServo3Angle = servo3Angle;
-  previousServo4Angle = servo4Angle;
 }
 
 

@@ -59,7 +59,7 @@ int freq = 5000;
 ////////////////////////////////////////////////////////////////////////
 // Movement
 
-enum MovementType { none, manual, remoteManual, remoteProgram };
+enum MovementType { none, localManual, localProgram, remoteManual, remoteProgram };
 MovementType movementType = none;
 long lastBluetoothUpdate = -1;
 long bluetoothStepDuration = 0;
@@ -142,15 +142,20 @@ float convertedServo3Angle = 90;
 float convertedServo4Angle = 90;
 
 // Previous angles for movement
-float lastServo1Angle = 90;
-float lastServo2Angle = 90;
-float lastServo3Angle = 90;
-float lastServo4Angle = 90;
+//float lastServo1Angle = 90;
+//float lastServo2Angle = 90;
+//float lastServo3Angle = 90;
+//float lastServo4Angle = 90;
 
-float nextServo1Angle = 90;
-float nextServo2Angle = 90;
-float nextServo3Angle = 90;
-float nextServo4Angle = 90;
+float fromServo1Angle = 90;
+float fromServo2Angle = 90;
+float fromServo3Angle = 90;
+float fromServo4Angle = 90;
+
+float toServo1Angle = 90;
+float toServo2Angle = 90;
+float toServo3Angle = 90;
+float toServo4Angle = 90;
 
 const float minServo1Angle = 0;
 const float maxServo1Angle = 180;
@@ -199,6 +204,7 @@ Servo servo4;
 #define ST_BLUETOOTH_MODE                 50
 
 int currentState = ST_INITIAL;
+int loopPhase = 0;
 
 ////////////////////////////////////////////////////////////////////////
 // Menu
