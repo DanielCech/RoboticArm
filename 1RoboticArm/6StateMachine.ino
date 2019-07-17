@@ -151,6 +151,7 @@ void manualMode() {
   if (firstEncoder.direction < 0) {
     int step = stepSize(selectedInputXUpdate, millis());
     selectedInputX = MAX(selectedInputX - step, minInputX);
+    checkSelectedInputCoordinateLimits();
     selectedInputXUpdate = millis();
     refreshDisplay = true;
     return;
@@ -158,7 +159,7 @@ void manualMode() {
   if (firstEncoder.direction > 0) {
     int step = stepSize(selectedInputXUpdate, millis());
     selectedInputX = MIN(selectedInputX + step, maxInputX);
-//    updateNextServoAngles(true);
+    checkSelectedInputCoordinateLimits();
     selectedInputXUpdate = millis();
     refreshDisplay = true;
     return;
@@ -167,7 +168,7 @@ void manualMode() {
   if (secondEncoder.direction < 0) {
     int step = stepSize(selectedInputYUpdate, millis());
     selectedInputY = MAX(selectedInputY - step, minInputY);
-//    updateNextServoAngles(true);
+    checkSelectedInputCoordinateLimits();
     selectedInputYUpdate = millis();
     refreshDisplay = true;
     return;
@@ -175,7 +176,7 @@ void manualMode() {
   if (secondEncoder.direction > 0) {
     int step = stepSize(selectedInputYUpdate, millis());
     selectedInputY = MIN(selectedInputY + step, maxInputY);
-//    updateNextServoAngles(true);
+    checkSelectedInputCoordinateLimits();
     selectedInputYUpdate = millis();
     refreshDisplay = true;
     return;
@@ -184,7 +185,7 @@ void manualMode() {
   if (thirdEncoder.direction < 0) {
     int step = stepSize(selectedInputZUpdate, millis());
     selectedInputZ = MAX(selectedInputZ - step, minInputZ);
-//    updateNextServoAngles(true);
+    checkSelectedInputCoordinateLimits();
     selectedInputZUpdate = millis();
     refreshDisplay = true;
     return;
@@ -192,7 +193,7 @@ void manualMode() {
   if (thirdEncoder.direction > 0) {
     int step = stepSize(selectedInputZUpdate, millis());
     selectedInputZ = MIN(selectedInputZ + step, maxInputZ);
-//    updateNextServoAngles(true);
+    checkSelectedInputCoordinateLimits();
     selectedInputZUpdate = millis();
     refreshDisplay = true;
     return;
@@ -201,7 +202,7 @@ void manualMode() {
   if (fourthEncoder.direction < 0) {
     int step = stepSize(selectedInputAngleUpdate, millis());
     selectedInputAngle = MAX(selectedInputAngle - step, minInputAngle);
-//    updateNextServoAngles(true);
+    checkSelectedInputCoordinateLimits();
     selectedInputZUpdate = millis();
     refreshDisplay = true;
     return;
@@ -214,7 +215,7 @@ void manualMode() {
     else {
       selectedInputAngle = MAX(selectedInputAngle - step, 0);
     }
-//    updateNextServoAngles(true);
+    checkSelectedInputCoordinateLimits();
     selectedInputAngleUpdate = millis();
     refreshDisplay = true;
     return;

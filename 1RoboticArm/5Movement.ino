@@ -296,27 +296,42 @@ void checkCurrentInputCoordinateLimits() {
 // Movement
 
 void startMovement(float toInputX, float toInputY, float toInputZ, float toInputAngle) {
-  if ((currentInputX == toInputX) && (currentInputY == toInputY) && (currentInputZ == toInputZ) && (currentInputAngle == toInputAngle)) { return; }
+  if ((int(currentInputX) == int(toInputX)) && (int(currentInputY) == int(toInputY)) && (int(currentInputZ) == int(toInputZ)) && (int(currentInputAngle) == int(toInputAngle))) { return; }
+  if (movePhase != MOVE_NONE) { return; }
 
-  switch (movePhase) {
-    case MOVE_BEGIN:
-    case MOVE_FINISHED: 
-      convertCoordinatesToAngles(fromInputX, fromInputY, fromInputZ, fromInputAngle, fromServo1Angle, fromServo2Angle, fromServo3Angle, fromServo4Angle);
-      convertCoordinatesToAngles(toInputX, toInputY, toInputZ, toInputAngle, toServo1Angle, toServo2Angle, toServo3Angle, toServo4Angle);
-      movePhase = MOVE_BEGIN;
-      return;
+  targetInputX = toInputX;
+  targetInputY = toInputY;
+  targetInputZ = toInputZ;
+  targetInputAngle = toInputAngle;
 
-    case MOVE_IN_PROGRESS: 
-      fromServo1Angle = servo1Angle;
-      fromServo2Angle = servo2Angle;
-      fromServo3Angle = servo3Angle;
-      fromServo4Angle = servo4Angle;   
-   
-      convertCoordinatesToAngles(toInputX, toInputY, toInputZ, toInputAngle, toServo1Angle, toServo2Angle, toServo3Angle, toServo4Angle);
-      movePhase = MOVE_IN_PROGRESS;
-      currentStepBegin = millis();
-      return; 
-    }
+  fromServo1Angle = servo1Angle;
+  fromServo2Angle = servo2Angle;
+  fromServo3Angle = servo3Angle;
+  fromServo4Angle = servo4Angle;
+
+//  convertCoordinatesToAngles(fromInputX, fromInputY, fromInputZ, fromInputAngle, fromServo1Angle, fromServo2Angle, fromServo3Angle, fromServo4Angle);
+  convertCoordinatesToAngles(toInputX, toInputY, toInputZ, toInputAngle, toServo1Angle, toServo2Angle, toServo3Angle, toServo4Angle);
+  movePhase = MOVE_BEGIN;
+  
+//  switch (movePhase) {
+//    case MOVE_BEGIN:
+//    case MOVE_FINISHED: 
+//      convertCoordinatesToAngles(fromInputX, fromInputY, fromInputZ, fromInputAngle, fromServo1Angle, fromServo2Angle, fromServo3Angle, fromServo4Angle);
+//      convertCoordinatesToAngles(toInputX, toInputY, toInputZ, toInputAngle, toServo1Angle, toServo2Angle, toServo3Angle, toServo4Angle);
+//      movePhase = MOVE_BEGIN;
+//      return;
+//
+//    case MOVE_IN_PROGRESS: 
+//      fromServo1Angle = servo1Angle;
+//      fromServo2Angle = servo2Angle;
+//      fromServo3Angle = servo3Angle;
+//      fromServo4Angle = servo4Angle;   
+//   
+//      convertCoordinatesToAngles(toInputX, toInputY, toInputZ, toInputAngle, toServo1Angle, toServo2Angle, toServo3Angle, toServo4Angle);
+//      movePhase = MOVE_IN_PROGRESS;
+//      currentStepBegin = millis();
+//      return; 
+//    }
 }
 
 void movement() {
@@ -362,6 +377,9 @@ void moveServos() {
 
 void manualMovement() {  
   switch (movePhase) {
+    case MOVE_NONE:
+      break;
+      
     case MOVE_BEGIN: {
       currentStepBegin = millis();
       movePhase = MOVE_IN_PROGRESS;
@@ -372,11 +390,11 @@ void manualMovement() {
     case MOVE_IN_PROGRESS: {
       double timeDelta = millis() - currentStepBegin;
       if (timeDelta <= moveStepDuration) {
-        
-        servo1Angle = fromServo1Angle + (toServo1Angle - fromServo1Angle) * easeInOutCubic(timeDelta / (double)moveStepDuration);
-        servo2Angle = fromServo2Angle + (toServo2Angle - fromServo2Angle) * easeInOutCubic(timeDelta / (double)moveStepDuration);
-        servo3Angle = fromServo3Angle + (toServo3Angle - fromServo3Angle) * easeInOutCubic(timeDelta / (double)moveStepDuration);
-        servo4Angle = fromServo4Angle + (toServo4Angle - fromServo4Angle) * easeInOutCubic(timeDelta / (double)moveStepDuration);
+        double progress = easeInOutCubic(timeDelta / (double)moveStepDuration);
+        servo1Angle = fromServo1Angle + (toServo1Angle - fromServo1Angle) * progress;
+        servo2Angle = fromServo2Angle + (toServo2Angle - fromServo2Angle) * progress;
+        servo3Angle = fromServo3Angle + (toServo3Angle - fromServo3Angle) * progress;
+        servo4Angle = fromServo4Angle + (toServo4Angle - fromServo4Angle) * progress;
       }
       else {
         movePhase = MOVE_FINISHED;
@@ -386,10 +404,11 @@ void manualMovement() {
 
     case MOVE_FINISHED: {
       //Serial.printf("Finished\n");
-//      selectedInputX = toInputX;
-//      selectedInputY = toInputY;
-//      selectedInputZ = toInputZ;
-//      selectedInputAngle = toInputAngle;
+      currentInputX = targetInputX;
+      currentInputY = targetInputY;
+      currentInputZ = targetInputZ;
+      currentInputAngle = targetInputAngle;
+      movePhase = MOVE_NONE;
       return;
     }
   }

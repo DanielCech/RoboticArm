@@ -76,6 +76,12 @@ int fromInputY = startY;
 int fromInputZ = startZ;
 int fromInputAngle = startAngle;
 
+// Input coordinates used for initial movement (in manual movement mode)
+int targetInputX = startX;
+int targetInputY = startY;
+int targetInputZ = startZ;
+int targetInputAngle = startAngle;
+
 // Input coordinates used for target movement (in manual movement mode)
 int selectedInputX = startX;
 int selectedInputY = startY;
@@ -242,11 +248,12 @@ bool refreshDisplay = true;
 #define STEP_MOVEMENT 2
 #define STEP_PAUSE_AFTER 3
 
-#define MOVE_BEGIN 0
-#define MOVE_IN_PROGRESS 1
-#define MOVE_FINISHED 2
+#define MOVE_NONE 0
+#define MOVE_BEGIN 1
+#define MOVE_IN_PROGRESS 2
+#define MOVE_FINISHED 3
 
-int movePhase = MOVE_FINISHED;
+int movePhase = MOVE_NONE;
 const int moveStepDuration = 1500;
 
 const int maxStepCount = 20;
