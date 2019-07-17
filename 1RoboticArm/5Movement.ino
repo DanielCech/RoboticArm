@@ -223,7 +223,41 @@ void checkRealCoordinateLimits() {
 }
 
 
-void checkInputCoordinateLimits() {
+void checkSelectedInputCoordinateLimits() {
+  if (selectedInputX < minInputX) {
+    selectedInputX = minInputX;
+  }
+
+  if (selectedInputX > maxInputX) {
+    selectedInputX = maxInputX;
+  }
+
+  if (selectedInputY < minInputY) {
+    selectedInputY = minInputY;
+  }
+
+  if (selectedInputY > maxInputY) {
+    selectedInputY = maxInputY;
+  }
+
+  if (selectedInputZ < minInputZ) {
+    selectedInputZ = minInputZ;
+  }
+
+  if (selectedInputZ > maxInputZ) {
+    selectedInputZ = maxInputZ;
+  }
+
+  if (selectedInputAngle < minInputAngle) {
+    selectedInputAngle = minInputAngle;
+  }
+
+  if (selectedInputAngle > maxInputAngle) {
+    selectedInputAngle = maxInputAngle;
+  }
+}
+
+void checkCurrentInputCoordinateLimits() {
   if (currentInputX < minInputX) {
     currentInputX = minInputX;
   }
@@ -261,16 +295,15 @@ void checkInputCoordinateLimits() {
 ////////////////////////////////////////////////////////////////////////
 // Movement
 
-void startMovement(float fromInputX, float fromInputY, float fromInputZ, float fromInputAngle, float toInputX, float toInputY, float toInputZ, float toInputAngle) {
-  if ((fromInputX == toInputX) && (fromInputY == toInputY) && (fromInputZ == toInputZ) && (fromInputAngle == toInputAngle)) { return; }
+void startMovement(float toInputX, float toInputY, float toInputZ, float toInputAngle) {
+  if ((currentInputX == toInputX) && (currentInputY == toInputY) && (currentInputZ == toInputZ) && (currentInputAngle == toInputAngle)) { return; }
 
   switch (movePhase) {
     case MOVE_BEGIN:
     case MOVE_FINISHED: 
       convertCoordinatesToAngles(fromInputX, fromInputY, fromInputZ, fromInputAngle, fromServo1Angle, fromServo2Angle, fromServo3Angle, fromServo4Angle);
       convertCoordinatesToAngles(toInputX, toInputY, toInputZ, toInputAngle, toServo1Angle, toServo2Angle, toServo3Angle, toServo4Angle);
-      movePhase = MOVE_IN_PROGRESS;
-      currentStepBegin = millis();
+      movePhase = MOVE_BEGIN;
       return;
 
     case MOVE_IN_PROGRESS: 
@@ -304,6 +337,10 @@ void movement() {
       immediateMovement();
   }
 
+  moveServos();
+}
+
+void moveServos() {
   checkServoAngleLimits();
 
   servo1.write(pulseWidthForAngle(servo1Angle));
@@ -324,18 +361,16 @@ void movement() {
 }
 
 void manualMovement() {  
-  double timeDelta = millis() - currentStepBegin;
-  
   switch (movePhase) {
     case MOVE_BEGIN: {
-//      updateNextServoAngles(false);
-      
+      currentStepBegin = millis();
       movePhase = MOVE_IN_PROGRESS;
       Serial.printf("Begin\n");
       return;
     }
 
     case MOVE_IN_PROGRESS: {
+      double timeDelta = millis() - currentStepBegin;
       if (timeDelta <= moveStepDuration) {
         
         servo1Angle = fromServo1Angle + (toServo1Angle - fromServo1Angle) * easeInOutCubic(timeDelta / (double)moveStepDuration);
@@ -351,6 +386,10 @@ void manualMovement() {
 
     case MOVE_FINISHED: {
       //Serial.printf("Finished\n");
+//      selectedInputX = toInputX;
+//      selectedInputY = toInputY;
+//      selectedInputZ = toInputZ;
+//      selectedInputAngle = toInputAngle;
       return;
     }
   }
@@ -389,28 +428,28 @@ void immediateMovement() {
 
 void numbersToCurrentInput() {
   if ((numberX >= minInputX) && (numberX <= maxInputX)) {
-    currentInputX = numberX;
+    selectedInputX = numberX;
   }
 
   if ((numberY >= minInputY) && (numberY <= maxInputY)) {
-    currentInputY = numberY;
+    selectedInputY = numberY;
   }
 
   if ((numberZ >= minInputZ) && (numberZ <= maxInputZ)) {
-    currentInputZ = numberZ;
+    selectedInputZ = numberZ;
   }
 
   if ((numberAngle >= minInputAngle) && (numberAngle <= maxInputAngle)) {
-    currentInputAngle = numberAngle;
+    selectedInputAngle = numberAngle;
   }
 }
 
 //void updateNextServoAngles(bool changePhase) {
 //  servoAnglesToLastServoAngles();
 //      
-//  float currentProgramStepRealY = minRealY + (currentInputY - minInputY) / float(maxInputY - minInputY) * (maxRealY - minRealY);
-//  float currentProgramStepRealZ = minRealZ + (currentInputZ - minInputZ) / float(maxInputZ - minInputZ) * (maxRealZ - minRealZ);
-//  convertCoordinatesToAngles(currentInputX, currentProgramStepRealY, currentProgramStepRealZ, currentInputAngle);
+//  float currentProgramStepRealY = minRealY + (selectedInputY - minInputY) / float(maxInputY - minInputY) * (maxRealY - minRealY);
+//  float currentProgramStepRealZ = minRealZ + (selectedInputZ - minInputZ) / float(maxInputZ - minInputZ) * (maxRealZ - minRealZ);
+//  convertCoordinatesToAngles(selectedInputX, currentProgramStepRealY, currentProgramStepRealZ, selectedInputAngle);
 //  convertedToNextServoAngles();
 //  currentStepBegin = millis();
 //

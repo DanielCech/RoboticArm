@@ -78,7 +78,7 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
             }
 
             // TODO: fix lastServoAngles etc....
-//            convertCoordinatesToAngles(currentInputX, currentInputY, currentInputZ, currentInputAngle);
+//            convertCoordinatesToAngles(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
 //            convertedToNextServoAngles();
 
             lastBluetoothUpdate = millis();
@@ -101,7 +101,7 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
 };
 
 //void updateLastServoAngles() {
-//  convertCoordinatesToAngles(currentInputX, currentInputY, currentInputZ, currentInputAngle);
+//  convertCoordinatesToAngles(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
 //  
 //  lastServo1Angle = convertedServo1Angle;
 //  lastServo2Angle = convertedServo2Angle;

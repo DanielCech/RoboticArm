@@ -119,10 +119,10 @@ void mainMenu() {
 }
 
 void resetPosition() {
-  currentInputX = startX;
-  currentInputY = startY;
-  currentInputZ = startZ;
-  currentInputAngle = startAngle;
+  selectedInputX = startX;
+  selectedInputY = startY;
+  selectedInputZ = startZ;
+  selectedInputAngle = startAngle;
   currentlyPumpEnabled = false;
   beforePumpEnabled = false;
 
@@ -139,94 +139,93 @@ void manualMode() {
 
   if (refreshDisplay) {
     char firstLine[20];
-    sprintf(firstLine, "XYZ:%3d,%3d,%3d", currentInputX, currentInputY, currentInputZ);
+    sprintf(firstLine, "XYZ:%3d,%3d,%3d", selectedInputX, selectedInputY, selectedInputZ);
     
     char secondLine[20];
-    sprintf(secondLine, "A:%-3d Pump:%s #%d", currentInputAngle, currentlyPumpEnabled ? "1" : "0", currentStep + 1 );
+    sprintf(secondLine, "A:%-3d Pump:%s #%d", selectedInputAngle, currentlyPumpEnabled ? "1" : "0", currentStep + 1 );
     
     displayStrings(String(firstLine), String(secondLine), lcd);
     refreshDisplay = false;
   }
 
   if (firstEncoder.direction < 0) {
-    int step = stepSize(currentInputXUpdate, millis());
-    currentInputX = MAX(currentInputX - step, minInputX);
-//    updateNextServoAngles(true);
-    currentInputXUpdate = millis();
+    int step = stepSize(selectedInputXUpdate, millis());
+    selectedInputX = MAX(selectedInputX - step, minInputX);
+    selectedInputXUpdate = millis();
     refreshDisplay = true;
     return;
   }
   if (firstEncoder.direction > 0) {
-    int step = stepSize(currentInputXUpdate, millis());
-    currentInputX = MIN(currentInputX + step, maxInputX);
+    int step = stepSize(selectedInputXUpdate, millis());
+    selectedInputX = MIN(selectedInputX + step, maxInputX);
 //    updateNextServoAngles(true);
-    currentInputXUpdate = millis();
+    selectedInputXUpdate = millis();
     refreshDisplay = true;
     return;
   }
 
   if (secondEncoder.direction < 0) {
-    int step = stepSize(currentInputYUpdate, millis());
-    currentInputY = MAX(currentInputY - step, minInputY);
+    int step = stepSize(selectedInputYUpdate, millis());
+    selectedInputY = MAX(selectedInputY - step, minInputY);
 //    updateNextServoAngles(true);
-    currentInputYUpdate = millis();
+    selectedInputYUpdate = millis();
     refreshDisplay = true;
     return;
   }
   if (secondEncoder.direction > 0) {
-    int step = stepSize(currentInputYUpdate, millis());
-    currentInputY = MIN(currentInputY + step, maxInputY);
+    int step = stepSize(selectedInputYUpdate, millis());
+    selectedInputY = MIN(selectedInputY + step, maxInputY);
 //    updateNextServoAngles(true);
-    currentInputYUpdate = millis();
+    selectedInputYUpdate = millis();
     refreshDisplay = true;
     return;
   }
 
   if (thirdEncoder.direction < 0) {
-    int step = stepSize(currentInputZUpdate, millis());
-    currentInputZ = MAX(currentInputZ - step, minInputZ);
+    int step = stepSize(selectedInputZUpdate, millis());
+    selectedInputZ = MAX(selectedInputZ - step, minInputZ);
 //    updateNextServoAngles(true);
-    currentInputZUpdate = millis();
+    selectedInputZUpdate = millis();
     refreshDisplay = true;
     return;
   }
   if (thirdEncoder.direction > 0) {
-    int step = stepSize(currentInputZUpdate, millis());
-    currentInputZ = MIN(currentInputZ + step, maxInputZ);
+    int step = stepSize(selectedInputZUpdate, millis());
+    selectedInputZ = MIN(selectedInputZ + step, maxInputZ);
 //    updateNextServoAngles(true);
-    currentInputZUpdate = millis();
+    selectedInputZUpdate = millis();
     refreshDisplay = true;
     return;
   }
 
   if (fourthEncoder.direction < 0) {
-    int step = stepSize(currentInputAngleUpdate, millis());
-    currentInputAngle = MAX(currentInputAngle - step, minInputAngle);
+    int step = stepSize(selectedInputAngleUpdate, millis());
+    selectedInputAngle = MAX(selectedInputAngle - step, minInputAngle);
 //    updateNextServoAngles(true);
-    currentInputZUpdate = millis();
+    selectedInputZUpdate = millis();
     refreshDisplay = true;
     return;
   }
   if (fourthEncoder.direction > 0) {
-    int step = stepSize(currentInputAngleUpdate, millis());
+    int step = stepSize(selectedInputAngleUpdate, millis());
     if (encoder4normalDirection) {
-      currentInputAngle = MIN(currentInputAngle + step, maxInputAngle);  
+      selectedInputAngle = MIN(selectedInputAngle + step, maxInputAngle);  
     }
     else {
-      currentInputAngle = MAX(currentInputAngle - step, 0);
+      selectedInputAngle = MAX(selectedInputAngle - step, 0);
     }
 //    updateNextServoAngles(true);
-    currentInputAngleUpdate = millis();
+    selectedInputAngleUpdate = millis();
     refreshDisplay = true;
     return;
   }
 
   if (firstEncoder.buttonPressed && currentState == ST_CREATE_PROGRAM) {
     struct ProgramStep newStep;
-    newStep.x = currentInputX;
-    newStep.y = currentInputY;
-    newStep.z = currentInputZ;
-    newStep.angle = currentInputAngle;
+    newStep.x = selectedInputX;
+    newStep.y = selectedInputY;
+    newStep.z = selectedInputZ;
+    newStep.angle = selectedInputAngle;
     newStep.pump = currentlyPumpEnabled;
     newStep.duration = 1000;
     newStep.pauseBefore = 300;
@@ -262,8 +261,9 @@ void manualMode() {
 
   // Start movement after 1s pause
   long now = millis();
-  if ((now - currentInputXUpdate > pauseBeforeManualMovement) && (now - currentInputYUpdate > pauseBeforeManualMovement) && (now - currentInputZUpdate > pauseBeforeManualMovement) && (now - currentInputAngleUpdate > pauseBeforeManualMovement)) {
-    startMovement(fromInputX, fromInputY, fromInputZ, fromInputAngle, currentInputX, currentInputY, currentInputZ, currentInputAngle);
+  if ((now - selectedInputXUpdate > pauseBeforeManualMovement) && (now - selectedInputYUpdate > pauseBeforeManualMovement) && (now - selectedInputZUpdate > pauseBeforeManualMovement) && (now - selectedInputAngleUpdate > pauseBeforeManualMovement)) {
+    movementType = localManual;
+    startMovement(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
   }
 }
 

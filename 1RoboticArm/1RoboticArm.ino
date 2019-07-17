@@ -76,18 +76,24 @@ int fromInputY = startY;
 int fromInputZ = startZ;
 int fromInputAngle = startAngle;
 
+// Input coordinates used for target movement (in manual movement mode)
+int selectedInputX = startX;
+int selectedInputY = startY;
+int selectedInputZ = startZ;
+int selectedInputAngle = startAngle;
+
+// Timestamps of X, Y, Z updates
+long selectedInputXUpdate = 0;
+long selectedInputYUpdate = 0;
+long selectedInputZUpdate = 0;
+long selectedInputAngleUpdate = 0;
+
 // Current input positions (in manual movement mode)
 int currentInputX = startX;
 int currentInputY = startY;
 int currentInputZ = startZ;
 int currentInputAngle = startAngle;
 bool currentlyPumpEnabled = false;
-
-// Timestamps of X, Y, Z updates
-long currentInputXUpdate = 0;
-long currentInputYUpdate = 0;
-long currentInputZUpdate = 0;
-long currentInputAngleUpdate = 0;
 
 const long pauseBeforeManualMovement = 1000;
 
