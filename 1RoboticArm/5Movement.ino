@@ -118,8 +118,8 @@ float toDegrees(float angle) {
 
 void convertInputToRealCoordinates(float inputX, float inputY, float inputZ, float inputAngle, float& realX, float& realY, float& realZ, float& realAngle) {
   realX = inputX;
-  realY = minRealY + (currentInputY - minInputY) / float(maxInputY - minInputY) * (maxRealY - minRealY);
-  realZ = minRealZ + (currentInputZ - minInputZ) / float(maxInputZ - minInputZ) * (maxRealZ - minRealZ);
+  realY = minRealY + (inputY - minInputY) / float(maxInputY - minInputY) * (maxRealY - minRealY);
+  realZ = minRealZ + (inputZ - minInputZ) / float(maxInputZ - minInputZ) * (maxRealZ - minRealZ);
   realAngle = inputAngle;
 
   checkRealCoordinateLimits(realX, realY, realZ, realAngle);
