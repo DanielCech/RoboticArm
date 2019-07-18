@@ -63,6 +63,7 @@ enum MovementType { none, localManual, localProgram, remoteManual, remoteProgram
 MovementType movementType = none;
 long lastBluetoothUpdate = -1;
 long bluetoothStepDuration = 0;
+float movementTolerance = 0.001;
 
 // Initial values of X, Y, Z
 const int startX = 90;
@@ -275,3 +276,12 @@ int programStepCount = 0;
 int currentStep = -1;
 int currentStepPhase = STEP_INITIAL;
 unsigned long currentStepBegin = 0;
+
+////////////////////////////////////////////////////////////////////////
+// Helpers
+
+bool equal(float a, float b)
+{
+ return fabs(a-b) < movementTolerance;
+}
+

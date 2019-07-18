@@ -296,8 +296,8 @@ void checkCurrentInputCoordinateLimits() {
 // Movement
 
 void startMovement(float toInputX, float toInputY, float toInputZ, float toInputAngle) {
-  if ((int(currentInputX) == int(toInputX)) && (int(currentInputY) == int(toInputY)) && (int(currentInputZ) == int(toInputZ)) && (int(currentInputAngle) == int(toInputAngle))) { return; }
   if (movePhase != MOVE_NONE) { return; }
+  if (equal(currentInputX, toInputX) && equal(currentInputY, toInputY) && equal(currentInputZ, toInputZ) && equal(currentInputAngle, toInputAngle)) { return; }
 
   targetInputX = toInputX;
   targetInputY = toInputY;
