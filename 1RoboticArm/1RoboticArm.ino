@@ -63,7 +63,7 @@ enum MovementType { none, localManual, localProgram, remoteManual, remoteProgram
 MovementType movementType = none;
 long lastBluetoothUpdate = -1;
 long bluetoothStepDuration = 0;
-float movementTolerance = 0.001;
+float movementTolerance = 0.0001;
 
 // Initial values of X, Y, Z
 const int startX = 90;

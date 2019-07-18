@@ -146,7 +146,7 @@ void manualMode() {
   if (firstEncoder.direction < 0) {
     int step = stepSize(selectedInputXUpdate, millis());
     selectedInputX = MAX(selectedInputX - step, minInputX);
-    checkSelectedInputCoordinateLimits();
+    checkInputCoordinateLimits(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
     selectedInputXUpdate = millis();
     refreshDisplay = true;
     return;
@@ -154,7 +154,7 @@ void manualMode() {
   if (firstEncoder.direction > 0) {
     int step = stepSize(selectedInputXUpdate, millis());
     selectedInputX = MIN(selectedInputX + step, maxInputX);
-    checkSelectedInputCoordinateLimits();
+    checkInputCoordinateLimits(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
     selectedInputXUpdate = millis();
     refreshDisplay = true;
     return;
@@ -163,7 +163,7 @@ void manualMode() {
   if (secondEncoder.direction < 0) {
     int step = stepSize(selectedInputYUpdate, millis());
     selectedInputY = MAX(selectedInputY - step, minInputY);
-    checkSelectedInputCoordinateLimits();
+    checkInputCoordinateLimits(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
     selectedInputYUpdate = millis();
     refreshDisplay = true;
     return;
@@ -171,7 +171,7 @@ void manualMode() {
   if (secondEncoder.direction > 0) {
     int step = stepSize(selectedInputYUpdate, millis());
     selectedInputY = MIN(selectedInputY + step, maxInputY);
-    checkSelectedInputCoordinateLimits();
+    checkInputCoordinateLimits(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
     selectedInputYUpdate = millis();
     refreshDisplay = true;
     return;
@@ -180,7 +180,7 @@ void manualMode() {
   if (thirdEncoder.direction < 0) {
     int step = stepSize(selectedInputZUpdate, millis());
     selectedInputZ = MAX(selectedInputZ - step, minInputZ);
-    checkSelectedInputCoordinateLimits();
+    checkInputCoordinateLimits(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
     selectedInputZUpdate = millis();
     refreshDisplay = true;
     return;
@@ -188,7 +188,7 @@ void manualMode() {
   if (thirdEncoder.direction > 0) {
     int step = stepSize(selectedInputZUpdate, millis());
     selectedInputZ = MIN(selectedInputZ + step, maxInputZ);
-    checkSelectedInputCoordinateLimits();
+    checkInputCoordinateLimits(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
     selectedInputZUpdate = millis();
     refreshDisplay = true;
     return;
@@ -197,7 +197,7 @@ void manualMode() {
   if (fourthEncoder.direction < 0) {
     int step = stepSize(selectedInputAngleUpdate, millis());
     selectedInputAngle = MAX(selectedInputAngle - step, minInputAngle);
-    checkSelectedInputCoordinateLimits();
+    checkInputCoordinateLimits(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
     selectedInputZUpdate = millis();
     refreshDisplay = true;
     return;
@@ -210,7 +210,7 @@ void manualMode() {
     else {
       selectedInputAngle = MAX(selectedInputAngle - step, 0);
     }
-    checkSelectedInputCoordinateLimits();
+    checkInputCoordinateLimits(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
     selectedInputAngleUpdate = millis();
     refreshDisplay = true;
     return;
