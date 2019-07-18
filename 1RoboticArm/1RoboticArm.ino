@@ -67,7 +67,7 @@ float movementTolerance = 0.0001;
 
 // Initial values of X, Y, Z
 const int startX = 90;
-const int startY = 11;
+const int startY = 50;
 const int startZ = 0;
 const int startAngle = 90;
 
@@ -130,7 +130,7 @@ const int maxInputAngle = 180;
 // Limits for real movement
 const float minRealX = 0;
 const float maxRealX = 180;
-const float minRealY = 3;
+const float minRealY = 1.5;
 const float maxRealY = 25;  // 16
 const float minRealZ = 10;   // 6
 const float maxRealZ = 30;  // 20
@@ -151,10 +151,11 @@ float previousServo2Angle = 90;
 float previousServo3Angle = 90;
 float previousServo4Angle = 90;
 
+// Servo angles - initial values are computed from startX, startY, startZ, startAngle
 float servo1Angle = 90;
-float servo2Angle = 90;
-float servo3Angle = 90;
-float servo4Angle = 90;
+float servo2Angle = 87.97;
+float servo3Angle = 78.03;
+float servo4Angle = 91.00;
 
 // Immediate results of conversion
 //float convertedServo1Angle = 90;
