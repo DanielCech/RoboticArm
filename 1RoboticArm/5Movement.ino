@@ -114,12 +114,56 @@ float toDegrees(float angle) {
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Coordinates to angles
+// Input coordinates to real coordinates
 
-void convertCoordinatesToAngles(float x, float y, float z, float angle, float& outputServo1Angle, float& outputServo2Angle, float& outputServo3Angle, float& outputServo4Angle) {
+void convertInputToRealCoordinates(float inputX, float inputY, float inputZ, float inputAngle, float& realX, float& realY, float& realZ, float& realAngle) {
+  realX = inputX;
+  realY = minRealY + (currentInputY - minInputY) / float(maxInputY - minInputY) * (maxRealY - minRealY);
+  realZ = minRealZ + (currentInputZ - minInputZ) / float(maxInputZ - minInputZ) * (maxRealZ - minRealZ);
+  realAngle = inputAngle;
 
-  float heightDelta = y - baseHeight;
-  float chord = sqrt(z * z + heightDelta * heightDelta);
+  if (realX < minRealX) {
+    realX = minRealX;
+  }
+
+  if (realX > maxRealX) {
+    realX = maxRealX;
+  }
+
+  if (realY < minRealY) {
+    realY = minRealY;
+  }
+
+  if (realY > maxRealY) {
+    realY = maxRealY;
+  }
+
+  if (realZ < minRealZ) {
+    realZ = minRealZ;
+  }
+
+  if (realZ > maxRealZ) {
+    realZ = maxRealZ;
+  }
+
+  if (realAngle < minRealAngle) {
+    realAngle = minRealAngle;
+  }
+
+  if (realAngle > maxRealAngle) {
+    realAngle = maxRealAngle;
+  }
+};
+
+
+
+////////////////////////////////////////////////////////////////////////
+// Real coordinates to angles
+
+void convertRealCoordinatesToAngles(float realX, float realY, float realZ, float realAngle, float& outputServo1Angle, float& outputServo2Angle, float& outputServo3Angle, float& outputServo4Angle) {
+
+  float heightDelta = realY - baseHeight;
+  float chord = sqrt(realZ * realZ + heightDelta * heightDelta);
   
 
   float betaComplement = toDegrees(acos((chord / 2) / armSegmentLength));
@@ -142,10 +186,10 @@ void convertCoordinatesToAngles(float x, float y, float z, float angle, float& o
     gama = 90 - gamaComplement;
   }
 
-  outputServo1Angle = 180 - x;
+  outputServo1Angle = 180 - realX;
   outputServo2Angle = gama - 10;
   outputServo3Angle = 107 - beta;
-  outputServo4Angle = 181 - angle;
+  outputServo4Angle = 181 - realAngle;
 
   Serial.printf("rX: %.2f, rY: %.2f, rZ: %.2f, hD: %.2f, chord: %.2f, b: %.2f(%.2f), d: %.2f, g: %.2f(%.2f), s2: %.2f, s3: %.2f, s4: %.2f\n",  realX, realY, realZ, heightDelta, chord, beta, betaComplement, delta, gama, gamaComplement, outputServo2Angle, outputServo3Angle, outputServo4Angle);
 };
@@ -188,39 +232,6 @@ void checkServoAngleLimits() {
   }
 }
 
-void checkRealCoordinateLimits() {
-  if (realX < minRealX) {
-    realX = minRealX;
-  }
-
-  if (realX > maxRealX) {
-    realX = maxRealX;
-  }
-
-  if (realY < minRealY) {
-    realY = minRealY;
-  }
-
-  if (realY > maxRealY) {
-    realY = maxRealY;
-  }
-
-  if (realZ < minRealZ) {
-    realZ = minRealZ;
-  }
-
-  if (realZ > maxRealZ) {
-    realZ = maxRealZ;
-  }
-
-  if (realAngle < minRealAngle) {
-    realAngle = minRealAngle;
-  }
-
-  if (realAngle > maxRealAngle) {
-    realAngle = maxRealAngle;
-  }
-}
 
 
 void checkSelectedInputCoordinateLimits() {
@@ -310,7 +321,15 @@ void startMovement(float toInputX, float toInputY, float toInputZ, float toInput
   fromServo4Angle = servo4Angle;
 
 //  convertCoordinatesToAngles(fromInputX, fromInputY, fromInputZ, fromInputAngle, fromServo1Angle, fromServo2Angle, fromServo3Angle, fromServo4Angle);
-  convertCoordinatesToAngles(toInputX, toInputY, toInputZ, toInputAngle, toServo1Angle, toServo2Angle, toServo3Angle, toServo4Angle);
+
+  float toRealX;
+  float toRealY;
+  float toRealZ;
+  float toRealAngle;
+
+  convertInputToRealCoordinates(toInputX, toInputY, toInputZ, toInputAngle, toRealX, toRealY, toRealZ, toRealAngle);
+  convertRealCoordinatesToAngles(toRealX, toRealY, toInputZ, toInputAngle, toServo1Angle, toServo2Angle, toServo3Angle, toServo4Angle);
+  
   movePhase = MOVE_BEGIN;
   
 //  switch (movePhase) {
@@ -388,17 +407,19 @@ void manualMovement() {
     }
 
     case MOVE_IN_PROGRESS: {
-      double timeDelta = millis() - currentStepBegin;
-      if (timeDelta <= moveStepDuration) {
-        double progress = easeInOutCubic(timeDelta / (double)moveStepDuration);
-        servo1Angle = fromServo1Angle + (toServo1Angle - fromServo1Angle) * progress;
-        servo2Angle = fromServo2Angle + (toServo2Angle - fromServo2Angle) * progress;
-        servo3Angle = fromServo3Angle + (toServo3Angle - fromServo3Angle) * progress;
-        servo4Angle = fromServo4Angle + (toServo4Angle - fromServo4Angle) * progress;
-      }
-      else {
-        movePhase = MOVE_FINISHED;
-      }
+
+      
+//      double timeDelta = millis() - currentStepBegin;
+//      if (timeDelta <= moveStepDuration) {
+//        double progress = easeInOutCubic(timeDelta / (double)moveStepDuration);
+//        servo1Angle = fromServo1Angle + (toServo1Angle - fromServo1Angle) * progress;
+//        servo2Angle = fromServo2Angle + (toServo2Angle - fromServo2Angle) * progress;
+//        servo3Angle = fromServo3Angle + (toServo3Angle - fromServo3Angle) * progress;
+//        servo4Angle = fromServo4Angle + (toServo4Angle - fromServo4Angle) * progress;
+//      }
+//      else {
+//        movePhase = MOVE_FINISHED;
+//      }
       return;
     }
 

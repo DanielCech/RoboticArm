@@ -126,11 +126,6 @@ void resetPosition() {
   currentlyPumpEnabled = false;
   beforePumpEnabled = false;
 
-  realX = startX;
-  realY = startY;
-  realZ = startZ;
-  realAngle = startAngle;
-
   currentState = ST_MAIN_MENU;
 }
 

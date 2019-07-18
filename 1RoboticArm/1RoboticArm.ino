@@ -122,10 +122,10 @@ const int minInputAngle = 0;
 const int maxInputAngle = 180;
 
 // Real float position
-float realX = startX;
-float realY = startY;
-float realZ = startZ;
-float realAngle = startAngle;
+//float realX = startX;
+//float realY = startY;
+//float realZ = startZ;
+//float realAngle = startAngle;
 
 // Limits for real movement
 const float minRealX = 0;
