@@ -235,6 +235,13 @@ void checkInputCoordinateLimits(int& inputX, int& inputY, int& inputZ, int& inpu
   if (inputAngle > maxInputAngle) {
     inputAngle = maxInputAngle;
   }
+
+  // Avoid collision with vacuum pump
+  if (inputY < 50) {
+    if (inputX < 55) {
+      inputX = 55;
+    }
+  }
 }
 
 
