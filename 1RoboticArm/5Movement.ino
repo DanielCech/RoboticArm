@@ -185,15 +185,14 @@ void playProgram() {
     }
 
     case STEP_MOVEMENT: {
-      if (timeDelta <= currentProgramStep.duration) {
-        moveDuration = currentProgramStep.duration;
-        manualMovement();
-      }
-      else {
+      moveDuration = currentProgramStep.duration;
+      manualMovement();
+
+      if (movePhase == MOVE_FINISHED) {
         currentStepPhase = STEP_PAUSE_AFTER;
         currentStepBegin = millis();
+        return;
       }
-      return;
     }
 
     case STEP_PAUSE_AFTER: {
