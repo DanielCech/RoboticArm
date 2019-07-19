@@ -29,7 +29,7 @@ void initialState() {
   //("Initial state");
 
   if (refreshDisplay) {
-    displayStrings("RoboticArm 0.2", "JVDA-01", lcd);
+    displayStrings("FrankArm JVDA-01", "  Macej & Cech", lcd);
     refreshDisplay = false;
   }
  

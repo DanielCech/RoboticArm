@@ -130,10 +130,10 @@ const int maxInputAngle = 180;
 // Limits for real movement
 const float minRealX = 0;
 const float maxRealX = 180;
-const float minRealY = 1.5;
+const float minRealY = 2.8;
 const float maxRealY = 25;  // 16
 const float minRealZ = 10;   // 6
-const float maxRealZ = 30;  // 20
+const float maxRealZ = 33;  // 20
 const float minRealAngle = 0;
 const float maxRealAngle = 180;
 
@@ -281,8 +281,7 @@ unsigned long currentStepBegin = 0;
 ////////////////////////////////////////////////////////////////////////
 // Helpers
 
-bool equal(float a, float b)
-{
+bool equal(float a, float b) {
  return fabs(a-b) < movementTolerance;
 }
 

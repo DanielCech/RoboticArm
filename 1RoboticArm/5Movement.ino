@@ -132,6 +132,9 @@ void convertInputToRealCoordinates(float inputX, float inputY, float inputZ, flo
 
 void convertRealCoordinatesToAngles(float realX, float realY, float realZ, float realAngle, float& outputServo1Angle, float& outputServo2Angle, float& outputServo3Angle, float& outputServo4Angle) {
 
+  // Height compensation
+  realY = realY - 0.7 * (realY - minRealY)/(maxRealY - minRealY);
+
   float heightDelta = realY - baseHeight;
   float chord = sqrt(realZ * realZ + heightDelta * heightDelta);
   
