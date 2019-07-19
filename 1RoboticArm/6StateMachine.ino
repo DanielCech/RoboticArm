@@ -126,7 +126,7 @@ void resetPosition() {
   currentlyPumpEnabled = false;
   beforePumpEnabled = false;
 
-  startMovement(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
+  startManualMovement(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
 
   currentState = ST_MAIN_MENU;
 }
@@ -261,7 +261,7 @@ void manualMode() {
   long now = millis();
   if ((now - selectedInputXUpdate > pauseBeforeManualMovement) && (now - selectedInputYUpdate > pauseBeforeManualMovement) && (now - selectedInputZUpdate > pauseBeforeManualMovement) && (now - selectedInputAngleUpdate > pauseBeforeManualMovement)) {
     movementType = localManual;
-    startMovement(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
+    startManualMovement(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
   }
 }
 
