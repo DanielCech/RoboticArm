@@ -126,6 +126,7 @@ void resetPosition() {
   currentlyPumpEnabled = false;
   beforePumpEnabled = false;
 
+  movementType = localManual;
   startManualMovement(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
 
   currentState = ST_MAIN_MENU;

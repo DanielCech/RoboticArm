@@ -61,41 +61,55 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
 
         numbersToCurrentInput();
 
-        if (movementType == remoteProgram) {
-          if (lastBluetoothUpdate < 0) {
-              lastBluetoothUpdate = millis();
-//              updateLastServoAngles();
-              return;
-            }
-          
-            long now = millis();
-            long stepDuration = now - lastBluetoothUpdate;
-          
-            if (stepDuration > 2000) {
-              lastBluetoothUpdate = millis();
-//              updateLastServoAngles();
-              return;
-            }
+        switch (movementType) {
+          case remoteManual:
+            movementType = remoteManual;
+            startManualMovement(numberX, numberY, numberZ, numberAngle);
+            currentlyPumpEnabled = (numberPump > 0);
+            break;
+            
+          case remoteProgram:
+            break;
 
-            // TODO: fix lastServoAngles etc....
-//            convertCoordinatesToAngles(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
-//            convertedToNextServoAngles();
 
-            lastBluetoothUpdate = millis();
+          default:
+            break;  
         }
-        else {
-          numbersToCurrentInput();
-//          updateNextServoAngles(true);
-        }
+
+
+//        if (movementType == remoteProgram) {
+//          if (lastBluetoothUpdate < 0) {
+//              lastBluetoothUpdate = millis();
+////              updateLastServoAngles();
+//              return;
+//            }
+//          
+//            long now = millis();
+//            long stepDuration = now - lastBluetoothUpdate;
+//          
+//            if (stepDuration > 2000) {
+//              lastBluetoothUpdate = millis();
+////              updateLastServoAngles();
+//              return;
+//            }
+//
+//            // TODO: fix lastServoAngles etc....
+////            convertCoordinatesToAngles(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
+////            convertedToNextServoAngles();
+//
+//            lastBluetoothUpdate = millis();
+//        }
+//        else {
+//          numbersToCurrentInput();
+////          updateNextServoAngles(true);
+//        }
         
 
-        currentlyPumpEnabled = (numberPump > 0);
-
-        if ((currentState == ST_MANUAL_MODE) || (currentState == ST_PLAY_PROGRAM)) {
-          refreshDisplay = true;
-        }
+//        if ((currentState == ST_MANUAL_MODE) || (currentState == ST_CREATE_PROGRAM)) {
+//          refreshDisplay = true;
+//        }
         
-        Serial.println();
+//        Serial.println();
       }
     }
 };

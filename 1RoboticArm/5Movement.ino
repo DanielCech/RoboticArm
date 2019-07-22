@@ -1,4 +1,3 @@
-
 ///////////////////////////////////////////////////////////////////////
 // Movement
 
@@ -27,7 +26,6 @@ void startManualMovement(float toInputX, float toInputY, float toInputZ, float t
   convertRealCoordinatesToAngles(toRealX, toRealY, toRealZ, toRealAngle, toServo1Angle, toServo2Angle, toServo3Angle, toServo4Angle);
 
   moveDuration = defaultMoveDuration;
-  movementType = localManual;
   movePhase = MOVE_BEGIN;
 }
 
@@ -272,12 +270,12 @@ void convertInputToRealCoordinates(float inputX, float inputY, float inputZ, flo
 void convertRealCoordinatesToAngles(float realX, float realY, float realZ, float realAngle, float& outputServo1Angle, float& outputServo2Angle, float& outputServo3Angle, float& outputServo4Angle) {
 
   // Height compensation
-  realY = realY - 1 * (realY - minRealY)/(maxRealY - minRealY);
+//  realY = realY - 1 * (realZ - minRealZ)/(maxRealZ - minRealZ);
+  realY = heightCompensation(realY, realZ);
 
   float heightDelta = realY - baseHeight;
   float chord = sqrt(realZ * realZ + heightDelta * heightDelta);
   
-
   float betaComplement = toDegrees(acos((chord / 2) / armSegmentLength));
   float delta = toDegrees(asin(abs(heightDelta) / chord));
   float gamaComplement = toDegrees(asin((chord / 2) / armSegmentLength)) / 2; //180 - 2 * betaComplement;
@@ -300,12 +298,24 @@ void convertRealCoordinatesToAngles(float realX, float realY, float realZ, float
 
   outputServo1Angle = 180 - realX;
   outputServo2Angle = gama - 10;
+  // Height compensation
+//  outputServo2Angle = angleHeightCompensation(realZ);
   outputServo3Angle = 107 - beta;
   outputServo4Angle = 181 - realAngle;
 
   Serial.printf("iX: %d, iY: %d, iZ: %d, rX: %.2f, rY: %.2f, rZ: %.2f, hD: %.2f, chord: %.2f, b: %.2f(%.2f), d: %.2f, g: %.2f(%.2f), s1: %.2f, s2: %.2f, s3: %.2f, s4: %.2f\n",  targetInputX, targetInputY, targetInputZ, realX, realY, realZ, heightDelta, chord, beta, betaComplement, delta, gama, gamaComplement, outputServo1Angle, outputServo2Angle, outputServo3Angle, outputServo4Angle);
 };
 
+
+float heightCompensation(float realY, float realZ) {
+  float values[][2] = {{10.0, 0.0}, {15.0, 1.3}, {21.0, 1.7}, {27.0, 1.3},{33.0, 0.5}};
+  float value = interpolate(realZ, values, 5);
+
+  Serial.printf("Compensation: %0.3f\n", value);
+
+  
+  return realY - value;
+}
 
 ////////////////////////////////////////////////////////////////////////
 // Limits checking
@@ -472,4 +482,35 @@ void numbersToCurrentInput() {
 //    }  
 //  }
 //}
+
+////////////////////////////////////////////////////////////////////////
+// Interpolate values
+
+float interpolate(float x, float array[][2], int count) {
+  float lastPosition = -1;
+  float lastValue = -1;
+
+  if (array[0][0] > x) {
+    return array[0][1];
+  }
+  
+  for (int index = 0; index < count; index++) {
+    if (array[index][0] == x) {
+      return array[index][1];
+    }
+
+    if ((lastPosition > -1) && (array[index][0] > x)) {
+      float nextPosition = -1;
+      float nextValue = -1;
+
+      return lastValue + (nextValue - lastValue) * (x - lastPosition)/(nextPosition - lastPosition);
+    }
+
+    lastPosition = array[index][0];
+    lastValue = array[index][1];
+    
+  }
+
+  return lastValue;
+}
 
