@@ -52,23 +52,48 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
         int numberImmediately = (int)strtol(stringImmediately.c_str(), NULL, 16);
         int numberControlServos = (int)strtol(stringControlServos.c_str(), NULL, 16);
 
-        if (numberImmediately > 0) {
-          movementType = remoteProgram;
+        switch (movementType) {
+          case none:
+            Serial.println("movement: none");
+            break;
+          case localManual:
+            Serial.println("movement: localManual");
+            break;
+          case localProgram:
+            Serial.println("movement: localProgram");
+            break;
+          case remoteManual:
+            Serial.println("movement: remoteManual");
+            break;
+          case remoteProgram:
+            Serial.println("movement: remoteProgram");
+            break;
         }
-        else {
-          movementType = remoteManual;
+        
+        if (movementType == none) {
+          if (numberImmediately > 0) {
+            movementType = remoteProgram;
+          }
+          else {
+            movementType = remoteManual;
+          }
         }
+//        else {
+//          return;
+//        }
+
+//        Serial.println("Bluetooth value");
 
         numbersToCurrentInput();
 
         switch (movementType) {
           case remoteManual:
-            movementType = remoteManual;
             startManualMovement(numberX, numberY, numberZ, numberAngle);
             currentlyPumpEnabled = (numberPump > 0);
             break;
             
           case remoteProgram:
+            
             break;
 
 
@@ -105,9 +130,9 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
 //        }
         
 
-//        if ((currentState == ST_MANUAL_MODE) || (currentState == ST_CREATE_PROGRAM)) {
-//          refreshDisplay = true;
-//        }
+        if ((currentState == ST_MANUAL_MODE) || (currentState == ST_CREATE_PROGRAM)) {
+          refreshDisplay = true;
+        }
         
 //        Serial.println();
       }

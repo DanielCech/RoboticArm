@@ -256,7 +256,7 @@ bool refreshDisplay = true;
 #define MOVE_FINISHED 3
 
 int movePhase = MOVE_NONE;
-const int defaultMoveDuration = 1500;
+const int defaultMoveDuration = 1700;
 int moveDuration = defaultMoveDuration;
 
 const int maxStepCount = 20;

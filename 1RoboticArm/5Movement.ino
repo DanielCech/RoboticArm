@@ -79,7 +79,7 @@ void manualMovement() {
     case MOVE_BEGIN: {
       currentStepBegin = millis();
       movePhase = MOVE_IN_PROGRESS;
-//      Serial.printf("Begin\n");
+      Serial.printf("Begin\n");
       return;
     }
 
@@ -99,12 +99,13 @@ void manualMovement() {
     }
 
     case MOVE_FINISHED: {
-      //Serial.printf("Finished\n");
+      Serial.printf("Finished\n");
       currentInputX = targetInputX;
       currentInputY = targetInputY;
       currentInputZ = targetInputZ;
       currentInputAngle = targetInputAngle;
       movePhase = MOVE_NONE;
+      movementType = none;
       return;
     }
   }
