@@ -126,9 +126,7 @@ void resetPosition() {
   currentlyPumpEnabled = false;
   beforePumpEnabled = false;
 
-  movementType = localManual;
-  startManualMovement(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
-
+  startManualMovement(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle, MV_LOCAL_MANUAL);
   currentState = ST_MAIN_MENU;
 }
 
@@ -151,6 +149,7 @@ void manualMode() {
     selectedInputX = MAX(selectedInputX - step, minInputX);
     checkInputCoordinateLimits(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
     selectedInputXUpdate = millis();
+    lastMovementSource = MV_LOCAL_MANUAL;
     refreshDisplay = true;
     return;
   }
@@ -159,6 +158,7 @@ void manualMode() {
     selectedInputX = MIN(selectedInputX + step, maxInputX);
     checkInputCoordinateLimits(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
     selectedInputXUpdate = millis();
+    lastMovementSource = MV_LOCAL_MANUAL;
     refreshDisplay = true;
     return;
   }
@@ -176,6 +176,7 @@ void manualMode() {
     selectedInputY = MIN(selectedInputY + step, maxInputY);
     checkInputCoordinateLimits(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
     selectedInputYUpdate = millis();
+    lastMovementSource = MV_LOCAL_MANUAL;
     refreshDisplay = true;
     return;
   }
@@ -185,6 +186,7 @@ void manualMode() {
     selectedInputZ = MAX(selectedInputZ - step, minInputZ);
     checkInputCoordinateLimits(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
     selectedInputZUpdate = millis();
+    lastMovementSource = MV_LOCAL_MANUAL;
     refreshDisplay = true;
     return;
   }
@@ -193,6 +195,7 @@ void manualMode() {
     selectedInputZ = MIN(selectedInputZ + step, maxInputZ);
     checkInputCoordinateLimits(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
     selectedInputZUpdate = millis();
+    lastMovementSource = MV_LOCAL_MANUAL;
     refreshDisplay = true;
     return;
   }
@@ -202,6 +205,7 @@ void manualMode() {
     selectedInputAngle = MAX(selectedInputAngle - step, minInputAngle);
     checkInputCoordinateLimits(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
     selectedInputZUpdate = millis();
+    lastMovementSource = MV_LOCAL_MANUAL;
     refreshDisplay = true;
     return;
   }
@@ -215,6 +219,7 @@ void manualMode() {
     }
     checkInputCoordinateLimits(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
     selectedInputAngleUpdate = millis();
+    lastMovementSource = MV_LOCAL_MANUAL;
     refreshDisplay = true;
     return;
   }
@@ -250,6 +255,7 @@ void manualMode() {
   if (thirdEncoder.buttonPressed) {
     currentlyPumpEnabled = !currentlyPumpEnabled;
     refreshDisplay = true;
+    lastMovementSource = MV_LOCAL_MANUAL;
     delay(200);
     return;
   }
@@ -258,12 +264,13 @@ void manualMode() {
     encoder4normalDirection = !encoder4normalDirection;
   }
 
-  // Start movement after 1s pause
-  long now = millis();
-  if ((now - selectedInputXUpdate > pauseBeforeManualMovement) && (now - selectedInputYUpdate > pauseBeforeManualMovement) && (now - selectedInputZUpdate > pauseBeforeManualMovement) && (now - selectedInputAngleUpdate > pauseBeforeManualMovement)) {
-    movementType = localManual;
-    startManualMovement(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
-  }
+  
+
+//  // Start movement after 1s pause
+//  long now = millis();
+//  if ((now - selectedInputXUpdate > pauseBeforeManualMovement) && (now - selectedInputYUpdate > pauseBeforeManualMovement) && (now - selectedInputZUpdate > pauseBeforeManualMovement) && (now - selectedInputAngleUpdate > pauseBeforeManualMovement)) {
+//    startManualMovement(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle, MV_LOCAL_MANUAL);
+//  }
 }
 
 void bluetoothMode() {

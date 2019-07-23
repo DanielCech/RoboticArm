@@ -59,8 +59,15 @@ int freq = 5000;
 ////////////////////////////////////////////////////////////////////////
 // Movement
 
-enum MovementType { none, localManual, localProgram, remoteManual, remoteProgram };
-MovementType movementType = none;
+#define MV_NONE                           0
+#define MV_LOCAL_MANUAL                   1
+#define MV_LOCAL_PROGRAM                  2
+#define MV_REMOTE_MANUAL                  3
+#define MV_REMOTE_PROGRAM                 4
+
+int movementType = MV_NONE;
+int lastMovementSource = MV_NONE;
+
 long lastBluetoothUpdate = -1;
 long bluetoothStepDuration = 0;
 float movementTolerance = 0.0001;
@@ -210,7 +217,6 @@ Servo servo1;
 Servo servo2;
 Servo servo3;
 Servo servo4;
-
 
 ////////////////////////////////////////////////////////////////////////
 // State

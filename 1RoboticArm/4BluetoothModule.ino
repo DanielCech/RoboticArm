@@ -53,31 +53,40 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
         int numberControlServos = (int)strtol(stringControlServos.c_str(), NULL, 16);
 
         switch (movementType) {
-          case none:
+          case MV_NONE:
             Serial.println("movement: none");
             break;
-          case localManual:
+          case MV_LOCAL_MANUAL:
             Serial.println("movement: localManual");
             break;
-          case localProgram:
+          case MV_LOCAL_PROGRAM:
             Serial.println("movement: localProgram");
             break;
-          case remoteManual:
+          case MV_REMOTE_MANUAL:
             Serial.println("movement: remoteManual");
             break;
-          case remoteProgram:
+          case MV_REMOTE_PROGRAM:
             Serial.println("movement: remoteProgram");
             break;
         }
-        
-        if (movementType == none) {
-          if (numberImmediately > 0) {
-            movementType = remoteProgram;
-          }
-          else {
-            movementType = remoteManual;
-          }
+
+        if (numberImmediately > 0) {
+          lastMovementSource = MV_REMOTE_PROGRAM;
         }
+        else {
+          lastMovementSource = MV_REMOTE_MANUAL;
+          currentlyPumpEnabled = (numberPump > 0);
+        }
+
+        
+//        if (mmovementTypeovementType == none) {
+//          if (numberImmediately > 0) {
+//            movementType = remoteProgram;
+//          }
+//          else {
+//            movementType = remoteManual;
+//          }
+//        }
 //        else {
 //          return;
 //        }
@@ -85,21 +94,22 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
 //        Serial.println("Bluetooth value");
 
         numbersToCurrentInput();
+        selectedInputXUpdate = selectedInputYUpdate = selectedInputZUpdate = selectedInputAngleUpdate = millis();
 
-        switch (movementType) {
-          case remoteManual:
-            startManualMovement(numberX, numberY, numberZ, numberAngle);
-            currentlyPumpEnabled = (numberPump > 0);
-            break;
-            
-          case remoteProgram:
-            
-            break;
-
-
-          default:
-            break;  
-        }
+//        switch (movementType) {
+//          case MV_REMOTE_MANUAL:
+//            startManualMovement(numberX, numberY, numberZ, numberAngle, MV_REMOTE_MANUAL);
+//            currentlyPumpEnabled = (numberPump > 0);
+//            break;
+//            
+//          case MV_REMOTE_PROGRAM:
+//            
+//            break;
+//
+//
+//          default:
+//            break;  
+//        }
 
 
 //        if (movementType == remoteProgram) {

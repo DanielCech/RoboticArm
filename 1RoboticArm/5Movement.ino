@@ -1,9 +1,12 @@
 ///////////////////////////////////////////////////////////////////////
 // Movement
 
-void startManualMovement(float toInputX, float toInputY, float toInputZ, float toInputAngle) {
+void startManualMovement(float toInputX, float toInputY, float toInputZ, float toInputAngle, int movement) {
   if (movePhase != MOVE_NONE) { return; }
+//  if (movementType != MV_NONE) { return; }
   if (equal(currentInputX, toInputX) && equal(currentInputY, toInputY) && equal(currentInputZ, toInputZ) && equal(currentInputAngle, toInputAngle)) { return; }
+
+  movementType = movement;
 
   targetInputX = toInputX;
   targetInputY = toInputY;
@@ -30,21 +33,32 @@ void startManualMovement(float toInputX, float toInputY, float toInputZ, float t
 }
 
 void movement() {
+  // Initiate local/remote manual movement
+  if ((lastMovementSource == MV_LOCAL_MANUAL) || (lastMovementSource == MV_REMOTE_MANUAL)) {
+    // Start movement after 1s pause
+    long now = millis();
+    if ((now - selectedInputXUpdate > pauseBeforeManualMovement) && (now - selectedInputYUpdate > pauseBeforeManualMovement) && (now - selectedInputZUpdate > pauseBeforeManualMovement) && (now - selectedInputAngleUpdate > pauseBeforeManualMovement)) {
+      startManualMovement(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle, lastMovementSource);
+      lastMovementSource = MV_NONE;
+    }
+  }
+  
+  // Movement progress
   switch (movementType) {
-    case none:
+    case MV_NONE:
       break;
       
-    case localManual:
-    case remoteManual:
+    case MV_LOCAL_MANUAL:
+    case MV_REMOTE_MANUAL:
       manualMovement();
       break;
 
     // TODO: complete
-    case localProgram:
+    case MV_LOCAL_PROGRAM:
       playProgram();
       break;  
       
-    case remoteProgram:
+    case MV_REMOTE_PROGRAM:
       immediateMovement();
   }
 
@@ -105,7 +119,7 @@ void manualMovement() {
       currentInputZ = targetInputZ;
       currentInputAngle = targetInputAngle;
       movePhase = MOVE_NONE;
-      movementType = none;
+      movementType = MV_NONE;
       return;
     }
   }
@@ -230,7 +244,7 @@ void startNewProgramStep() {
 
       currentStep = -1;
       currentStepPhase = STEP_PAUSE_BEFORE;
-      movementType = none;
+      movementType = MV_NONE;
       return;
     }
 }
