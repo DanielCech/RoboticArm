@@ -276,6 +276,7 @@ struct ProgramStep {
   int duration;
   int pauseBefore;
   int pauseAfter;
+  long timing;
 };
 
 struct ProgramStep program[maxStepCount];
@@ -284,6 +285,9 @@ int programStepCount = 0;
 int currentStep = -1;
 int currentStepPhase = STEP_INITIAL;
 unsigned long currentStepBegin = 0;
+
+
+struct ProgramStep remoteProgramCache[maxStepCount];
 
 ////////////////////////////////////////////////////////////////////////
 // Helpers
