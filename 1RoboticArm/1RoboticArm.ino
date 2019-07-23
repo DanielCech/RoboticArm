@@ -283,7 +283,6 @@ struct ProgramStep localProgram[localProgramMaxStepCount];
 int localProgramStepCount = 0;
 int localProgramCurrentStep = -1;
 int localProgramCurrentStepPhase = STEP_INITIAL;
-unsigned long localProgramCurrentStepBegin = 0;
 
 // Remote program
 const int remoteProgramMaxStepCount = 100;
@@ -291,7 +290,8 @@ struct ProgramStep remoteProgram[remoteProgramMaxStepCount];
 int remoteProgramStepCount = 0;
 int remoteProgramCurrentStep = -1;
 int remoteProgramCurrentStepPhase = STEP_INITIAL;
-unsigned long remoteProgramCurrentStepBegin = 0;
+
+unsigned long currentStepBegin = 0;
 
 ////////////////////////////////////////////////////////////////////////
 // Helpers

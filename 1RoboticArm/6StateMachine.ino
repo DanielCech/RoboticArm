@@ -168,6 +168,7 @@ void manualMode() {
     selectedInputY = MAX(selectedInputY - step, minInputY);
     checkInputCoordinateLimits(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
     selectedInputYUpdate = millis();
+    lastMovementSource = MV_LOCAL_MANUAL;
     refreshDisplay = true;
     return;
   }

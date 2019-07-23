@@ -54,7 +54,7 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
 
         checkInputFloatCoordinateLimits(numberX, numberY, numberZ, numberAngle);
 
-        Serial.printf("nX:%0.2f nY:%0.2f nZ:%0.2f nAngle:%0.2f sPump:%s", numberX, numberY, numberZ, numberAngle, stringPump.c_str());
+        Serial.printf("nX:%.2f nY:%.2f nZ:%.2f nAngle:%.2f", numberX, numberY, numberZ, numberAngle);
 
 //        switch (movementType) {
 //          case MV_NONE:

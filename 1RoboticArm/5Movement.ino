@@ -6,6 +6,7 @@ void startManualMovement(float toInputX, float toInputY, float toInputZ, float t
 //  if (movementType != MV_NONE) { return; }
   if (equal(currentInputX, toInputX) && equal(currentInputY, toInputY) && equal(currentInputZ, toInputZ) && equal(currentInputAngle, toInputAngle)) { return; }
 
+
   movementType = movement;
 
   targetInputX = toInputX;
@@ -50,7 +51,7 @@ void movement() {
       
     case MV_LOCAL_MANUAL:
     case MV_REMOTE_MANUAL:
-      manualMovement(true);
+      manualMovement();
       break;
 
     // TODO: complete
@@ -60,6 +61,7 @@ void movement() {
       
     case MV_REMOTE_PROGRAM:
       playRemoteProgram();
+      break;
   }
 
   moveServos();
@@ -85,28 +87,33 @@ void moveServos() {
   previousServo4Angle = servo4Angle;
 }
 
-void manualMovement(bool easeInOut) {  
+void manualMovement() {  
   switch (movePhase) {
     case MOVE_NONE:
       break;
       
     case MOVE_BEGIN: {
-      localProgramCurrentStepBegin = millis();
+      currentStepBegin = millis();
       movePhase = MOVE_IN_PROGRESS;
-      Serial.printf("Begin\n");
+      Serial.printf("manualMovement: begin\n");
       return;
     }
 
     case MOVE_IN_PROGRESS: {      
-      double timeDelta = millis() - localProgramCurrentStepBegin;
+      double timeDelta = millis() - currentStepBegin;
       if (timeDelta <= moveDuration) {
-        double progress = easeInOut ? easeInOutCubic(timeDelta / (double)moveDuration) : linear(timeDelta / (double)moveDuration);
+        double progress = easeInOutCubic(timeDelta / (double)moveDuration);
         servo1Angle = fromServo1Angle + (toServo1Angle - fromServo1Angle) * progress;
         servo2Angle = fromServo2Angle + (toServo2Angle - fromServo2Angle) * progress;
         servo3Angle = fromServo3Angle + (toServo3Angle - fromServo3Angle) * progress;
         servo4Angle = fromServo4Angle + (toServo4Angle - fromServo4Angle) * progress;
       }
       else {
+//        servo1Angle = toServo1Angle;
+//        servo2Angle = toServo2Angle;
+//        servo3Angle = toServo3Angle;
+//        servo4Angle = toServo4Angle;
+        
         movePhase = MOVE_FINISHED;
       }
       return;
@@ -134,14 +141,14 @@ void playRemoteProgram() {
     return;
   }
 
-  double timeDelta = millis() - remoteProgramCurrentStepBegin;
+//  double timeDelta = millis() - currentStepBegin;
   
   ProgramStep currentProgramStep = remoteProgram[remoteProgramCurrentStep];
 
   switch (remoteProgramCurrentStepPhase) {
     case STEP_PAUSE_BEFORE: {
       Serial.printf("remoteProgram: pause before\n");
-      remoteProgramCurrentStepBegin = millis();
+      currentStepBegin = millis();
 
       targetInputX = currentProgramStep.x;
       targetInputY = currentProgramStep.y;
@@ -175,8 +182,8 @@ void playRemoteProgram() {
     }
 
     case STEP_MOVEMENT: {
-      Serial.printf("remoteProgram: movement\n");
-      manualMovement(false);
+//      Serial.printf("remoteProgram: movement\n");
+      remoteProgramMovement();
 
       if (movePhase == MOVE_FINISHED) {
         startNewRemoteProgramStep();
@@ -188,16 +195,16 @@ void playRemoteProgram() {
 
 void startNewRemoteProgramStep() { 
   if (remoteProgramCurrentStep < remoteProgramStepCount - 1) {
-      Serial.printf("startNewRemoteProgramStep: step\n");
+//      Serial.printf("startNewRemoteProgramStep: step\n");
       remoteProgramCurrentStep++;
       remoteProgramCurrentStepPhase = STEP_PAUSE_BEFORE;
 
-      remoteProgramCurrentStepBegin = millis();
+      currentStepBegin = millis();
       ProgramStep currentProgramStep = remoteProgram[remoteProgramCurrentStep];
       currentlyPumpEnabled = currentProgramStep.pump;
     }
     else {
-      Serial.printf("startNewRemoteProgramStep: finish\n");
+//      Serial.printf("startNewRemoteProgramStep: finish\n");
       remoteProgramCurrentStep = -1;
       remoteProgramStepCount = 0;
       remoteProgramCurrentStepPhase = STEP_PAUSE_BEFORE;
@@ -205,6 +212,51 @@ void startNewRemoteProgramStep() {
       lastMovementSource = MV_NONE;
       return;
     }
+}
+
+void remoteProgramMovement() {  
+  switch (movePhase) {
+    case MOVE_NONE:
+      break;
+      
+    case MOVE_BEGIN: {
+      currentStepBegin = millis();
+      movePhase = MOVE_IN_PROGRESS;
+      Serial.printf("remoteProgramMovement: begin\n");
+      return;
+    }
+
+    case MOVE_IN_PROGRESS: {      
+      double timeDelta = millis() - currentStepBegin;
+      if (timeDelta <= moveDuration) {
+        double progress = easeInOutCubic(timeDelta / (double)moveDuration);
+        servo1Angle = fromServo1Angle + (toServo1Angle - fromServo1Angle) * progress;
+        servo2Angle = fromServo2Angle + (toServo2Angle - fromServo2Angle) * progress;
+        servo3Angle = fromServo3Angle + (toServo3Angle - fromServo3Angle) * progress;
+        servo4Angle = fromServo4Angle + (toServo4Angle - fromServo4Angle) * progress;
+      }
+      else {
+//        servo1Angle = toServo1Angle;
+//        servo2Angle = toServo2Angle;
+//        servo3Angle = toServo3Angle;
+//        servo4Angle = toServo4Angle;
+        
+        movePhase = MOVE_FINISHED;
+      }
+      return;
+    }
+
+    case MOVE_FINISHED: {
+      Serial.printf("Finished\n");
+      currentInputX = targetInputX;
+      currentInputY = targetInputY;
+      currentInputZ = targetInputZ;
+      currentInputAngle = targetInputAngle;
+      movePhase = MOVE_NONE;
+      movementType = MV_NONE;
+      return;
+    }
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -225,7 +277,7 @@ void playLocalProgram() {
     refreshDisplay = false;
   }
 
-  double timeDelta = millis() - localProgramCurrentStepBegin;
+  double timeDelta = millis() - currentStepBegin;
   
   ProgramStep currentProgramStep = localProgram[localProgramCurrentStep];
 
@@ -235,7 +287,7 @@ void playLocalProgram() {
         // Do nothing 
       }
       else {
-        localProgramCurrentStepBegin = millis();
+        currentStepBegin = millis();
 
         targetInputX = currentProgramStep.x;
         targetInputY = currentProgramStep.y;
@@ -265,11 +317,11 @@ void playLocalProgram() {
 
     case STEP_MOVEMENT: {
       moveDuration = currentProgramStep.duration;
-      manualMovement(true);
+      manualMovement();
 
       if (movePhase == MOVE_FINISHED) {
         localProgramCurrentStepPhase = STEP_PAUSE_AFTER;
-        localProgramCurrentStepBegin = millis();
+        currentStepBegin = millis();
         return;
       }
     }
@@ -293,7 +345,7 @@ void startNewLocalProgramStep() {
       localProgramCurrentStep++;
       localProgramCurrentStepPhase = STEP_PAUSE_BEFORE;
 
-      localProgramCurrentStepBegin = millis();
+      currentStepBegin = millis();
 
       Serial.printf("Step: %d\n", localProgramCurrentStep);
       ProgramStep currentProgramStep = localProgram[localProgramCurrentStep];
@@ -385,7 +437,7 @@ void convertRealCoordinatesToAngles(float realX, float realY, float realZ, float
   outputServo3Angle = 107 - beta;
   outputServo4Angle = 181 - realAngle;
 
-  Serial.printf("iX: %d, iY: %d, iZ: %d, rX: %.2f, rY: %.2f, rZ: %.2f, hD: %.2f, chord: %.2f, b: %.2f(%.2f), d: %.2f, g: %.2f(%.2f), s1: %.2f, s2: %.2f, s3: %.2f, s4: %.2f\n",  targetInputX, targetInputY, targetInputZ, realX, realY, realZ, heightDelta, chord, beta, betaComplement, delta, gama, gamaComplement, outputServo1Angle, outputServo2Angle, outputServo3Angle, outputServo4Angle);
+//  Serial.printf("iX: %d, iY: %d, iZ: %d, rX: %.2f, rY: %.2f, rZ: %.2f, hD: %.2f, chord: %.2f, b: %.2f(%.2f), d: %.2f, g: %.2f(%.2f), s1: %.2f, s2: %.2f, s3: %.2f, s4: %.2f\n",  targetInputX, targetInputY, targetInputZ, realX, realY, realZ, heightDelta, chord, beta, betaComplement, delta, gama, gamaComplement, outputServo1Angle, outputServo2Angle, outputServo3Angle, outputServo4Angle);
 };
 
 
