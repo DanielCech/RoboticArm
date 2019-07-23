@@ -279,12 +279,12 @@ struct ProgramStep {
   long timing;
 };
 
-struct ProgramStep program[maxStepCount];
+struct ProgramStep localProgram[maxStepCount];
 
-int programStepCount = 0;
-int currentStep = -1;
-int currentStepPhase = STEP_INITIAL;
-unsigned long currentStepBegin = 0;
+int localProgramStepCount = 0;
+int localProgramCurrentStep = -1;
+int localProgramCurrentStepPhase = STEP_INITIAL;
+unsigned long localProgramCurrentStepBegin = 0;
 
 
 struct ProgramStep remoteProgramCache[maxStepCount];

@@ -55,7 +55,7 @@ void movement() {
 
     // TODO: complete
     case MV_LOCAL_PROGRAM:
-      playProgram();
+      playLocalProgram();
       break;  
       
     case MV_REMOTE_PROGRAM:
@@ -91,14 +91,14 @@ void manualMovement() {
       break;
       
     case MOVE_BEGIN: {
-      currentStepBegin = millis();
+      localProgramCurrentStepBegin = millis();
       movePhase = MOVE_IN_PROGRESS;
       Serial.printf("Begin\n");
       return;
     }
 
     case MOVE_IN_PROGRESS: {      
-      double timeDelta = millis() - currentStepBegin;
+      double timeDelta = millis() - localProgramCurrentStepBegin;
       if (timeDelta <= moveDuration) {
         double progress = easeInOutCubic(timeDelta / (double)moveDuration);
         servo1Angle = fromServo1Angle + (toServo1Angle - fromServo1Angle) * progress;
@@ -140,34 +140,34 @@ void immediateMovement() {
 }
 
 ////////////////////////////////////////////////////////////////////////
-// Playing program
+// Playing local program
 
-void playProgram() {
+void playLocalProgram() {
   
-  if (currentStep == -1) {
-    startNewProgramStep();
+  if (localProgramCurrentStep == -1) {
+    startNewLocalProgramStep();
     return;
   }
 
   if (refreshDisplay) {
     char line[20];
-    sprintf(line, "%d / %d", currentStep + 1, programStepCount);
+    sprintf(line, "%d / %d", localProgramCurrentStep + 1, localProgramStepCount);
     
     displayStrings("Playing Program", line, lcd);
     refreshDisplay = false;
   }
 
-  double timeDelta = millis() - currentStepBegin;
+  double timeDelta = millis() - localProgramCurrentStepBegin;
   
-  ProgramStep currentProgramStep = program[currentStep];
+  ProgramStep currentProgramStep = localProgram[localProgramCurrentStep];
 
-  switch (currentStepPhase) {
+  switch (localProgramCurrentStepPhase) {
     case STEP_PAUSE_BEFORE: {
       if (timeDelta <= currentProgramStep.duration) {
         // Do nothing 
       }
       else {
-        currentStepBegin = millis();
+        localProgramCurrentStepBegin = millis();
         float currentProgramStepRealY = minRealY + (currentProgramStep.y - minInputY) / float(maxInputY - minInputY) * (maxRealY - minRealY);
         float currentProgramStepRealZ = minRealZ + (currentProgramStep.z - minInputZ) / float(maxInputZ - minInputZ) * (maxRealZ - minRealZ);
 
@@ -191,7 +191,7 @@ void playProgram() {
         
         movePhase = MOVE_BEGIN;
         
-        currentStepPhase = STEP_MOVEMENT;
+        localProgramCurrentStepPhase = STEP_MOVEMENT;
         movePhase = MOVE_BEGIN;
       }
       return;
@@ -202,8 +202,8 @@ void playProgram() {
       manualMovement();
 
       if (movePhase == MOVE_FINISHED) {
-        currentStepPhase = STEP_PAUSE_AFTER;
-        currentStepBegin = millis();
+        localProgramCurrentStepPhase = STEP_PAUSE_AFTER;
+        localProgramCurrentStepBegin = millis();
         return;
       }
     }
@@ -213,24 +213,24 @@ void playProgram() {
         // Do nothing 
       }
       else {
-        startNewProgramStep();
+        startNewLocalProgramStep();
       }
       return;
     }
   }
 }
 
-void startNewProgramStep() {
-  Serial.printf("startNewProgramStep\n");
+void startNewLocalProgramStep() {
+  Serial.printf("startNewLocalProgramStep\n");
   
-  if (currentStep < programStepCount - 1) {
-      currentStep++;
-      currentStepPhase = STEP_PAUSE_BEFORE;
+  if (localProgramCurrentStep < localProgramStepCount - 1) {
+      localProgramCurrentStep++;
+      localProgramCurrentStepPhase = STEP_PAUSE_BEFORE;
 
-      currentStepBegin = millis();
+      localProgramCurrentStepBegin = millis();
 
-      Serial.printf("Step: %d\n", currentStep);
-      ProgramStep currentProgramStep = program[currentStep];
+      Serial.printf("Step: %d\n", localProgramCurrentStep);
+      ProgramStep currentProgramStep = localProgram[localProgramCurrentStep];
 
       currentlyPumpEnabled = currentProgramStep.pump;
       
@@ -242,8 +242,8 @@ void startNewProgramStep() {
       refreshDisplay = true;
       delay(200);
 
-      currentStep = -1;
-      currentStepPhase = STEP_PAUSE_BEFORE;
+      localProgramCurrentStep = -1;
+      localProgramCurrentStepPhase = STEP_PAUSE_BEFORE;
       movementType = MV_NONE;
       return;
     }

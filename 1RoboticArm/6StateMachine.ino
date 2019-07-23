@@ -62,8 +62,8 @@ void mainMenu() {
         
 
       case MENU_CREATE_PROGRAM:
-        programStepCount = 0;
-        currentStep = -1;
+        localProgramStepCount = 0;
+        localProgramCurrentStep = -1;
         currentState = ST_CREATE_PROGRAM;
         refreshDisplay = true;
         delay(200);
@@ -138,7 +138,7 @@ void manualMode() {
     sprintf(firstLine, "XYZ:%3d,%3d,%3d", selectedInputX, selectedInputY, selectedInputZ);
     
     char secondLine[20];
-    sprintf(secondLine, "A:%-3d Pump:%s #%d", selectedInputAngle, currentlyPumpEnabled ? "1" : "0", currentStep + 1 );
+    sprintf(secondLine, "A:%-3d Pump:%s #%d", selectedInputAngle, currentlyPumpEnabled ? "1" : "0", localProgramCurrentStep + 1 );
     
     displayStrings(String(firstLine), String(secondLine), lcd);
     refreshDisplay = false;
@@ -234,9 +234,9 @@ void manualMode() {
     newStep.duration = 1000;
     newStep.pauseBefore = 300;
     newStep.pauseAfter = 300;
-    currentStep++;
-    programStepCount++;
-    program[currentStep] = newStep;
+    localProgramCurrentStep++;
+    localProgramStepCount++;
+    localProgram[localProgramCurrentStep] = newStep;
 
     refreshDisplay = true;
     delay(200);
@@ -245,7 +245,7 @@ void manualMode() {
 
   // Return to main menu
   if (secondEncoder.buttonPressed) {
-    currentStep = -1;
+    localProgramCurrentStep = -1;
     currentState = ST_MAIN_MENU;
     refreshDisplay = true;
     delay(200);
@@ -340,7 +340,7 @@ void processState() {
    }
 
   case ST_PLAY_PROGRAM: {
-      playProgram();
+      playLocalProgram();
       return;
     }
     
