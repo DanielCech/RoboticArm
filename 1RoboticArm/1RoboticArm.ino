@@ -265,13 +265,11 @@ int movePhase = MOVE_NONE;
 const int defaultMoveDuration = 1700;
 int moveDuration = defaultMoveDuration;
 
-const int maxStepCount = 20;
-
 struct ProgramStep {
-  int x;
-  int y;
-  int z;
-  int angle;
+  float x;
+  float y;
+  float z;
+  float angle;
   bool pump;
   int duration;
   int pauseBefore;
@@ -279,15 +277,21 @@ struct ProgramStep {
   long timing;
 };
 
-struct ProgramStep localProgram[maxStepCount];
-
+// Local program
+const int localProgramMaxStepCount = 20;
+struct ProgramStep localProgram[localProgramMaxStepCount];
 int localProgramStepCount = 0;
 int localProgramCurrentStep = -1;
 int localProgramCurrentStepPhase = STEP_INITIAL;
 unsigned long localProgramCurrentStepBegin = 0;
 
-
-struct ProgramStep remoteProgramCache[maxStepCount];
+// Remote program
+const int remoteProgramMaxStepCount = 100;
+struct ProgramStep remoteProgram[remoteProgramMaxStepCount];
+int remoteProgramStepCount = 0;
+int remoteProgramCurrentStep = -1;
+int remoteProgramCurrentStepPhase = STEP_INITIAL;
+unsigned long remoteProgramCurrentStepBegin = 0;
 
 ////////////////////////////////////////////////////////////////////////
 // Helpers

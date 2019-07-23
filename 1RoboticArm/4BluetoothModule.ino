@@ -72,6 +72,20 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
 
         if (numberImmediately > 0) {
           lastMovementSource = MV_REMOTE_PROGRAM;
+
+          struct ProgramStep newStep;
+          newStep.x = numberX;
+          newStep.y = numberY;
+          newStep.z = numberZ;
+          newStep.angle = numberAngle;
+          newStep.pump = (numberPump > 0);
+          newStep.timing = millis();
+         
+          remoteProgramStepCount++;
+          if (remoteProgramStepCount < remoteProgramMaxStepCount) {
+            remoteProgram[remoteProgramStepCount] = newStep;  
+//            Serial.println("remoteProgram");
+          }
         }
         else {
           lastMovementSource = MV_REMOTE_MANUAL;

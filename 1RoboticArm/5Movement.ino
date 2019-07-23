@@ -50,7 +50,7 @@ void movement() {
       
     case MV_LOCAL_MANUAL:
     case MV_REMOTE_MANUAL:
-      manualMovement();
+      manualMovement(true);
       break;
 
     // TODO: complete
@@ -59,7 +59,7 @@ void movement() {
       break;  
       
     case MV_REMOTE_PROGRAM:
-      immediateMovement();
+      playRemoteProgram();
   }
 
   moveServos();
@@ -85,7 +85,7 @@ void moveServos() {
   previousServo4Angle = servo4Angle;
 }
 
-void manualMovement() {  
+void manualMovement(bool easeInOut) {  
   switch (movePhase) {
     case MOVE_NONE:
       break;
@@ -100,7 +100,7 @@ void manualMovement() {
     case MOVE_IN_PROGRESS: {      
       double timeDelta = millis() - localProgramCurrentStepBegin;
       if (timeDelta <= moveDuration) {
-        double progress = easeInOutCubic(timeDelta / (double)moveDuration);
+        double progress = easeInOut ? easeInOutCubic(timeDelta / (double)moveDuration) : linear(timeDelta / (double)moveDuration);
         servo1Angle = fromServo1Angle + (toServo1Angle - fromServo1Angle) * progress;
         servo2Angle = fromServo2Angle + (toServo2Angle - fromServo2Angle) * progress;
         servo3Angle = fromServo3Angle + (toServo3Angle - fromServo3Angle) * progress;
@@ -125,18 +125,85 @@ void manualMovement() {
   }
 }
 
-void immediateMovement() {
-//          
-//  double timeDelta = millis() - lastBluetoothUpdate;
-//  
-//  if (timeDelta <= bluetoothStepDuration) {
-//    
-//    servo1Angle = lastServo1Angle + (nextServo1Angle - lastServo1Angle) * linear(timeDelta / (double)bluetoothStepDuration);
-//    servo2Angle = lastServo2Angle + (nextServo2Angle - lastServo2Angle) * linear(timeDelta / (double)bluetoothStepDuration);
-//    servo3Angle = lastServo3Angle + (nextServo3Angle - lastServo3Angle) * linear(timeDelta / (double)bluetoothStepDuration);
-//    servo4Angle = lastServo4Angle + (nextServo4Angle - lastServo4Angle) * linear(timeDelta / (double)bluetoothStepDuration);
-//
-//  }
+////////////////////////////////////////////////////////////////////////
+// Playing remote program
+
+void playRemoteProgram() {
+  if (remoteProgramCurrentStep == -1) {
+    startNewRemoteProgramStep();
+    return;
+  }
+
+  double timeDelta = millis() - remoteProgramCurrentStepBegin;
+  
+  ProgramStep currentProgramStep = localProgram[localProgramCurrentStep];
+
+  switch (localProgramCurrentStepPhase) {
+    case STEP_PAUSE_BEFORE: {
+      remoteProgramCurrentStepBegin = millis();
+
+      targetInputX = currentProgramStep.x;
+      targetInputY = currentProgramStep.y;
+      targetInputZ = currentProgramStep.z;
+      targetInputAngle = currentProgramStep.angle;
+
+      fromServo1Angle = servo1Angle;
+      fromServo2Angle = servo2Angle;
+      fromServo3Angle = servo3Angle;
+      fromServo4Angle = servo4Angle;
+    
+      float toRealX;
+      float toRealY;
+      float toRealZ;
+      float toRealAngle;
+    
+      convertInputToRealCoordinates(targetInputX, targetInputY, targetInputZ, targetInputAngle, toRealX, toRealY, toRealZ, toRealAngle);  
+      convertRealCoordinatesToAngles(toRealX, toRealY, toRealZ, toRealAngle, toServo1Angle, toServo2Angle, toServo3Angle, toServo4Angle);
+      
+      movePhase = MOVE_BEGIN;
+      
+      localProgramCurrentStepPhase = STEP_MOVEMENT;
+      movePhase = MOVE_BEGIN;
+      
+      return;
+    }
+
+    case STEP_MOVEMENT: {
+      moveDuration = currentProgramStep.duration;
+      manualMovement(false);
+
+      if (movePhase == MOVE_FINISHED) {
+        localProgramCurrentStepPhase = STEP_PAUSE_AFTER;
+        localProgramCurrentStepBegin = millis();
+        return;
+      }
+    }
+
+    case STEP_PAUSE_AFTER: {
+      startNewLocalProgramStep();
+      return;
+    }
+  }
+}
+
+void startNewRemoteProgramStep() {
+  Serial.printf("startNewRemoteProgramStep\n");
+  
+  if (remoteProgramCurrentStep < remoteProgramStepCount - 1) {
+      remoteProgramCurrentStep++;
+      remoteProgramCurrentStep = STEP_PAUSE_BEFORE;
+
+      remoteProgramCurrentStepBegin = millis();
+      ProgramStep currentProgramStep = remoteProgram[remoteProgramCurrentStep];
+      currentlyPumpEnabled = currentProgramStep.pump;
+    }
+    else {
+      remoteProgramCurrentStep = -1;
+      remoteProgramStepCount = 0;
+      remoteProgramCurrentStepPhase = STEP_PAUSE_BEFORE;
+      movementType = MV_NONE;
+      return;
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -168,8 +235,6 @@ void playLocalProgram() {
       }
       else {
         localProgramCurrentStepBegin = millis();
-        float currentProgramStepRealY = minRealY + (currentProgramStep.y - minInputY) / float(maxInputY - minInputY) * (maxRealY - minRealY);
-        float currentProgramStepRealZ = minRealZ + (currentProgramStep.z - minInputZ) / float(maxInputZ - minInputZ) * (maxRealZ - minRealZ);
 
         targetInputX = currentProgramStep.x;
         targetInputY = currentProgramStep.y;
@@ -199,7 +264,7 @@ void playLocalProgram() {
 
     case STEP_MOVEMENT: {
       moveDuration = currentProgramStep.duration;
-      manualMovement();
+      manualMovement(true);
 
       if (movePhase == MOVE_FINISHED) {
         localProgramCurrentStepPhase = STEP_PAUSE_AFTER;
