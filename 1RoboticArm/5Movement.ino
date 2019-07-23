@@ -136,10 +136,11 @@ void playRemoteProgram() {
 
   double timeDelta = millis() - remoteProgramCurrentStepBegin;
   
-  ProgramStep currentProgramStep = localProgram[localProgramCurrentStep];
+  ProgramStep currentProgramStep = remoteProgram[remoteProgramCurrentStep];
 
-  switch (localProgramCurrentStepPhase) {
+  switch (remoteProgramCurrentStepPhase) {
     case STEP_PAUSE_BEFORE: {
+      Serial.printf("remoteProgram: pause before\n");
       remoteProgramCurrentStepBegin = millis();
 
       targetInputX = currentProgramStep.x;
@@ -159,49 +160,49 @@ void playRemoteProgram() {
     
       convertInputToRealCoordinates(targetInputX, targetInputY, targetInputZ, targetInputAngle, toRealX, toRealY, toRealZ, toRealAngle);  
       convertRealCoordinatesToAngles(toRealX, toRealY, toRealZ, toRealAngle, toServo1Angle, toServo2Angle, toServo3Angle, toServo4Angle);
-      
-      movePhase = MOVE_BEGIN;
-      
-      localProgramCurrentStepPhase = STEP_MOVEMENT;
+
+      if (remoteProgramCurrentStep == 0) {
+        moveDuration = 500; //300;
+      }
+      else {
+        moveDuration = (currentProgramStep.timing - remoteProgram[remoteProgramCurrentStep - 1].timing);
+      }
+
+      remoteProgramCurrentStepPhase = STEP_MOVEMENT;
       movePhase = MOVE_BEGIN;
       
       return;
     }
 
     case STEP_MOVEMENT: {
-      moveDuration = currentProgramStep.duration;
+      Serial.printf("remoteProgram: movement\n");
       manualMovement(false);
 
       if (movePhase == MOVE_FINISHED) {
-        localProgramCurrentStepPhase = STEP_PAUSE_AFTER;
-        localProgramCurrentStepBegin = millis();
+        startNewRemoteProgramStep();
         return;
       }
-    }
-
-    case STEP_PAUSE_AFTER: {
-      startNewLocalProgramStep();
-      return;
     }
   }
 }
 
-void startNewRemoteProgramStep() {
-  Serial.printf("startNewRemoteProgramStep\n");
-  
+void startNewRemoteProgramStep() { 
   if (remoteProgramCurrentStep < remoteProgramStepCount - 1) {
+      Serial.printf("startNewRemoteProgramStep: step\n");
       remoteProgramCurrentStep++;
-      remoteProgramCurrentStep = STEP_PAUSE_BEFORE;
+      remoteProgramCurrentStepPhase = STEP_PAUSE_BEFORE;
 
       remoteProgramCurrentStepBegin = millis();
       ProgramStep currentProgramStep = remoteProgram[remoteProgramCurrentStep];
       currentlyPumpEnabled = currentProgramStep.pump;
     }
     else {
+      Serial.printf("startNewRemoteProgramStep: finish\n");
       remoteProgramCurrentStep = -1;
       remoteProgramStepCount = 0;
       remoteProgramCurrentStepPhase = STEP_PAUSE_BEFORE;
       movementType = MV_NONE;
+      lastMovementSource = MV_NONE;
       return;
     }
 }
@@ -310,6 +311,7 @@ void startNewLocalProgramStep() {
       localProgramCurrentStep = -1;
       localProgramCurrentStepPhase = STEP_PAUSE_BEFORE;
       movementType = MV_NONE;
+      lastMovementSource = MV_NONE;
       return;
     }
 }
@@ -476,6 +478,47 @@ void checkInputCoordinateLimits(int& inputX, int& inputY, int& inputZ, int& inpu
   }
 }
 
+void checkInputFloatCoordinateLimits(float& inputX, float& inputY, float& inputZ, float& inputAngle) {
+  if (inputX < minInputX) {
+    inputX = minInputX;
+  }
+
+  if (inputX > maxInputX) {
+    inputX = maxInputX;
+  }
+
+  if (inputY < minInputY) {
+    inputY = minInputY;
+  }
+
+  if (inputY > maxInputY) {
+    inputY = maxInputY;
+  }
+
+  if (inputZ < minInputZ) {
+    inputY = minInputZ;
+  }
+
+  if (inputZ > maxInputZ) {
+    inputZ = maxInputZ;
+  }
+
+  if (inputAngle < minInputAngle) {
+    inputAngle = minInputAngle;
+  }
+
+  if (inputAngle > maxInputAngle) {
+    inputAngle = maxInputAngle;
+  }
+
+  // Avoid collision with vacuum pump
+  if (inputY < 50) {
+    if (inputX < 55) {
+      inputX = 55;
+    }
+  }
+}
+
 
 void checkRealCoordinateLimits(float& realX, float& realY, float& realZ, float& realAngle) {
   if (realX < minRealX) {
@@ -529,7 +572,7 @@ void checkRealCoordinateLimits(float& realX, float& realY, float& realZ, float& 
 //  nextServo4Angle = convertedServo4Angle;
 //}
 
-void numbersToCurrentInput() {
+void numbersToSelectedInput() {
   if ((numberX >= minInputX) && (numberX <= maxInputX)) {
     selectedInputX = numberX;
   }
@@ -546,6 +589,7 @@ void numbersToCurrentInput() {
     selectedInputAngle = numberAngle;
   }
 }
+
 
 //void updateNextServoAngles(bool changePhase) {
 //  servoAnglesToLastServoAngles();

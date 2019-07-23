@@ -52,23 +52,27 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
         int numberImmediately = (int)strtol(stringImmediately.c_str(), NULL, 16);
         int numberControlServos = (int)strtol(stringControlServos.c_str(), NULL, 16);
 
-        switch (movementType) {
-          case MV_NONE:
-            Serial.println("movement: none");
-            break;
-          case MV_LOCAL_MANUAL:
-            Serial.println("movement: localManual");
-            break;
-          case MV_LOCAL_PROGRAM:
-            Serial.println("movement: localProgram");
-            break;
-          case MV_REMOTE_MANUAL:
-            Serial.println("movement: remoteManual");
-            break;
-          case MV_REMOTE_PROGRAM:
-            Serial.println("movement: remoteProgram");
-            break;
-        }
+        checkInputFloatCoordinateLimits(numberX, numberY, numberZ, numberAngle);
+
+        Serial.printf("nX:%0.2f nY:%0.2f nZ:%0.2f nAngle:%0.2f sPump:%s", numberX, numberY, numberZ, numberAngle, stringPump.c_str());
+
+//        switch (movementType) {
+//          case MV_NONE:
+//            Serial.println("movement: none");
+//            break;
+//          case MV_LOCAL_MANUAL:
+//            Serial.println("movement: localManual");
+//            break;
+//          case MV_LOCAL_PROGRAM:
+//            Serial.println("movement: localProgram");
+//            break;
+//          case MV_REMOTE_MANUAL:
+//            Serial.println("movement: remoteManual");
+//            break;
+//          case MV_REMOTE_PROGRAM:
+//            Serial.println("movement: remoteProgram");
+//            break;
+//        }
 
         if (numberImmediately > 0) {
           lastMovementSource = MV_REMOTE_PROGRAM;
@@ -81,14 +85,20 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
           newStep.pump = (numberPump > 0);
           newStep.timing = millis();
          
-          remoteProgramStepCount++;
           if (remoteProgramStepCount < remoteProgramMaxStepCount) {
-            remoteProgram[remoteProgramStepCount] = newStep;  
+            remoteProgram[remoteProgramStepCount] = newStep;
+            remoteProgramStepCount++;  
 //            Serial.println("remoteProgram");
+          }
+
+          // We need initial steps for interpolation`````````````````````
+          if (remoteProgramStepCount > 3) {
+            movementType = MV_REMOTE_PROGRAM;  
           }
         }
         else {
           lastMovementSource = MV_REMOTE_MANUAL;
+          selectedInputXUpdate = selectedInputYUpdate = selectedInputZUpdate = selectedInputAngleUpdate = millis();
           currentlyPumpEnabled = (numberPump > 0);
         }
 
@@ -107,8 +117,8 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
 
 //        Serial.println("Bluetooth value");
 
-        numbersToCurrentInput();
-        selectedInputXUpdate = selectedInputYUpdate = selectedInputZUpdate = selectedInputAngleUpdate = millis();
+        
+
 
 //        switch (movementType) {
 //          case MV_REMOTE_MANUAL:
@@ -152,7 +162,8 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
 //          numbersToCurrentInput();
 ////          updateNextServoAngles(true);
 //        }
-        
+
+        numbersToSelectedInput();
 
         if ((currentState == ST_MANUAL_MODE) || (currentState == ST_CREATE_PROGRAM)) {
           refreshDisplay = true;
