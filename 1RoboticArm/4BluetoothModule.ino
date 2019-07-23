@@ -54,7 +54,7 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
 
         checkInputFloatCoordinateLimits(numberX, numberY, numberZ, numberAngle);
 
-        Serial.printf("nX:%.2f nY:%.2f nZ:%.2f nAngle:%.2f", numberX, numberY, numberZ, numberAngle);
+        Serial.printf("nX:%.2f nY:%.2f nZ:%.2f nAngle:%.2f immediately:%d\n", numberX, numberY, numberZ, numberAngle, numberImmediately);
 
 //        switch (movementType) {
 //          case MV_NONE:
@@ -84,15 +84,30 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
           newStep.angle = numberAngle;
           newStep.pump = (numberPump > 0);
           newStep.timing = millis();
-         
+
+          float toRealX;
+          float toRealY;
+          float toRealZ;
+          float toRealAngle;
+
+          convertInputToRealCoordinates(numberX, numberY, numberZ, numberAngle, toRealX, toRealY, toRealZ, toRealAngle);  
+          convertRealCoordinatesToAngles(toRealX, toRealY, toRealZ, toRealAngle, newStep.servo1Angle, newStep.servo2Angle, newStep.servo3Angle, newStep.servo4Angle);
+
+          if (remoteProgramStepCount == 0) {
+            remoteProgramBegin = millis();
+          }
+          
           if (remoteProgramStepCount < remoteProgramMaxStepCount) {
             remoteProgram[remoteProgramStepCount] = newStep;
             remoteProgramStepCount++;  
 //            Serial.println("remoteProgram");
           }
 
+          
+
           // We need initial steps for interpolation`````````````````````
           if (remoteProgramStepCount > 3) {
+            remoteProgramReplayBegin = millis();
             movementType = MV_REMOTE_PROGRAM;  
           }
         }

@@ -275,6 +275,10 @@ struct ProgramStep {
   int pauseBefore;
   int pauseAfter;
   long timing;
+  float servo1Angle;
+  float servo2Angle;
+  float servo3Angle;
+  float servo4Angle;
 };
 
 // Local program
@@ -290,6 +294,8 @@ struct ProgramStep remoteProgram[remoteProgramMaxStepCount];
 int remoteProgramStepCount = 0;
 int remoteProgramCurrentStep = -1;
 int remoteProgramCurrentStepPhase = STEP_INITIAL;
+unsigned long remoteProgramBegin = 0;
+unsigned long remoteProgramReplayBegin = 0;
 
 unsigned long currentStepBegin = 0;
 
