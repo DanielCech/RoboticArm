@@ -77,13 +77,17 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
         if (numberImmediately > 0) {
           lastMovementSource = MV_REMOTE_PROGRAM;
 
+          if (remoteProgramStepCount == 0) {
+            remoteProgramBegin = millis();
+          }
+
           struct ProgramStep newStep;
           newStep.x = numberX;
           newStep.y = numberY;
           newStep.z = numberZ;
           newStep.angle = numberAngle;
           newStep.pump = (numberPump > 0);
-          newStep.timing = millis();
+          newStep.timing = millis() - remoteProgramBegin;
 
           float toRealX;
           float toRealY;
@@ -93,9 +97,7 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
           convertInputToRealCoordinates(numberX, numberY, numberZ, numberAngle, toRealX, toRealY, toRealZ, toRealAngle);  
           convertRealCoordinatesToAngles(toRealX, toRealY, toRealZ, toRealAngle, newStep.servo1Angle, newStep.servo2Angle, newStep.servo3Angle, newStep.servo4Angle);
 
-          if (remoteProgramStepCount == 0) {
-            remoteProgramBegin = millis();
-          }
+          
           
           if (remoteProgramStepCount < remoteProgramMaxStepCount) {
             remoteProgram[remoteProgramStepCount] = newStep;
@@ -105,8 +107,8 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
 
           
 
-          // We need initial steps for interpolation`````````````````````
-          if (remoteProgramStepCount > 3) {
+          // We need initial steps for interpolation
+          if (remoteProgramStepCount > 10) {
             remoteProgramReplayBegin = millis();
             movementType = MV_REMOTE_PROGRAM;  
           }

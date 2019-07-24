@@ -138,7 +138,7 @@ void manualMovement() {
 // Playing remote program
 
 void playRemoteProgram() {
-  interpolateRemoteProgram(millis() - (remoteProgramReplayBegin - remoteProgramBegin), servo1Angle, servo2Angle, servo3Angle, servo4Angle);
+  interpolateRemoteProgram(millis() - remoteProgramReplayBegin, servo1Angle, servo2Angle, servo3Angle, servo4Angle);
   
 //  servo1Angle = fromServo1Angle + (toServo1Angle - fromServo1Angle) * progress;
 //  servo2Angle = fromServo2Angle + (toServo2Angle - fromServo2Angle) * progress;
@@ -725,6 +725,7 @@ void interpolateRemoteProgram(long time, float& angle1, float& angle2, float& an
       angle2 = remoteProgram[index].servo2Angle;
       angle3 = remoteProgram[index].servo3Angle;
       angle4 = remoteProgram[index].servo4Angle;
+      return;
     }
 
     if ((lastPosition > -1) && (remoteProgram[index].timing > time)) {
