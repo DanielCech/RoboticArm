@@ -230,6 +230,8 @@ Servo servo4;
 #define ST_CREATE_PROGRAM_CONFIRM_STEP    31
 #define ST_MANUAL_MODE                    40
 #define ST_BLUETOOTH_MODE                 50
+#define ST_SELF_TEST                      60
+#define ST_COMPACT_POSITION               70
 
 int currentState = ST_INITIAL;
 int loopPhase = 0;
@@ -237,12 +239,13 @@ int loopPhase = 0;
 ////////////////////////////////////////////////////////////////////////
 // Menu
 
-#define MENU_RESET_POSITION 0
-#define MENU_PLAY_PROGRAM   1
-#define MENU_CREATE_PROGRAM 2
-#define MENU_MANUAL_MODE    3
-#define MENU_BLUETOOTH_MODE 4
-#define MENU_DEMO           5
+#define MENU_RESET_POSITION       0
+#define MENU_PLAY_PROGRAM         1
+#define MENU_CREATE_PROGRAM       2
+#define MENU_MANUAL_MODE          3
+#define MENU_BLUETOOTH_MODE       4
+#define MENU_SELF_TEST            5
+#define MENU_COMPACT_POSITION     6
 
 int selectedMenuItem = 0;
 int menuOffset = 0;
@@ -292,6 +295,8 @@ int remoteProgramCurrentStep = -1;
 int remoteProgramCurrentStepPhase = STEP_INITIAL;
 
 unsigned long currentStepBegin = 0;
+
+unsigned long lastRemoteProgramUpdate = 0;
 
 ////////////////////////////////////////////////////////////////////////
 // Helpers

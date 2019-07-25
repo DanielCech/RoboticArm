@@ -4,7 +4,7 @@
 bool bluetoothModeSelection = false;
 bool bluetoothModeEnabled = false;
 
-String menuItems[6] = {"Reset Position", "Play Program", "Create Program", "Manual Mode", "Bluetooth Mode", "Demo"};
+String menuItems[7] = {"Reset Position", "Play Program", "Create Program", "Manual Mode", "Bluetooth Mode", "Self-Test", "Compact Position"};
 
 int stepSize(long before, long after) {
   long difference = after - before;
@@ -50,7 +50,6 @@ void mainMenu() {
       case MENU_RESET_POSITION:
         currentState = ST_RESET_POSITION;
         refreshDisplay = true;
-        ("Button Pressed");
         delay(200);
         return;
         
@@ -81,8 +80,17 @@ void mainMenu() {
         delay(200);
         return;
 
-      case MENU_DEMO:
-        break;
+      case MENU_SELF_TEST:
+        currentState = ST_SELF_TEST;
+        refreshDisplay = true;
+        delay(200);
+        return;
+
+      case MENU_COMPACT_POSITION:
+        currentState = ST_SELF_TEST;
+        refreshDisplay = true;
+        delay(200);
+        return;
     }
   }
 
@@ -104,7 +112,7 @@ void mainMenu() {
     refreshDisplay = true;
   }
   if (firstEncoder.direction > 0) {
-    selectedMenuItem = MIN(selectedMenuItem + 1, 4);
+    selectedMenuItem = MIN(selectedMenuItem + 1, 6);
     refreshDisplay = true;
   }
 

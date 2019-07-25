@@ -54,7 +54,7 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
 
         checkInputFloatCoordinateLimits(numberX, numberY, numberZ, numberAngle);
 
-        Serial.printf("nX:%.2f nY:%.2f nZ:%.2f nAngle:%.2f", numberX, numberY, numberZ, numberAngle);
+//        Serial.printf("nX:%.2f nY:%.2f nZ:%.2f nAngle:%.2f", numberX, numberY, numberZ, numberAngle);
 
 //        switch (movementType) {
 //          case MV_NONE:
@@ -76,25 +76,44 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
 
         if (numberImmediately > 0) {
           lastMovementSource = MV_REMOTE_PROGRAM;
+          movementType = MV_REMOTE_PROGRAM;
 
-          struct ProgramStep newStep;
-          newStep.x = numberX;
-          newStep.y = numberY;
-          newStep.z = numberZ;
-          newStep.angle = numberAngle;
-          newStep.pump = (numberPump > 0);
-          newStep.timing = millis();
-         
-          if (remoteProgramStepCount < remoteProgramMaxStepCount) {
-            remoteProgram[remoteProgramStepCount] = newStep;
-            remoteProgramStepCount++;  
-//            Serial.println("remoteProgram");
-          }
+//          if (lastRemoteProgramUpdate == 0) {
+//            moveDuration = 300;
+//            startManualMovement(numberX, numberY, numberZ, numberAngle, MV_REMOTE_PROGRAM);
+//            lastRemoteProgramUpdate = millis();
+//          }
+//          else {
+//            moveDuration = millis() - lastRemoteProgramUpdate;
+//            startManualMovement(numberX, numberY, numberZ, numberAngle, MV_REMOTE_PROGRAM);
+//            lastRemoteProgramUpdate = millis();
+//          }
+          float toRealX;
+          float toRealY;
+          float toRealZ;
+          float toRealAngle;
 
-          // We need initial steps for interpolation`````````````````````
-          if (remoteProgramStepCount > 3) {
-            movementType = MV_REMOTE_PROGRAM;  
-          }
+          convertInputToRealCoordinates(numberX, numberY, numberZ, numberAngle, toRealX, toRealY, toRealZ, toRealAngle);  
+          convertRealCoordinatesToAngles(toRealX, toRealY, toRealZ, toRealAngle, servo1Angle, servo2Angle, servo3Angle, servo4Angle);
+
+//          struct ProgramStep newStep;
+//          newStep.x = numberX;
+//          newStep.y = numberY;
+//          newStep.z = numberZ;
+//          newStep.angle = numberAngle;
+//          newStep.pump = (numberPump > 0);
+//          newStep.timing = millis();
+//         
+//          if (remoteProgramStepCount < remoteProgramMaxStepCount) {
+//            remoteProgram[remoteProgramStepCount] = newStep;
+//            remoteProgramStepCount++;  
+////            Serial.println("remoteProgram");
+//          }
+//
+//          // We need initial steps for interpolation
+//          if (remoteProgramStepCount > 3) {
+//            movementType = MV_REMOTE_PROGRAM;  
+//          }
         }
         else {
           lastMovementSource = MV_REMOTE_MANUAL;

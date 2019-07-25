@@ -1,10 +1,16 @@
-///////////////////////////////////////////////////////////////////////
+  ///////////////////////////////////////////////////////////////////////
 // Movement
 
 void startManualMovement(float toInputX, float toInputY, float toInputZ, float toInputAngle, int movement) {
-  if (movePhase != MOVE_NONE) { return; }
+  if (movePhase != MOVE_NONE) { 
+    Serial.printf("startManualMovement: not none\n");
+    return; 
+   }
 //  if (movementType != MV_NONE) { return; }
-  if (equal(currentInputX, toInputX) && equal(currentInputY, toInputY) && equal(currentInputZ, toInputZ) && equal(currentInputAngle, toInputAngle)) { return; }
+  if (equal(currentInputX, toInputX) && equal(currentInputY, toInputY) && equal(currentInputZ, toInputZ) && equal(currentInputAngle, toInputAngle)) { 
+    Serial.printf("startManualMovement: equal axis\n");
+    return; 
+   }
 
 
   movementType = movement;
@@ -60,7 +66,7 @@ void movement() {
       break;  
       
     case MV_REMOTE_PROGRAM:
-      playRemoteProgram();
+//      manualMovement();
       break;
   }
 
