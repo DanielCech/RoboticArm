@@ -64,6 +64,7 @@ int freq = 5000;
 #define MV_LOCAL_PROGRAM                  2
 #define MV_REMOTE_MANUAL                  3
 #define MV_REMOTE_PROGRAM                 4
+#define MV_TEST                           5
 
 int movementType = MV_NONE;
 int lastMovementSource = MV_NONE;
@@ -231,6 +232,7 @@ Servo servo4;
 #define ST_MANUAL_MODE                    40
 #define ST_BLUETOOTH_MODE                 50
 #define ST_SELF_TEST                      60
+#define ST_SELF_TEST_PROGRESS             61
 #define ST_COMPACT_POSITION               70
 
 int currentState = ST_INITIAL;
@@ -297,6 +299,25 @@ int remoteProgramCurrentStepPhase = STEP_INITIAL;
 unsigned long currentStepBegin = 0;
 
 unsigned long lastRemoteProgramUpdate = 0;
+
+////////////////////////////////////////////////////////////////////////
+// Self-Test
+
+#define TEST_MENU_SERVO_1         0
+#define TEST_MENU_SERVO_2         1
+#define TEST_MENU_SERVO_3         2
+#define TEST_MENU_SERVO_4         3
+
+int testType;
+int testState;
+unsigned long testPhaseStart;
+unsigned long testPhaseLength;
+unsigned long testPhaseTimeDelta;
+
+int selectedTestMenuItem = 0;
+int testMenuOffset = 0;
+String testFirstLine;
+String testSecondLine;
 
 ////////////////////////////////////////////////////////////////////////
 // Helpers

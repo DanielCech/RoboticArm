@@ -4,7 +4,8 @@
 bool bluetoothModeSelection = false;
 bool bluetoothModeEnabled = false;
 
-String menuItems[7] = {"Reset Position", "Play Program", "Create Program", "Manual Mode", "Bluetooth Mode", "Self-Test", "Compact Position"};
+String menuItems[] = {"Reset Position", "Play Program", "Create Program", "Manual Mode", "Bluetooth Mode", "Self-Test", "Compactify"};
+String testMenuItems[] = {"Servo1 Range", "Servo2 Range", "Servo3 Program", "Servo4 Range"};
 
 int stepSize(long before, long after) {
   long difference = after - before;
@@ -87,7 +88,7 @@ void mainMenu() {
         return;
 
       case MENU_COMPACT_POSITION:
-        currentState = ST_SELF_TEST;
+        currentState = ST_COMPACT_POSITION;
         refreshDisplay = true;
         delay(200);
         return;
@@ -328,6 +329,83 @@ void confirmProgramStep() {
   }
 }
 
+void selfTest() {
+  if (firstEncoder.buttonPressed) {
+    switch (selectedTestMenuItem) {
+      case TEST_MENU_SERVO_1:
+        currentState = ST_SELF_TEST_PROGRESS;
+        testType = TEST_MENU_SERVO_1;
+        testState = 0;
+        refreshDisplay = true;
+        delay(200);
+        return;
+        
+      case TEST_MENU_SERVO_2:
+        currentState = ST_SELF_TEST_PROGRESS;
+        testType = TEST_MENU_SERVO_2;
+        testState = 0;
+        refreshDisplay = true;
+        delay(200);
+        return;
+
+      case TEST_MENU_SERVO_3:
+        currentState = ST_SELF_TEST_PROGRESS;
+        testType = TEST_MENU_SERVO_3;
+        testState = 0;
+        refreshDisplay = true;
+        delay(200);
+        return;
+
+    case TEST_MENU_SERVO_4:
+        currentState = ST_SELF_TEST_PROGRESS;
+        testType = TEST_MENU_SERVO_4;
+        testState = 0;
+        refreshDisplay = true;
+        delay(200);
+        return;
+    }
+  }
+
+  if (secondEncoder.buttonPressed) {
+    currentState = ST_MAIN_MENU;
+    refreshDisplay = true;
+    return;
+  }
+  
+  if (refreshDisplay) {
+    String first = ((selectedTestMenuItem == testMenuOffset) ? "> ": "  ") + testMenuItems[testMenuOffset];
+    String second = ((selectedTestMenuItem == testMenuOffset + 1) ? "> ": "  ") + testMenuItems[testMenuOffset + 1];
+    displayStrings(first, second, lcd);
+    refreshDisplay = false;
+  }
+
+  if (firstEncoder.direction < 0) {
+    selectedTestMenuItem = MAX(selectedTestMenuItem - 1, 0);
+    refreshDisplay = true;
+  }
+  if (firstEncoder.direction > 0) {
+    selectedTestMenuItem = MIN(selectedTestMenuItem + 1, 3);
+    refreshDisplay = true;
+  }
+
+  if (selectedTestMenuItem > testMenuOffset + 1) {
+    testMenuOffset = selectedTestMenuItem - 1;
+    refreshDisplay = true;
+  }
+  else if (selectedTestMenuItem < testMenuOffset) {
+    testMenuOffset = selectedTestMenuItem;
+    refreshDisplay = true;
+  }
+}
+
+void compactPosition() {
+  servo1Angle = 90;
+  servo2Angle = 90;
+  servo3Angle = 90;
+  servo4Angle = 90;
+
+  currentState = ST_MAIN_MENU;
+}
 
 void processState() {
 
@@ -365,6 +443,22 @@ void processState() {
     
   case ST_BLUETOOTH_MODE: {
       bluetoothMode();
+      return;
+    }
+
+  case ST_SELF_TEST: {
+      selfTest();
+      return;
+    }
+
+  case ST_SELF_TEST_PROGRESS: {
+      selfTestProgress();
+      return;
+    }
+
+
+  case ST_COMPACT_POSITION: {
+      compactPosition();
       return;
     }
           
