@@ -5,7 +5,7 @@ bool bluetoothModeSelection = false;
 bool bluetoothModeEnabled = false;
 
 String menuItems[] = {"Reset Position", "Play Program", "Create Program", "Manual Mode", "Bluetooth Mode", "Self-Test", "Compactify"};
-String testMenuItems[] = {"Servo1 Range", "Servo2 Range", "Servo3 Program", "Servo4 Range"};
+String testMenuItems[] = {"Servo1 Range", "Servo2 Range", "Servo3 Range", "Servo4 Range"};
 
 int stepSize(long before, long after) {
   long difference = after - before;

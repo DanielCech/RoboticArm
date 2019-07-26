@@ -15,6 +15,18 @@ void selfTestProgress() {
       case TEST_MENU_SERVO_1: 
         testServo1();
         break;
+
+      case TEST_MENU_SERVO_2: 
+        testServo2();
+        break;
+
+      case TEST_MENU_SERVO_3: 
+        testServo3();
+        break;
+
+      case TEST_MENU_SERVO_4: 
+        testServo4();
+        break;
     }
 
     if (refreshDisplay) {
@@ -38,7 +50,7 @@ void testServo1() {
   case 1:
     testPhaseTimeDelta = millis() - testPhaseStart;
     if (testPhaseTimeDelta < testPhaseLength) {
-      servo1Angle = 180.0 * (testPhaseTimeDelta / float(testPhaseLength));
+      servo1Angle = minServo1Angle + (testPhaseTimeDelta / float(testPhaseLength)) * (maxServo1Angle - minServo1Angle);
     }
     else {
       testState = 2;
@@ -54,19 +66,129 @@ void testServo1() {
   case 3:
     testPhaseTimeDelta = millis() - testPhaseStart;
     if (testPhaseTimeDelta < testPhaseLength) {
-      servo1Angle = 180.0 * (1 - (testPhaseTimeDelta / float(testPhaseLength)));
+      servo1Angle = minServo1Angle + (1 - (testPhaseTimeDelta / float(testPhaseLength))) * (maxServo1Angle - minServo1Angle);
     }
     else {
       testState = 0;
     }
     break;
-    
-    
-    
-  
-
-
-    
   }
 }
 
+void testServo2() {
+  testFirstLine = "Servo2";
+  testSecondLine = "";
+
+  switch (testState) {
+  case 0:
+    testPhaseStart = millis();
+    testPhaseLength = 10000;
+    testState = 1;
+    break;
+
+  case 1:
+    testPhaseTimeDelta = millis() - testPhaseStart;
+    if (testPhaseTimeDelta < testPhaseLength) {
+      servo2Angle = minServo2Angle + (testPhaseTimeDelta / float(testPhaseLength)) * (maxServo2Angle - minServo2Angle);
+    }
+    else {
+      testState = 2;
+    }
+    break;
+
+  case 2:
+    testPhaseStart = millis();
+    testPhaseLength = 10000;
+    testState = 3;
+    break;
+
+  case 3:
+    testPhaseTimeDelta = millis() - testPhaseStart;
+    if (testPhaseTimeDelta < testPhaseLength) {
+      servo2Angle = minServo2Angle + (1 - (testPhaseTimeDelta / float(testPhaseLength))) * (maxServo2Angle - minServo2Angle);
+    }
+    else {
+      testState = 0;
+    }
+    break;
+  }
+}
+
+
+void testServo3() {
+  testFirstLine = "Servo3";
+  testSecondLine = "";
+
+  switch (testState) {
+  case 0:
+    testPhaseStart = millis();
+    testPhaseLength = 10000;
+    testState = 1;
+    break;
+
+  case 1:
+    testPhaseTimeDelta = millis() - testPhaseStart;
+    if (testPhaseTimeDelta < testPhaseLength) {
+      servo3Angle = minServo3Angle + (testPhaseTimeDelta / float(testPhaseLength)) * (maxServo3Angle - minServo3Angle);
+    }
+    else {
+      testState = 2;
+    }
+    break;
+
+  case 2:
+    testPhaseStart = millis();
+    testPhaseLength = 10000;
+    testState = 3;
+    break;
+
+  case 3:
+    testPhaseTimeDelta = millis() - testPhaseStart;
+    if (testPhaseTimeDelta < testPhaseLength) {
+      servo3Angle = minServo3Angle + (1 - (testPhaseTimeDelta / float(testPhaseLength))) * (maxServo3Angle - minServo3Angle);
+    }
+    else {
+      testState = 0;
+    }
+    break;
+  }
+}
+
+void testServo4() {
+  testFirstLine = "Servo4";
+  testSecondLine = "";
+
+  switch (testState) {
+  case 0:
+    testPhaseStart = millis();
+    testPhaseLength = 10000;
+    testState = 1;
+    break;
+
+  case 1:
+    testPhaseTimeDelta = millis() - testPhaseStart;
+    if (testPhaseTimeDelta < testPhaseLength) {
+      servo4Angle = minServo4Angle + (testPhaseTimeDelta / float(testPhaseLength)) * (maxServo4Angle - minServo4Angle);
+    }
+    else {
+      testState = 2;
+    }
+    break;
+
+  case 2:
+    testPhaseStart = millis();
+    testPhaseLength = 10000;
+    testState = 3;
+    break;
+
+  case 3:
+    testPhaseTimeDelta = millis() - testPhaseStart;
+    if (testPhaseTimeDelta < testPhaseLength) {
+      servo4Angle = minServo4Angle + (1 - (testPhaseTimeDelta / float(testPhaseLength))) * (maxServo4Angle - minServo4Angle);
+    }
+    else {
+      testState = 0;
+    }
+    break;
+  }
+}

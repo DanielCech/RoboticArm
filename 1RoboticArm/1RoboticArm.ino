@@ -191,8 +191,8 @@ const float minServo1Angle = 0;
 const float maxServo1Angle = 180;
 const float minServo2Angle = 0;
 const float maxServo2Angle = 110;  // 16
-const float minServo3Angle = 0;   // 6
-const float maxServo3Angle = 112;  // 20
+const float minServo3Angle = 20;   // 6
+const float maxServo3Angle = 90;  // 20
 const float minServo4Angle = 0;
 const float maxServo4Angle = 180;
 
