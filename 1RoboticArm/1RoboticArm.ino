@@ -129,12 +129,6 @@ const int maxInputZ = 200;  // 20
 const int minInputAngle = 0;
 const int maxInputAngle = 180;
 
-// Real float position
-//float realX = startX;
-//float realY = startY;
-//float realZ = startZ;
-//float realAngle = startAngle;
-
 // Limits for real movement
 const float minRealX = 0;
 const float maxRealX = 180;
@@ -151,6 +145,15 @@ float numberY;
 float numberZ;
 float numberAngle;
 
+// Movement duration for each servo
+unsigned long servo1MoveDuration;
+unsigned long servo2MoveDuration;
+unsigned long servo3MoveDuration;
+unsigned long servo4MoveDuration;
+unsigned long moveDuration;
+
+double speedFactor = 35;
+
 ////////////////////////////////////////////////////////////////////////
 // Servo Angles
 
@@ -164,18 +167,6 @@ float servo1Angle = 90;
 float servo2Angle = 87.97;
 float servo3Angle = 78.03;
 float servo4Angle = 91.00;
-
-// Immediate results of conversion
-//float convertedServo1Angle = 90;
-//float convertedServo2Angle = 90;
-//float convertedServo3Angle = 90;
-//float convertedServo4Angle = 90;
-
-// Previous angles for movement
-//float lastServo1Angle = 90;
-//float lastServo2Angle = 90;
-//float lastServo3Angle = 90;
-//float lastServo4Angle = 90;
 
 float fromServo1Angle = 90;
 float fromServo2Angle = 90;
@@ -199,13 +190,6 @@ const float maxServo4Angle = 180;
 // PWM Related
 const int minPulseWidth = 500;
 const int maxPulseWidth = 2500;
-
-//const int minEpsilon = 0;
-//const int maxEpsilon = 90;
-//const int minGama = 0;
-//const int maxGama = 90;
-//const int minDelta = 0;
-//const int maxDelta = 90;
 
 const double baseHeight = 11;         // vyska zakladny 11 cm
 const double armSegmentLength = 20;   // delka casti ramena 20 cm
@@ -267,8 +251,8 @@ bool refreshDisplay = true;
 #define MOVE_FINISHED 3
 
 int movePhase = MOVE_NONE;
-const int defaultMoveDuration = 1700;
-int moveDuration = defaultMoveDuration;
+//const int defaultMoveDuration = 1700;
+//int moveDuration = defaultMoveDuration;
 
 struct ProgramStep {
   float x;
@@ -336,4 +320,7 @@ String testSecondLine;
 bool equal(float a, float b) {
  return fabs(a-b) < movementTolerance;
 }
+
+#define MAX(x, y) ((x <= y) ? y : x)
+#define MIN(x, y) ((x <= y) ? x : y)
 
