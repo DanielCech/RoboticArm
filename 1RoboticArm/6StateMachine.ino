@@ -5,7 +5,7 @@ bool bluetoothModeSelection = false;
 bool bluetoothModeEnabled = false;
 
 String menuItems[] = {"Reset Position", "Play Program", "Create Program", "Manual Mode", "Bluetooth Mode", "Self-Test", "Compactify"};
-String testMenuItems[] = {"Servo1 Range", "Servo2 Range", "Servo3 Range", "Servo4 Range"};
+String testMenuItems[] = {"Servo1 Slow", "Servo2 Slow", "Servo3 Slow", "Servo4 Slow", "Servo1 Fast", "Servo2 Fast", "Servo3 Fast", "Servo4 Fast"};
 
 int stepSize(long before, long after) {
   long difference = after - before;
@@ -331,39 +331,12 @@ void confirmProgramStep() {
 
 void selfTest() {
   if (firstEncoder.buttonPressed) {
-    switch (selectedTestMenuItem) {
-      case TEST_MENU_SERVO_1:
-        currentState = ST_SELF_TEST_PROGRESS;
-        testType = TEST_MENU_SERVO_1;
-        testState = 0;
-        refreshDisplay = true;
-        delay(200);
-        return;
-        
-      case TEST_MENU_SERVO_2:
-        currentState = ST_SELF_TEST_PROGRESS;
-        testType = TEST_MENU_SERVO_2;
-        testState = 0;
-        refreshDisplay = true;
-        delay(200);
-        return;
-
-      case TEST_MENU_SERVO_3:
-        currentState = ST_SELF_TEST_PROGRESS;
-        testType = TEST_MENU_SERVO_3;
-        testState = 0;
-        refreshDisplay = true;
-        delay(200);
-        return;
-
-    case TEST_MENU_SERVO_4:
-        currentState = ST_SELF_TEST_PROGRESS;
-        testType = TEST_MENU_SERVO_4;
-        testState = 0;
-        refreshDisplay = true;
-        delay(200);
-        return;
-    }
+    currentState = ST_SELF_TEST_PROGRESS;
+    testType = selectedTestMenuItem;
+    testState = 0;
+    refreshDisplay = true;
+    delay(200);
+    return;
   }
 
   if (secondEncoder.buttonPressed) {
@@ -384,7 +357,7 @@ void selfTest() {
     refreshDisplay = true;
   }
   if (firstEncoder.direction > 0) {
-    selectedTestMenuItem = MIN(selectedTestMenuItem + 1, 3);
+    selectedTestMenuItem = MIN(selectedTestMenuItem + 1, 7);
     refreshDisplay = true;
   }
 

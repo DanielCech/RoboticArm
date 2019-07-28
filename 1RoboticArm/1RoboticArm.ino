@@ -189,9 +189,9 @@ float toServo4Angle = 90;
 
 const float minServo1Angle = 0;
 const float maxServo1Angle = 180;
-const float minServo2Angle = 0;
-const float maxServo2Angle = 110;  // 16
-const float minServo3Angle = 20;   // 6
+const float minServo2Angle = 10;
+const float maxServo2Angle = 90;  // 16
+const float minServo3Angle = 30;   // 6
 const float maxServo3Angle = 90;  // 20
 const float minServo4Angle = 0;
 const float maxServo4Angle = 180;
@@ -303,10 +303,14 @@ unsigned long lastRemoteProgramUpdate = 0;
 ////////////////////////////////////////////////////////////////////////
 // Self-Test
 
-#define TEST_MENU_SERVO_1         0
-#define TEST_MENU_SERVO_2         1
-#define TEST_MENU_SERVO_3         2
-#define TEST_MENU_SERVO_4         3
+#define TEST_MENU_SERVO_1_SLOW         0
+#define TEST_MENU_SERVO_2_SLOW         1
+#define TEST_MENU_SERVO_3_SLOW         2
+#define TEST_MENU_SERVO_4_SLOW         3
+#define TEST_MENU_SERVO_1_FAST         4
+#define TEST_MENU_SERVO_2_FAST         5
+#define TEST_MENU_SERVO_3_FAST         6
+#define TEST_MENU_SERVO_4_FAST         7
 
 int testType;
 int testState;
@@ -314,10 +318,17 @@ unsigned long testPhaseStart;
 unsigned long testPhaseLength;
 unsigned long testPhaseTimeDelta;
 
+const unsigned long slowSpeed = 7000;
+const unsigned long fastSpeed = 2000;
+
+
+
 int selectedTestMenuItem = 0;
 int testMenuOffset = 0;
 String testFirstLine;
 String testSecondLine;
+
+
 
 ////////////////////////////////////////////////////////////////////////
 // Helpers

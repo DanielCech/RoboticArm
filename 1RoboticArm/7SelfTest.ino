@@ -12,19 +12,43 @@ void selfTestProgress() {
     movementType = MV_TEST;
 
     switch (testType) {
-      case TEST_MENU_SERVO_1: 
+      case TEST_MENU_SERVO_1_SLOW: 
+        testPhaseLength = slowSpeed;
         testServo1();
         break;
 
-      case TEST_MENU_SERVO_2: 
+      case TEST_MENU_SERVO_2_SLOW: 
+        testPhaseLength = slowSpeed;
         testServo2();
         break;
 
-      case TEST_MENU_SERVO_3: 
+      case TEST_MENU_SERVO_3_SLOW: 
+        testPhaseLength = slowSpeed;
         testServo3();
         break;
 
-      case TEST_MENU_SERVO_4: 
+      case TEST_MENU_SERVO_4_SLOW: 
+        testPhaseLength = slowSpeed;
+        testServo4();
+        break;
+
+        case TEST_MENU_SERVO_1_FAST: 
+        testPhaseLength = fastSpeed;
+        testServo1();
+        break;
+
+      case TEST_MENU_SERVO_2_FAST: 
+        testPhaseLength = fastSpeed;
+        testServo2();
+        break;
+
+      case TEST_MENU_SERVO_3_FAST: 
+        testPhaseLength = fastSpeed;
+        testServo3();
+        break;
+
+      case TEST_MENU_SERVO_4_FAST: 
+        testPhaseLength = fastSpeed;
         testServo4();
         break;
     }
@@ -43,7 +67,6 @@ void testServo1() {
   switch (testState) {
   case 0:
     testPhaseStart = millis();
-    testPhaseLength = 4000;
     testState = 1;
     break;
 
@@ -59,7 +82,6 @@ void testServo1() {
 
   case 2:
     testPhaseStart = millis();
-    testPhaseLength = 4000;
     testState = 3;
     break;
 
@@ -82,7 +104,6 @@ void testServo2() {
   switch (testState) {
   case 0:
     testPhaseStart = millis();
-    testPhaseLength = 10000;
     testState = 1;
     break;
 
@@ -98,7 +119,6 @@ void testServo2() {
 
   case 2:
     testPhaseStart = millis();
-    testPhaseLength = 10000;
     testState = 3;
     break;
 
@@ -122,7 +142,6 @@ void testServo3() {
   switch (testState) {
   case 0:
     testPhaseStart = millis();
-    testPhaseLength = 10000;
     testState = 1;
     break;
 
@@ -138,7 +157,6 @@ void testServo3() {
 
   case 2:
     testPhaseStart = millis();
-    testPhaseLength = 10000;
     testState = 3;
     break;
 
@@ -161,7 +179,6 @@ void testServo4() {
   switch (testState) {
   case 0:
     testPhaseStart = millis();
-    testPhaseLength = 10000;
     testState = 1;
     break;
 
@@ -177,7 +194,6 @@ void testServo4() {
 
   case 2:
     testPhaseStart = millis();
-    testPhaseLength = 10000;
     testState = 3;
     break;
 
