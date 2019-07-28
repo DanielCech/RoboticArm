@@ -44,54 +44,163 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
 
         //Serial.printf("sX:%s sY:%s sZ:%s sAngle:%s sPump:%s", stringX.c_str(), stringY.c_str(), stringZ.c_str(), stringAngle.c_str(), stringPump.c_str());
 
-        float numberX = (float)strtol(stringX.c_str(), NULL, 16) / 10;
-        float numberY = (float)strtol(stringY.c_str(), NULL, 16) / 10;
-        float numberZ = (float)strtol(stringZ.c_str(), NULL, 16) / 10;
-        float numberAngle = (float)strtol(stringAngle.c_str(), NULL, 16) / 10;
+        numberX = (float)strtol(stringX.c_str(), NULL, 16) / 10;
+        numberY = (float)strtol(stringY.c_str(), NULL, 16) / 10;
+        numberZ = (float)strtol(stringZ.c_str(), NULL, 16) / 10;
+        numberAngle = (float)strtol(stringAngle.c_str(), NULL, 16) / 10;
         int numberPump = (int)strtol(stringPump.c_str(), NULL, 16);
         int numberImmediately = (int)strtol(stringImmediately.c_str(), NULL, 16);
         int numberControlServos = (int)strtol(stringControlServos.c_str(), NULL, 16);
 
-        immediately = (bool)numberImmediately;
+        checkInputFloatCoordinateLimits(numberX, numberY, numberZ, numberAngle);
 
-        if ((numberX >= minInputX) && (numberX <= maxInputX)) {
-          currentInputX = numberX;
-        }
+//        Serial.printf("nX:%.2f nY:%.2f nZ:%.2f nAngle:%.2f", numberX, numberY, numberZ, numberAngle);
 
-        if ((numberY >= minInputY) && (numberY <= maxInputY)) {
-          currentInputY = numberY;
-        }
+//        switch (movementType) {
+//          case MV_NONE:
+//            Serial.println("movement: none");
+//            break;
+//          case MV_LOCAL_MANUAL:
+//            Serial.println("movement: localManual");
+//            break;
+//          case MV_LOCAL_PROGRAM:
+//            Serial.println("movement: localProgram");
+//            break;
+//          case MV_REMOTE_MANUAL:
+//            Serial.println("movement: remoteManual");
+//            break;
+//          case MV_REMOTE_PROGRAM:
+//            Serial.println("movement: remoteProgram");
+//            break;
+//        }
 
-        if ((numberZ >= minInputZ) && (numberZ <= maxInputZ)) {
-          currentInputZ = numberZ;
-        }
+        if (numberImmediately > 0) {
+          lastMovementSource = MV_REMOTE_PROGRAM;
+          movementType = MV_REMOTE_PROGRAM;
 
-        if ((numberAngle >= minInputAngle) && (numberAngle <= maxInputAngle)) {
-          currentInputAngle = numberAngle;
-        }
+//          if (lastRemoteProgramUpdate == 0) {
+//            moveDuration = 300;
+//            startManualMovement(numberX, numberY, numberZ, numberAngle, MV_REMOTE_PROGRAM);
+//            lastRemoteProgramUpdate = millis();
+//          }
+//          else {
+//            moveDuration = millis() - lastRemoteProgramUpdate;
+//            startManualMovement(numberX, numberY, numberZ, numberAngle, MV_REMOTE_PROGRAM);
+//            lastRemoteProgramUpdate = millis();
+//          }
+          float toRealX;
+          float toRealY;
+          float toRealZ;
+          float toRealAngle;
 
+          convertInputToRealCoordinates(numberX, numberY, numberZ, numberAngle, toRealX, toRealY, toRealZ, toRealAngle);  
+          convertRealCoordinatesToAngles(toRealX, toRealY, toRealZ, toRealAngle, servo1Angle, servo2Angle, servo3Angle, servo4Angle);
 
-        if (immediately) {
-          realX = numberX;
-          realY = numberY;
-          realZ = numberZ;
-          realAngle = numberAngle;
+//          struct ProgramStep newStep;
+//          newStep.x = numberX;
+//          newStep.y = numberY;
+//          newStep.z = numberZ;
+//          newStep.angle = numberAngle;
+//          newStep.pump = (numberPump > 0);
+//          newStep.timing = millis();
+//         
+//          if (remoteProgramStepCount < remoteProgramMaxStepCount) {
+//            remoteProgram[remoteProgramStepCount] = newStep;
+//            remoteProgramStepCount++;  
+////            Serial.println("remoteProgram");
+//          }
+//
+//          // We need initial steps for interpolation
+//          if (remoteProgramStepCount > 3) {
+//            movementType = MV_REMOTE_PROGRAM;  
+//          }
         }
         else {
-          updateNextServoAngles(!immediately);
+          lastMovementSource = MV_REMOTE_MANUAL;
+          selectedInputXUpdate = selectedInputYUpdate = selectedInputZUpdate = selectedInputAngleUpdate = millis();
+          currentlyPumpEnabled = (numberPump > 0);
         }
+
+        
+//        if (mmovementTypeovementType == none) {
+//          if (numberImmediately > 0) {
+//            movementType = remoteProgram;
+//          }
+//          else {
+//            movementType = remoteManual;
+//          }
+//        }
+//        else {
+//          return;
+//        }
+
+//        Serial.println("Bluetooth value");
+
         
 
-        currentlyPumpEnabled = (numberPump > 0);
 
-        if ((currentState != ST_PLAY_PROGRAM) && (currentState != ST_MANUAL_MODE)) {
+//        switch (movementType) {
+//          case MV_REMOTE_MANUAL:
+//            startManualMovement(numberX, numberY, numberZ, numberAngle, MV_REMOTE_MANUAL);
+//            currentlyPumpEnabled = (numberPump > 0);
+//            break;
+//            
+//          case MV_REMOTE_PROGRAM:
+//            
+//            break;
+//
+//
+//          default:
+//            break;  
+//        }
+
+
+//        if (movementType == remoteProgram) {
+//          if (lastBluetoothUpdate < 0) {
+//              lastBluetoothUpdate = millis();
+////              updateLastServoAngles();
+//              return;
+//            }
+//          
+//            long now = millis();
+//            long stepDuration = now - lastBluetoothUpdate;
+//          
+//            if (stepDuration > 2000) {
+//              lastBluetoothUpdate = millis();
+////              updateLastServoAngles();
+//              return;
+//            }
+//
+//            // TODO: fix lastServoAngles etc....
+////            convertCoordinatesToAngles(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
+////            convertedToNextServoAngles();
+//
+//            lastBluetoothUpdate = millis();
+//        }
+//        else {
+//          numbersToCurrentInput();
+////          updateNextServoAngles(true);
+//        }
+
+        numbersToSelectedInput();
+
+        if ((currentState == ST_MANUAL_MODE) || (currentState == ST_CREATE_PROGRAM)) {
           refreshDisplay = true;
         }
         
-        Serial.println();
+//        Serial.println();
       }
     }
 };
+
+//void updateLastServoAngles() {
+//  convertCoordinatesToAngles(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
+//  
+//  lastServo1Angle = convertedServo1Angle;
+//  lastServo2Angle = convertedServo2Angle;
+//  lastServo3Angle = convertedServo3Angle;
+//  lastServo4Angle = convertedServo4Angle;
+//}
 
 void enableBluetooth() {
   Serial.println("Starting...");

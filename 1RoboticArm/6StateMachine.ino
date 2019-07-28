@@ -4,7 +4,8 @@
 bool bluetoothModeSelection = false;
 bool bluetoothModeEnabled = false;
 
-String menuItems[6] = {"Reset Position", "Play Program", "Create Program", "Manual Mode", "Bluetooth Mode", "Demo"};
+String menuItems[] = {"Reset Position", "Play Program", "Create Program", "Manual Mode", "Bluetooth Mode", "Self-Test", "Compactify"};
+String testMenuItems[] = {"Servo1 Slow", "Servo2 Slow", "Servo3 Slow", "Servo4 Slow", "Servo1 Fast", "Servo2 Fast", "Servo3 Fast", "Servo4 Fast"};
 
 int stepSize(long before, long after) {
   long difference = after - before;
@@ -26,31 +27,30 @@ int stepSize(long before, long after) {
 
 void initialState() {
 
-  //Serial.println("Initial state");
+  //("Initial state");
 
   if (refreshDisplay) {
-    displayStrings("RoboticArm 0.2", "JVDA-01", lcd);
+    displayStrings("FrankArm JVDA-01", "  Macej & Cech", lcd);
     refreshDisplay = false;
   }
  
   if (firstEncoder.buttonPressed) {
     currentState = ST_MAIN_MENU;
     refreshDisplay = true;
-    Serial.println("Button Pressed");
+    ("Button Pressed");
     delay(200);
   }
 }
 
 
 void mainMenu() {
-//  Serial.println("Main menu");
+//  ("Main menu");
 
   if (firstEncoder.buttonPressed) {
     switch (selectedMenuItem) {
       case MENU_RESET_POSITION:
         currentState = ST_RESET_POSITION;
         refreshDisplay = true;
-        Serial.println("Button Pressed");
         delay(200);
         return;
         
@@ -62,8 +62,8 @@ void mainMenu() {
         
 
       case MENU_CREATE_PROGRAM:
-        programStepCount = 0;
-        currentStep = -1;
+        localProgramStepCount = 0;
+        localProgramCurrentStep = -1;
         currentState = ST_CREATE_PROGRAM;
         refreshDisplay = true;
         delay(200);
@@ -81,8 +81,17 @@ void mainMenu() {
         delay(200);
         return;
 
-      case MENU_DEMO:
-        break;
+      case MENU_SELF_TEST:
+        currentState = ST_SELF_TEST;
+        refreshDisplay = true;
+        delay(200);
+        return;
+
+      case MENU_COMPACT_POSITION:
+        currentState = ST_COMPACT_POSITION;
+        refreshDisplay = true;
+        delay(200);
+        return;
     }
   }
 
@@ -104,7 +113,7 @@ void mainMenu() {
     refreshDisplay = true;
   }
   if (firstEncoder.direction > 0) {
-    selectedMenuItem = MIN(selectedMenuItem + 1, 4);
+    selectedMenuItem = MIN(selectedMenuItem + 1, 6);
     refreshDisplay = true;
   }
 
@@ -119,139 +128,125 @@ void mainMenu() {
 }
 
 void resetPosition() {
-  currentInputX = startX;
-  currentInputY = startY;
-  currentInputZ = startZ;
-  currentInputAngle = startAngle;
+  selectedInputX = startX;
+  selectedInputY = startY;
+  selectedInputZ = startZ;
+  selectedInputAngle = startAngle;
   currentlyPumpEnabled = false;
   beforePumpEnabled = false;
 
-  startX;
-  realY = startY;
-  realZ = startZ;
-  realAngle = startAngle;
-
+  startManualMovement(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle, MV_LOCAL_MANUAL);
   currentState = ST_MAIN_MENU;
 }
 
-void createProgram() {
-//  Serial.println("Create program");
-}
 
 void manualMode() {
-//  Serial.println("Manual mode");
 
   if (refreshDisplay) {
-
     char firstLine[20];
-    sprintf(firstLine, "XYZ:%3d,%3d,%3d", currentInputX, currentInputY, currentInputZ);
+    sprintf(firstLine, "XYZ:%3d,%3d,%3d", selectedInputX, selectedInputY, selectedInputZ);
     
-
     char secondLine[20];
-    sprintf(secondLine, "A:%-3d Pump:%s #%d", currentInputAngle, currentlyPumpEnabled ? "1" : "0", currentStep + 1 );
+    sprintf(secondLine, "A:%-3d Pump:%s #%d", selectedInputAngle, currentlyPumpEnabled ? "1" : "0", localProgramCurrentStep + 1 );
     
-
-
     displayStrings(String(firstLine), String(secondLine), lcd);
     refreshDisplay = false;
   }
 
-  manualMovement();
-
   if (firstEncoder.direction < 0) {
-    int step = stepSize(currentInputXUpdate, millis());
-    currentInputX = MAX(currentInputX - step, minInputX);
-//    realX = currentInputX;
-    updateNextServoAngles(true);
-    currentInputXUpdate = millis();
+    int step = stepSize(selectedInputXUpdate, millis());
+    selectedInputX = MAX(selectedInputX - step, minInputX);
+    checkInputCoordinateLimits(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
+    selectedInputXUpdate = millis();
+    lastMovementSource = MV_LOCAL_MANUAL;
     refreshDisplay = true;
     return;
   }
   if (firstEncoder.direction > 0) {
-    int step = stepSize(currentInputXUpdate, millis());
-    currentInputX = MIN(currentInputX + step, maxInputX);
-    updateNextServoAngles(true);
-//    realX = currentInputX;
-    currentInputXUpdate = millis();
+    int step = stepSize(selectedInputXUpdate, millis());
+    selectedInputX = MIN(selectedInputX + step, maxInputX);
+    checkInputCoordinateLimits(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
+    selectedInputXUpdate = millis();
+    lastMovementSource = MV_LOCAL_MANUAL;
     refreshDisplay = true;
     return;
   }
 
   if (secondEncoder.direction < 0) {
-    int step = stepSize(currentInputYUpdate, millis());
-    currentInputY = MAX(currentInputY - step, minInputY);
-    updateNextServoAngles(true);
-//    realY = minRealY + ((currentInputY - minInputY) / float(maxInputY - minInputY)) * (maxRealY - minRealY);
-    currentInputYUpdate = millis();
+    int step = stepSize(selectedInputYUpdate, millis());
+    selectedInputY = MAX(selectedInputY - step, minInputY);
+    checkInputCoordinateLimits(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
+    selectedInputYUpdate = millis();
+    lastMovementSource = MV_LOCAL_MANUAL;
     refreshDisplay = true;
     return;
   }
   if (secondEncoder.direction > 0) {
-    int step = stepSize(currentInputYUpdate, millis());
-    currentInputY = MIN(currentInputY + step, maxInputY);
-    updateNextServoAngles(true);
-//    realY = minRealY + ((currentInputY - minInputY) / float(maxInputY - minInputY)) * (maxRealY - minRealY);
-    currentInputYUpdate = millis();
+    int step = stepSize(selectedInputYUpdate, millis());
+    selectedInputY = MIN(selectedInputY + step, maxInputY);
+    checkInputCoordinateLimits(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
+    selectedInputYUpdate = millis();
+    lastMovementSource = MV_LOCAL_MANUAL;
     refreshDisplay = true;
     return;
   }
 
   if (thirdEncoder.direction < 0) {
-    int step = stepSize(currentInputZUpdate, millis());
-    currentInputZ = MAX(currentInputZ - step, minInputZ);
-    updateNextServoAngles(true);
-//    realZ = minRealZ + ((currentInputZ - minInputZ) / float(maxInputZ - minInputZ)) * (maxRealZ - minRealZ);
-    currentInputZUpdate = millis();
+    int step = stepSize(selectedInputZUpdate, millis());
+    selectedInputZ = MAX(selectedInputZ - step, minInputZ);
+    checkInputCoordinateLimits(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
+    selectedInputZUpdate = millis();
+    lastMovementSource = MV_LOCAL_MANUAL;
     refreshDisplay = true;
     return;
   }
   if (thirdEncoder.direction > 0) {
-    int step = stepSize(currentInputZUpdate, millis());
-    currentInputZ = MIN(currentInputZ + step, maxInputZ);
-    updateNextServoAngles(true);
-//    realZ = minRealZ + (currentInputZ - minInputZ) / float(maxInputZ - minInputZ) * (maxRealZ - minRealZ);
-    currentInputZUpdate = millis();
+    int step = stepSize(selectedInputZUpdate, millis());
+    selectedInputZ = MIN(selectedInputZ + step, maxInputZ);
+    checkInputCoordinateLimits(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
+    selectedInputZUpdate = millis();
+    lastMovementSource = MV_LOCAL_MANUAL;
     refreshDisplay = true;
     return;
   }
 
   if (fourthEncoder.direction < 0) {
-    int step = stepSize(currentInputAngleUpdate, millis());
-    currentInputAngle = MAX(currentInputAngle - step, minInputAngle);
-    updateNextServoAngles(true);
-//    realAngle = currentInputAngle;
-    currentInputZUpdate = millis();
+    int step = stepSize(selectedInputAngleUpdate, millis());
+    selectedInputAngle = MAX(selectedInputAngle - step, minInputAngle);
+    checkInputCoordinateLimits(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
+    selectedInputZUpdate = millis();
+    lastMovementSource = MV_LOCAL_MANUAL;
     refreshDisplay = true;
     return;
   }
   if (fourthEncoder.direction > 0) {
-    int step = stepSize(currentInputAngleUpdate, millis());
+    int step = stepSize(selectedInputAngleUpdate, millis());
     if (encoder4normalDirection) {
-      currentInputAngle = MIN(currentInputAngle + step, maxInputAngle);  
+      selectedInputAngle = MIN(selectedInputAngle + step, maxInputAngle);  
     }
     else {
-      currentInputAngle = MAX(currentInputAngle - step, 0);
+      selectedInputAngle = MAX(selectedInputAngle - step, 0);
     }
-    updateNextServoAngles(true);
-//    realAngle = currentInputAngle;
-    currentInputAngleUpdate = millis();
+    checkInputCoordinateLimits(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle);
+    selectedInputAngleUpdate = millis();
+    lastMovementSource = MV_LOCAL_MANUAL;
     refreshDisplay = true;
     return;
   }
 
   if (firstEncoder.buttonPressed && currentState == ST_CREATE_PROGRAM) {
     struct ProgramStep newStep;
-    newStep.x = currentInputX;
-    newStep.y = currentInputY;
-    newStep.z = currentInputZ;
-    newStep.angle = currentInputAngle;
+    newStep.x = selectedInputX;
+    newStep.y = selectedInputY;
+    newStep.z = selectedInputZ;
+    newStep.angle = selectedInputAngle;
     newStep.pump = currentlyPumpEnabled;
     newStep.duration = 1000;
     newStep.pauseBefore = 300;
     newStep.pauseAfter = 300;
-    currentStep++;
-    programStepCount++;
-    program[currentStep] = newStep;
+    localProgramCurrentStep++;
+    localProgramStepCount++;
+    localProgram[localProgramCurrentStep] = newStep;
 
     refreshDisplay = true;
     delay(200);
@@ -260,7 +255,7 @@ void manualMode() {
 
   // Return to main menu
   if (secondEncoder.buttonPressed) {
-    currentStep = -1;
+    localProgramCurrentStep = -1;
     currentState = ST_MAIN_MENU;
     refreshDisplay = true;
     delay(200);
@@ -270,6 +265,7 @@ void manualMode() {
   if (thirdEncoder.buttonPressed) {
     currentlyPumpEnabled = !currentlyPumpEnabled;
     refreshDisplay = true;
+    lastMovementSource = MV_LOCAL_MANUAL;
     delay(200);
     return;
   }
@@ -277,6 +273,14 @@ void manualMode() {
   if (fourthEncoder.buttonPressed) {
     encoder4normalDirection = !encoder4normalDirection;
   }
+
+  
+
+//  // Start movement after 1s pause
+//  long now = millis();
+//  if ((now - selectedInputXUpdate > pauseBeforeManualMovement) && (now - selectedInputYUpdate > pauseBeforeManualMovement) && (now - selectedInputZUpdate > pauseBeforeManualMovement) && (now - selectedInputAngleUpdate > pauseBeforeManualMovement)) {
+//    startManualMovement(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle, MV_LOCAL_MANUAL);
+//  }
 }
 
 void bluetoothMode() {
@@ -325,6 +329,56 @@ void confirmProgramStep() {
   }
 }
 
+void selfTest() {
+  if (firstEncoder.buttonPressed) {
+    currentState = ST_SELF_TEST_PROGRESS;
+    testType = selectedTestMenuItem;
+    testState = 0;
+    refreshDisplay = true;
+    delay(200);
+    return;
+  }
+
+  if (secondEncoder.buttonPressed) {
+    currentState = ST_MAIN_MENU;
+    refreshDisplay = true;
+    return;
+  }
+  
+  if (refreshDisplay) {
+    String first = ((selectedTestMenuItem == testMenuOffset) ? "> ": "  ") + testMenuItems[testMenuOffset];
+    String second = ((selectedTestMenuItem == testMenuOffset + 1) ? "> ": "  ") + testMenuItems[testMenuOffset + 1];
+    displayStrings(first, second, lcd);
+    refreshDisplay = false;
+  }
+
+  if (firstEncoder.direction < 0) {
+    selectedTestMenuItem = MAX(selectedTestMenuItem - 1, 0);
+    refreshDisplay = true;
+  }
+  if (firstEncoder.direction > 0) {
+    selectedTestMenuItem = MIN(selectedTestMenuItem + 1, 7);
+    refreshDisplay = true;
+  }
+
+  if (selectedTestMenuItem > testMenuOffset + 1) {
+    testMenuOffset = selectedTestMenuItem - 1;
+    refreshDisplay = true;
+  }
+  else if (selectedTestMenuItem < testMenuOffset) {
+    testMenuOffset = selectedTestMenuItem;
+    refreshDisplay = true;
+  }
+}
+
+void compactPosition() {
+  servo1Angle = 90;
+  servo2Angle = 90;
+  servo3Angle = 90;
+  servo4Angle = 90;
+
+  currentState = ST_MAIN_MENU;
+}
 
 void processState() {
 
@@ -346,7 +400,7 @@ void processState() {
    }
 
   case ST_PLAY_PROGRAM: {
-      playProgram();
+      playLocalProgram();
       return;
     }
     
@@ -362,6 +416,22 @@ void processState() {
     
   case ST_BLUETOOTH_MODE: {
       bluetoothMode();
+      return;
+    }
+
+  case ST_SELF_TEST: {
+      selfTest();
+      return;
+    }
+
+  case ST_SELF_TEST_PROGRESS: {
+      selfTestProgress();
+      return;
+    }
+
+
+  case ST_COMPACT_POSITION: {
+      compactPosition();
       return;
     }
           

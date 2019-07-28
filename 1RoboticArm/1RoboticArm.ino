@@ -59,26 +59,58 @@ int freq = 5000;
 ////////////////////////////////////////////////////////////////////////
 // Movement
 
-bool immediately = false;
+#define MV_NONE                           0
+#define MV_LOCAL_MANUAL                   1
+#define MV_LOCAL_PROGRAM                  2
+#define MV_REMOTE_MANUAL                  3
+#define MV_REMOTE_PROGRAM                 4
+#define MV_TEST                           5
+
+int movementType = MV_NONE;
+int lastMovementSource = MV_NONE;
+
+long lastBluetoothUpdate = -1;
+long bluetoothStepDuration = 0;
+float movementTolerance = 0.0001;
 
 // Initial values of X, Y, Z
 const int startX = 90;
-const int startY = 11;
+const int startY = 50;
 const int startZ = 0;
 const int startAngle = 90;
 
-// Current input positions
+// Input coordinates used for initial movement (in manual movement mode)
+int fromInputX = startX;
+int fromInputY = startY;
+int fromInputZ = startZ;
+int fromInputAngle = startAngle;
+
+// Input coordinates used for initial movement (in manual movement mode)
+int targetInputX = startX;
+int targetInputY = startY;
+int targetInputZ = startZ;
+int targetInputAngle = startAngle;
+
+// Input coordinates used for target movement (in manual movement mode)
+int selectedInputX = startX;
+int selectedInputY = startY;
+int selectedInputZ = startZ;
+int selectedInputAngle = startAngle;
+
+// Timestamps of X, Y, Z updates
+long selectedInputXUpdate = 0;
+long selectedInputYUpdate = 0;
+long selectedInputZUpdate = 0;
+long selectedInputAngleUpdate = 0;
+
+// Current input positions (in manual movement mode)
 int currentInputX = startX;
 int currentInputY = startY;
 int currentInputZ = startZ;
 int currentInputAngle = startAngle;
 bool currentlyPumpEnabled = false;
 
-// Timestamps of X, Y, Z updates
-long currentInputXUpdate = 0;
-long currentInputYUpdate = 0;
-long currentInputZUpdate = 0;
-long currentInputAngleUpdate = 0;
+const long pauseBeforeManualMovement = 1000;
 
 // Last input positions
 int lastInputX = 90;
@@ -98,53 +130,69 @@ const int minInputAngle = 0;
 const int maxInputAngle = 180;
 
 // Real float position
-float realX = startX;
-float realY = startY;
-float realZ = startZ;
-float realAngle = startAngle;
+//float realX = startX;
+//float realY = startY;
+//float realZ = startZ;
+//float realAngle = startAngle;
 
 // Limits for real movement
 const float minRealX = 0;
 const float maxRealX = 180;
-const float minRealY = 3;
+const float minRealY = 2.8;
 const float maxRealY = 25;  // 16
 const float minRealZ = 10;   // 6
-const float maxRealZ = 30;  // 20
+const float maxRealZ = 33;  // 20
 const float minRealAngle = 0;
 const float maxRealAngle = 180;
 
+// Temporary values
+float numberX;
+float numberY;
+float numberZ;
+float numberAngle;
 
 ////////////////////////////////////////////////////////////////////////
 // Servo Angles
 
+float previousServo1Angle = 90;
+float previousServo2Angle = 90;
+float previousServo3Angle = 90;
+float previousServo4Angle = 90;
+
+// Servo angles - initial values are computed from startX, startY, startZ, startAngle
 float servo1Angle = 90;
-float servo2Angle = 90;
-float servo3Angle = 90;
-float servo4Angle = 90;
+float servo2Angle = 87.97;
+float servo3Angle = 78.03;
+float servo4Angle = 91.00;
 
 // Immediate results of conversion
-float convertedServo1Angle = 90;
-float convertedServo2Angle = 90;
-float convertedServo3Angle = 90;
-float convertedServo4Angle = 90;
+//float convertedServo1Angle = 90;
+//float convertedServo2Angle = 90;
+//float convertedServo3Angle = 90;
+//float convertedServo4Angle = 90;
 
 // Previous angles for movement
-float lastServo1Angle = 90;
-float lastServo2Angle = 90;
-float lastServo3Angle = 90;
-float lastServo4Angle = 90;
+//float lastServo1Angle = 90;
+//float lastServo2Angle = 90;
+//float lastServo3Angle = 90;
+//float lastServo4Angle = 90;
 
-float nextServo1Angle = 90;
-float nextServo2Angle = 90;
-float nextServo3Angle = 90;
-float nextServo4Angle = 90;
+float fromServo1Angle = 90;
+float fromServo2Angle = 90;
+float fromServo3Angle = 90;
+float fromServo4Angle = 90;
+
+float toServo1Angle = 90;
+float toServo2Angle = 90;
+float toServo3Angle = 90;
+float toServo4Angle = 90;
 
 const float minServo1Angle = 0;
 const float maxServo1Angle = 180;
-const float minServo2Angle = 0;
-const float maxServo2Angle = 110;  // 16
-const float minServo3Angle = 0;   // 6
-const float maxServo3Angle = 112;  // 20
+const float minServo2Angle = 10;
+const float maxServo2Angle = 90;  // 16
+const float minServo3Angle = 30;   // 6
+const float maxServo3Angle = 90;  // 20
 const float minServo4Angle = 0;
 const float maxServo4Angle = 180;
 
@@ -152,12 +200,12 @@ const float maxServo4Angle = 180;
 const int minPulseWidth = 500;
 const int maxPulseWidth = 2500;
 
-const int minEpsilon = 0;
-const int maxEpsilon = 90;
-const int minGama = 0;
-const int maxGama = 90;
-const int minDelta = 0;
-const int maxDelta = 90;
+//const int minEpsilon = 0;
+//const int maxEpsilon = 90;
+//const int minGama = 0;
+//const int maxGama = 90;
+//const int minDelta = 0;
+//const int maxDelta = 90;
 
 const double baseHeight = 11;         // vyska zakladny 11 cm
 const double armSegmentLength = 20;   // delka casti ramena 20 cm
@@ -171,7 +219,6 @@ Servo servo2;
 Servo servo3;
 Servo servo4;
 
-
 ////////////////////////////////////////////////////////////////////////
 // State
 
@@ -184,21 +231,26 @@ Servo servo4;
 #define ST_CREATE_PROGRAM_CONFIRM_STEP    31
 #define ST_MANUAL_MODE                    40
 #define ST_BLUETOOTH_MODE                 50
+#define ST_SELF_TEST                      60
+#define ST_SELF_TEST_PROGRESS             61
+#define ST_COMPACT_POSITION               70
+
+int currentState = ST_INITIAL;
+int loopPhase = 0;
 
 ////////////////////////////////////////////////////////////////////////
 // Menu
 
-#define MENU_RESET_POSITION 0
-#define MENU_PLAY_PROGRAM   1
-#define MENU_CREATE_PROGRAM 2
-#define MENU_MANUAL_MODE    3
-#define MENU_BLUETOOTH_MODE 4
-#define MENU_DEMO           5
+#define MENU_RESET_POSITION       0
+#define MENU_PLAY_PROGRAM         1
+#define MENU_CREATE_PROGRAM       2
+#define MENU_MANUAL_MODE          3
+#define MENU_BLUETOOTH_MODE       4
+#define MENU_SELF_TEST            5
+#define MENU_COMPACT_POSITION     6
 
-int currentState = ST_INITIAL;
 int selectedMenuItem = 0;
 int menuOffset = 0;
-
 bool refreshDisplay = true;
 
 ////////////////////////////////////////////////////////////////////////
@@ -209,29 +261,79 @@ bool refreshDisplay = true;
 #define STEP_MOVEMENT 2
 #define STEP_PAUSE_AFTER 3
 
-#define MOVE_BEGIN 0
-#define MOVE_IN_PROGRESS 1
-#define MOVE_FINISHED 2
+#define MOVE_NONE 0
+#define MOVE_BEGIN 1
+#define MOVE_IN_PROGRESS 2
+#define MOVE_FINISHED 3
 
-int movePhase = MOVE_FINISHED;
-const int moveStepDuration = 1500;
-
-const int maxStepCount = 20;
+int movePhase = MOVE_NONE;
+const int defaultMoveDuration = 1700;
+int moveDuration = defaultMoveDuration;
 
 struct ProgramStep {
-  int x;
-  int y;
-  int z;
-  int angle;
+  float x;
+  float y;
+  float z;
+  float angle;
   bool pump;
   int duration;
   int pauseBefore;
   int pauseAfter;
+  long timing;
 };
 
-struct ProgramStep program[maxStepCount];
+// Local program
+const int localProgramMaxStepCount = 20;
+struct ProgramStep localProgram[localProgramMaxStepCount];
+int localProgramStepCount = 0;
+int localProgramCurrentStep = -1;
+int localProgramCurrentStepPhase = STEP_INITIAL;
 
-int programStepCount = 0;
-int currentStep = -1;
-int currentStepPhase = STEP_INITIAL;
+// Remote program
+const int remoteProgramMaxStepCount = 100;
+struct ProgramStep remoteProgram[remoteProgramMaxStepCount];
+int remoteProgramStepCount = 0;
+int remoteProgramCurrentStep = -1;
+int remoteProgramCurrentStepPhase = STEP_INITIAL;
+
 unsigned long currentStepBegin = 0;
+
+unsigned long lastRemoteProgramUpdate = 0;
+
+////////////////////////////////////////////////////////////////////////
+// Self-Test
+
+#define TEST_MENU_SERVO_1_SLOW         0
+#define TEST_MENU_SERVO_2_SLOW         1
+#define TEST_MENU_SERVO_3_SLOW         2
+#define TEST_MENU_SERVO_4_SLOW         3
+#define TEST_MENU_SERVO_1_FAST         4
+#define TEST_MENU_SERVO_2_FAST         5
+#define TEST_MENU_SERVO_3_FAST         6
+#define TEST_MENU_SERVO_4_FAST         7
+
+int testType;
+int testState;
+unsigned long testPhaseStart;
+unsigned long testPhaseLength;
+unsigned long testPhaseTimeDelta;
+
+const unsigned long slowSpeed = 7000;
+const unsigned long fastSpeed = 2000;
+
+
+
+int selectedTestMenuItem = 0;
+int testMenuOffset = 0;
+String testFirstLine;
+String testSecondLine;
+
+
+
+////////////////////////////////////////////////////////////////////////
+// Helpers
+
+bool equal(float a, float b) {
+ return fabs(a-b) < movementTolerance;
+}
+

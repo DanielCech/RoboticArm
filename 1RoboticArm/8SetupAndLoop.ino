@@ -43,7 +43,9 @@ void setup() {
   pinMode(pumpPin, OUTPUT);  // !! important for pump
 }
 
-
+int pulseWidthForAngle(float angle) {
+  return 500 + (angle / 180.0) * 2000;
+}
 
 
 void loop() {
@@ -60,28 +62,8 @@ void loop() {
     digitalWrite(pumpPin, currentlyPumpEnabled ? HIGH : LOW);
     beforePumpEnabled = currentlyPumpEnabled;
   }
-  
-//  servo1Angle = currentX;
-//  servo2Angle = currentY;
-//  servo3Angle = currentZ;
-//  servo4Angle = currentAngle;
-//  checkCoordinateLimits();
 
-  if ((currentState != ST_PLAY_PROGRAM) && (currentState != ST_MANUAL_MODE)) {
-    checkRealCoordinateLimits();
-    convertCoordinatesToAngles(realX, realY, realZ, realAngle);
-    servo1Angle = convertedServo1Angle;
-    servo2Angle = convertedServo2Angle;
-    servo3Angle = convertedServo3Angle;  
-    servo4Angle = convertedServo4Angle;
-  }
-
-  checkServoAngleLimits();
-  
-  servo1.write(servo1Angle);
-  servo2.write(servo2Angle);
-  servo3.write(servo3Angle);
-  servo4.write(servo4Angle); 
+  movement();
 }
 
 
