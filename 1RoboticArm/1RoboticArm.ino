@@ -250,6 +250,10 @@ bool refreshDisplay = true;
 #define MOVE_IN_PROGRESS 2
 #define MOVE_FINISHED 3
 
+#define COMMAND_MANUAL    0
+#define COMMAND_MOVE      1
+#define COMMAND_CIRCULAR  2
+
 int movePhase = MOVE_NONE;
 //const int defaultMoveDuration = 1700;
 //int moveDuration = defaultMoveDuration;
@@ -272,17 +276,11 @@ struct ProgramStep localProgram[localProgramMaxStepCount];
 int localProgramStepCount = 0;
 int localProgramCurrentStep = -1;
 int localProgramCurrentStepPhase = STEP_INITIAL;
-
-// Remote program
-const int remoteProgramMaxStepCount = 100;
-struct ProgramStep remoteProgram[remoteProgramMaxStepCount];
-int remoteProgramStepCount = 0;
-int remoteProgramCurrentStep = -1;
-int remoteProgramCurrentStepPhase = STEP_INITIAL;
-
 unsigned long currentStepBegin = 0;
 
-unsigned long lastRemoteProgramUpdate = 0;
+// Remote program
+
+
 
 ////////////////////////////////////////////////////////////////////////
 // Self-Test
