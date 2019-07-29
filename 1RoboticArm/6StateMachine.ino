@@ -5,7 +5,7 @@ bool bluetoothModeSelection = false;
 bool bluetoothModeEnabled = false;
 
 String menuItems[] = {"Reset Position", "Play Program", "Create Program", "Manual Mode", "Bluetooth Mode", "Self-Test", "Compactify"};
-String testMenuItems[] = {"Servo1 Slow", "Servo2 Slow", "Servo3 Slow", "Servo4 Slow", "Servo1 Fast", "Servo2 Fast", "Servo3 Fast", "Servo4 Fast"};
+String testMenuItems[] = {"Servo1 Slow", "Servo2 Slow", "Servo3 Slow", "Servo4 Slow", "Servo1 Fast", "Servo2 Fast", "Servo3 Fast", "Servo4 Fast", "Random coords"};
 
 int stepSize(long before, long after) {
   long difference = after - before;
@@ -273,14 +273,6 @@ void manualMode() {
   if (fourthEncoder.buttonPressed) {
     encoder4normalDirection = !encoder4normalDirection;
   }
-
-  
-
-//  // Start movement after 1s pause
-//  long now = millis();
-//  if ((now - selectedInputXUpdate > pauseBeforeManualMovement) && (now - selectedInputYUpdate > pauseBeforeManualMovement) && (now - selectedInputZUpdate > pauseBeforeManualMovement) && (now - selectedInputAngleUpdate > pauseBeforeManualMovement)) {
-//    startManualMovement(selectedInputX, selectedInputY, selectedInputZ, selectedInputAngle, MV_LOCAL_MANUAL);
-//  }
 }
 
 void bluetoothMode() {
@@ -357,7 +349,7 @@ void selfTest() {
     refreshDisplay = true;
   }
   if (firstEncoder.direction > 0) {
-    selectedTestMenuItem = MIN(selectedTestMenuItem + 1, 7);
+    selectedTestMenuItem = MIN(selectedTestMenuItem + 1, 8);
     refreshDisplay = true;
   }
 

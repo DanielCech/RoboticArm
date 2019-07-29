@@ -51,6 +51,10 @@ void selfTestProgress() {
         testPhaseLength = fastSpeed;
         testServo4();
         break;
+
+      case TEST_MENU_RANDOM_COORDS:
+        testRandomCoords();
+        break;
     }
 
     if (refreshDisplay) {
@@ -208,3 +212,47 @@ void testServo4() {
     break;
   }
 }
+
+void testRandomCoords() {
+  testFirstLine = "Random Coords";
+  testSecondLine = "";
+
+  switch (testState) {
+    case 0: {
+      testPhaseStart = millis();
+      testState = 1;
+      break;
+    }
+  
+    case 1: {
+      testPhaseTimeDelta = millis() - testPhaseStart;
+      if (testPhaseTimeDelta < 5000) {
+        // Do nothing
+      }
+      else {
+        testState = 2;
+      }
+      break;
+    }
+  
+    case 2: {
+      int randomX = random(180);
+      int randomY = random(70);
+      int randomZ = random(150);
+      int randomAngle = 90;
+      startManualMovement(randomX, randomY, randomZ, randomAngle, MV_TEST);
+      testState = 3;
+      break;
+    }
+  
+    case 3: {
+      manualMovement(&finishStep);
+      break;
+    }
+  }
+}
+
+void finishStep() {
+  testState = 0;
+}
+
