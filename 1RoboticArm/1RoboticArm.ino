@@ -295,6 +295,7 @@ unsigned long lastRemoteProgramUpdate = 0;
 #define TEST_MENU_SERVO_2_FAST         5
 #define TEST_MENU_SERVO_3_FAST         6
 #define TEST_MENU_SERVO_4_FAST         7
+#define TEST_MENU_RANDOM_COORDS        8
 
 int testType;
 int testState;

@@ -63,7 +63,7 @@ void movement() {
       
     case MV_LOCAL_MANUAL:
     case MV_REMOTE_MANUAL:
-      manualMovement();
+      manualMovement(NULL);
       break;
 
     // TODO: complete
@@ -99,7 +99,7 @@ void moveServos() {
   previousServo4Angle = servo4Angle;
 }
 
-void manualMovement() {  
+void manualMovement(void (*completion)()) {  
   switch (movePhase) {
     case MOVE_NONE:
       break;
@@ -114,8 +114,6 @@ void manualMovement() {
     case MOVE_IN_PROGRESS: {      
       double timeDelta = millis() - currentStepBegin;
       if (timeDelta <= moveDuration) {
-//        double progress = easeInOutCubic(timeDelta / (double)moveDuration);
-
         double servo1Progress = MIN(easeInOutCubic(timeDelta / (double)servo1MoveDuration), 1);
         double servo2Progress = MIN(easeInOutCubic(timeDelta / (double)servo2MoveDuration), 1);
         double servo3Progress = MIN(easeInOutCubic(timeDelta / (double)servo3MoveDuration), 1);
@@ -126,12 +124,7 @@ void manualMovement() {
         servo3Angle = fromServo3Angle + (toServo3Angle - fromServo3Angle) * servo3Progress;
         servo4Angle = fromServo4Angle + (toServo4Angle - fromServo4Angle) * servo4Progress;
       }
-      else {
-//        servo1Angle = toServo1Angle;
-//        servo2Angle = toServo2Angle;
-//        servo3Angle = toServo3Angle;
-//        servo4Angle = toServo4Angle;
-        
+      else { 
         movePhase = MOVE_FINISHED;
       }
       return;
@@ -145,6 +138,11 @@ void manualMovement() {
       currentInputAngle = targetInputAngle;
       movePhase = MOVE_NONE;
       movementType = MV_NONE;
+
+      if (completion != NULL) {
+        (*completion)();  
+      }
+      
       return;
     }
   }
@@ -335,7 +333,7 @@ void playLocalProgram() {
 
     case STEP_MOVEMENT: {
       moveDuration = currentProgramStep.duration;
-      manualMovement();
+      manualMovement(NULL);
 
       if (movePhase == MOVE_FINISHED) {
         localProgramCurrentStepPhase = STEP_PAUSE_AFTER;
