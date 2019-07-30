@@ -38,7 +38,7 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
         std::string stringY = receivedMessage.substr(5, 4);
         std::string stringZ = receivedMessage.substr(9, 4);
         std::string stringAngle = receivedMessage.substr(13, 4);
-        std::string stringPump = receivedMessage.substr(17, 1);
+        std::string stringPump = receivedMessage.substr(18, 1);
         
 //        std::string stringControlServos = receivedMessage.substr(18, 1);
 
@@ -86,6 +86,8 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
             break;
 
           case COMMAND_MOVE:
+            movementType = MV_REMOTE_PROGRAM;
+            lastMovementSource = MV_REMOTE_PROGRAM;
             startManualMovement(numberX, numberY, numberZ, numberAngle, MV_TEST); 
             break;
 
@@ -210,7 +212,7 @@ void enableBluetooth() {
   
   // Control characteristic
   pService = pServer->createService(SERVICE_UUID);
-  pCharControl = pService->createCharacteristic(CONTROL_UUID, BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE);
+  pCharControl = pService->createCharacteristic(CONTROL_UUID, BLECharacteristic::PROPERTY_READ | BLECharacteristic::PROPERTY_WRITE | BLECharacteristic::PROPERTY_NOTIFY);
   pCharControl->setCallbacks(new ControlCallbacks());
   pCharControl->addDescriptor(new BLE2902());
   
