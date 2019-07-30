@@ -33,22 +33,24 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
      
       if (receivedMessage.length() > 0) {
         
-        std::string stringX = receivedMessage.substr(0, 4);
-        std::string stringY = receivedMessage.substr(4, 4);
-        std::string stringZ = receivedMessage.substr(8, 4);
-        std::string stringAngle = receivedMessage.substr(12, 4);
-        std::string stringPump = receivedMessage.substr(16, 1);
-        std::string stringCommand = receivedMessage.substr(17, 1);
+        std::string stringCommand = receivedMessage.substr(0, 1);
+        std::string stringX = receivedMessage.substr(1, 4);
+        std::string stringY = receivedMessage.substr(5, 4);
+        std::string stringZ = receivedMessage.substr(9, 4);
+        std::string stringAngle = receivedMessage.substr(13, 4);
+        std::string stringPump = receivedMessage.substr(17, 1);
+        
 //        std::string stringControlServos = receivedMessage.substr(18, 1);
 
         //Serial.printf("sX:%s sY:%s sZ:%s sAngle:%s sPump:%s", stringX.c_str(), stringY.c_str(), stringZ.c_str(), stringAngle.c_str(), stringPump.c_str());
 
+        int numberCommand = (int)strtol(stringCommand.c_str(), NULL, 16);
         numberX = (float)strtol(stringX.c_str(), NULL, 16) / 10;
         numberY = (float)strtol(stringY.c_str(), NULL, 16) / 10;
         numberZ = (float)strtol(stringZ.c_str(), NULL, 16) / 10;
         numberAngle = (float)strtol(stringAngle.c_str(), NULL, 16) / 10;
         int numberPump = (int)strtol(stringPump.c_str(), NULL, 16);
-        int numberCommand = (int)strtol(stringCommand.c_str(), NULL, 16);
+        
 //        int numberControlServos = (int)strtol(stringControlServos.c_str(), NULL, 16);
 
         checkInputFloatCoordinateLimits(numberX, numberY, numberZ, numberAngle);
@@ -73,25 +75,43 @@ class ControlCallbacks: public BLECharacteristicCallbacks {
 //            break;
 //        }
 
-        
-        if (numberCommand == COMMAND_MANUAL) {
-          lastMovementSource = MV_REMOTE_MANUAL;
-          selectedInputXUpdate = selectedInputYUpdate = selectedInputZUpdate = selectedInputAngleUpdate = millis();
-          currentlyPumpEnabled = (numberPump > 0);
-        }
-        else {
-          lastMovementSource = MV_REMOTE_PROGRAM;
-          movementType = MV_REMOTE_PROGRAM;
-          
-          if (numberCommand == COMMAND_MOVE) {
+        switch (numberCommand) {
+          case COMMAND_NONE:
+            break;
+
+          case COMMAND_MANUAL:
+            lastMovementSource = MV_REMOTE_MANUAL;
+            selectedInputXUpdate = selectedInputYUpdate = selectedInputZUpdate = selectedInputAngleUpdate = millis();
+            currentlyPumpEnabled = (numberPump > 0);
+            break;
+
+          case COMMAND_MOVE:
             startManualMovement(numberX, numberY, numberZ, numberAngle, MV_TEST); 
-          }
-          
+            break;
 
-          
+
+          case COMMAND_CIRCULAR:
+            break;
         }
 
-        
+
+//        
+//        if (numberCommand == COMMAND_MANUAL) {
+//          
+//        }
+//        else {
+//          lastMovementSource = MV_REMOTE_PROGRAM;
+//          movementType = MV_REMOTE_PROGRAM;
+//          
+//          if (numberCommand == COMMAND_MOVE) {
+//            startManualMovement(numberX, numberY, numberZ, numberAngle, MV_TEST); 
+//          }
+//          
+//
+//          
+//        }
+//
+//        
 //        if (mmovementTypeovementType == none) {
 //          if (numberImmediately > 0) {
 //            movementType = remoteProgram;

@@ -250,9 +250,10 @@ bool refreshDisplay = true;
 #define MOVE_IN_PROGRESS 2
 #define MOVE_FINISHED 3
 
-#define COMMAND_MANUAL    0
-#define COMMAND_MOVE      1
-#define COMMAND_CIRCULAR  2
+#define COMMAND_NONE      0
+#define COMMAND_MANUAL    1
+#define COMMAND_MOVE      2
+#define COMMAND_CIRCULAR  3
 
 int movePhase = MOVE_NONE;
 //const int defaultMoveDuration = 1700;
