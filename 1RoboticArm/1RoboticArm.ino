@@ -77,7 +77,7 @@ float movementTolerance = 0.0001;
 const int startX = 90;
 const int startY = 50;
 const int startZ = 0;
-const int startAngle = 90;
+const int startAngle = 0;
 
 // Input coordinates used for initial movement (in manual movement mode)
 int fromInputX = startX;
@@ -127,7 +127,7 @@ const int maxInputY = 200;  // 16
 const int minInputZ = 0;   // 6
 const int maxInputZ = 200;  // 20
 const int minInputAngle = 0;
-const int maxInputAngle = 180;
+const int maxInputAngle = 40;
 
 // Limits for real movement
 const float minRealX = 0;
@@ -137,7 +137,7 @@ const float maxRealY = 25;  // 16
 const float minRealZ = 10;   // 6
 const float maxRealZ = 33;  // 20
 const float minRealAngle = 0;
-const float maxRealAngle = 180;
+const float maxRealAngle = 40;
 
 // Temporary values
 float numberX;
@@ -250,6 +250,11 @@ bool refreshDisplay = true;
 #define MOVE_IN_PROGRESS 2
 #define MOVE_FINISHED 3
 
+#define COMMAND_NONE      0
+#define COMMAND_MANUAL    1
+#define COMMAND_MOVE      2
+#define COMMAND_CIRCULAR  3
+
 int movePhase = MOVE_NONE;
 //const int defaultMoveDuration = 1700;
 //int moveDuration = defaultMoveDuration;
@@ -272,17 +277,11 @@ struct ProgramStep localProgram[localProgramMaxStepCount];
 int localProgramStepCount = 0;
 int localProgramCurrentStep = -1;
 int localProgramCurrentStepPhase = STEP_INITIAL;
-
-// Remote program
-const int remoteProgramMaxStepCount = 100;
-struct ProgramStep remoteProgram[remoteProgramMaxStepCount];
-int remoteProgramStepCount = 0;
-int remoteProgramCurrentStep = -1;
-int remoteProgramCurrentStepPhase = STEP_INITIAL;
-
 unsigned long currentStepBegin = 0;
 
-unsigned long lastRemoteProgramUpdate = 0;
+// Remote program
+
+
 
 ////////////////////////////////////////////////////////////////////////
 // Self-Test
@@ -324,4 +323,3 @@ bool equal(float a, float b) {
 
 #define MAX(x, y) ((x <= y) ? y : x)
 #define MIN(x, y) ((x <= y) ? x : y)
-
