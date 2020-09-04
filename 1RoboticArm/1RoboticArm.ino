@@ -77,7 +77,7 @@ float movementTolerance = 0.0001;
 const int startX = 90;
 const int startY = 50;
 const int startZ = 0;
-const int startAngle = 90;
+const int startAngle = 0;
 
 // Input coordinates used for initial movement (in manual movement mode)
 int fromInputX = startX;
@@ -127,7 +127,7 @@ const int maxInputY = 200;  // 16
 const int minInputZ = 0;   // 6
 const int maxInputZ = 200;  // 20
 const int minInputAngle = 0;
-const int maxInputAngle = 180;
+const int maxInputAngle = 40;
 
 // Limits for real movement
 const float minRealX = 0;
@@ -137,7 +137,7 @@ const float maxRealY = 25;  // 16
 const float minRealZ = 10;   // 6
 const float maxRealZ = 33;  // 20
 const float minRealAngle = 0;
-const float maxRealAngle = 180;
+const float maxRealAngle = 40;
 
 // Temporary values
 float numberX;
@@ -323,4 +323,3 @@ bool equal(float a, float b) {
 
 #define MAX(x, y) ((x <= y) ? y : x)
 #define MIN(x, y) ((x <= y) ? x : y)
-
